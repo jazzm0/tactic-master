@@ -30,7 +30,7 @@ public class ChessboardView extends View {
         darkBrownPaint.setColor(Color.parseColor("#8B4513")); // Darker brown color
         textPaint = new Paint();
         textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(40);
+        textPaint.setTextSize(30);
         textPaint.setAntiAlias(true);
     }
 
@@ -62,7 +62,7 @@ public class ChessboardView extends View {
         // Draw the column labels (a-h)
         for (int col = 0; col < BOARD_SIZE; col++) {
             String label = String.valueOf((char) ('a' + col));
-            float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.6f;
+            float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.8f;
             float y = height - 10;
             canvas.drawText(label, x, y, textPaint);
         }
@@ -71,7 +71,7 @@ public class ChessboardView extends View {
         for (int row = 0; row < BOARD_SIZE; row++) {
             String label = String.valueOf(BOARD_SIZE - row);
             float x = 10;
-            float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .5f;
+            float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .4f;
             canvas.drawText(label, x, y, textPaint);
         }
     }
