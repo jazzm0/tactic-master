@@ -1,15 +1,40 @@
+// src/main/java/com/tacticmaster/board/Chessboard.java
 package com.tacticmaster.board;
 
 import com.tacticmaster.puzzle.Puzzle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Chessboard {
 
     private final char[][] board;
     private boolean whiteToMove;
+    private final List<int[]> moves;
+    private int movesIndex = 0;
 
     public Chessboard(Puzzle puzzle) {
         this.board = new char[8][8];
         setupBoard(puzzle.fen());
+        this.moves = convertMovesToCoordinates(List.of(puzzle.moves().split(" ")));
+    }
+
+    private List<int[]> convertMovesToCoordinates(List<String> moves) {
+        List<int[]> coordinates = new ArrayList<>();
+        for (String move : moves) {
+            int fromCol = move.charAt(0) - 'a';
+            int fromRow = 8 - (move.charAt(1) - '0');
+            int toCol = move.charAt(2) - 'a';
+            int toRow = 8 - (move.charAt(3) - '0');
+
+            if (!whiteToMove) {
+                fromRow = 7 - fromRow;
+                toRow = 7 - toRow;
+            }
+
+            coordinates.add(new int[]{fromRow, fromCol, toRow, toCol});
+        }
+        return coordinates;
     }
 
     private void setupBoard(String fen) {
@@ -45,5 +70,33 @@ public class Chessboard {
 
     public boolean isWhiteToMove() {
         return whiteToMove;
+    }
+
+    public boolean isCorrectMove(int fromRow, int fromCol, int toRow, int toCol) {
+        if (movesIndex >= moves.size()) {
+            return false;
+        }
+        int[] move = moves.get(movesIndex);
+        return move[0] == fromRow && move[1] == fromCol && move[2] == toRow && move[3] == toCol;
+    }
+
+    public void makeNextMove() {
+        int[] move = moves.get(movesIndex);
+        movePiece(move[0], move[1], move[2], move[3]);
+    }
+
+    public boolean movePiece(int fromRow, int fromCol, int toRow, int toCol) {
+        if (Character.isUpperCase(board[fromRow][fromCol]) && Character.isUpperCase(board[toRow][toCol]) ||
+                Character.isLowerCase(board[fromRow][fromCol]) && Character.isLowerCase(board[toRow][toCol]) || board[fromRow][fromCol] == ' ') {
+            return false;
+        }
+        board[toRow][toCol] = board[fromRow][fromCol];
+        board[fromRow][fromCol] = ' ';
+        movesIndex++;
+        return true;
+    }
+
+    public boolean solved() {
+        return movesIndex == moves.size();
     }
 }

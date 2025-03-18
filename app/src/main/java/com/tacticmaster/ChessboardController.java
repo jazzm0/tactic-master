@@ -1,5 +1,7 @@
+// src/main/java/com/tacticmaster/ChessboardController.java
 package com.tacticmaster;
 
+import android.content.Context;
 import android.widget.TextView;
 
 import com.tacticmaster.board.ChessboardView;
@@ -8,7 +10,7 @@ import com.tacticmaster.puzzle.Puzzle;
 
 import java.util.List;
 
-public class ChessboardController {
+public class ChessboardController implements ChessboardView.PuzzleFinishedListener {
 
     private final DatabaseAccessor databaseAccessor;
     private final ChessboardView chessboardView;
@@ -16,18 +18,20 @@ public class ChessboardController {
     private final TextView puzzleRatingTextView;
     private final TextView puzzleThemesTextView;
     private final TextView puzzleMovesTextView;
-
+    private final Context context;
 
     private int currentPuzzleIndex = 0;
     private List<Puzzle> puzzles;
 
-    public ChessboardController(DatabaseAccessor databaseAccessor, ChessboardView chessboardView, TextView puzzleIdTextView, TextView puzzleRatingTextView, TextView puzzleThemesTextView, TextView puzzleMovesTextView) {
+    public ChessboardController(Context context, DatabaseAccessor databaseAccessor, ChessboardView chessboardView, TextView puzzleIdTextView, TextView puzzleRatingTextView, TextView puzzleThemesTextView, TextView puzzleMovesTextView) {
+        this.context = context;
         this.databaseAccessor = databaseAccessor;
         this.chessboardView = chessboardView;
         this.puzzleIdTextView = puzzleIdTextView;
         this.puzzleRatingTextView = puzzleRatingTextView;
         this.puzzleThemesTextView = puzzleThemesTextView;
         this.puzzleMovesTextView = puzzleMovesTextView;
+        this.chessboardView.setPuzzleSolvedListener(this);
     }
 
     public void loadPuzzlesWithRatingGreaterThan(int rating) {
@@ -42,10 +46,10 @@ public class ChessboardController {
         Puzzle puzzle = puzzles.get(currentPuzzleIndex);
         chessboardView.setPuzzle(puzzle);
 
-        puzzleIdTextView.setText("Puzzle ID: " + puzzle.puzzleId());
-        puzzleRatingTextView.setText("Rating: " + puzzle.rating());
-        puzzleThemesTextView.setText("Themes: " + puzzle.themes());
-        puzzleMovesTextView.setText("Moves: " + puzzle.moves());
+        puzzleIdTextView.setText(context.getString(R.string.puzzle_id, puzzle.puzzleId()));
+        puzzleRatingTextView.setText(context.getString(R.string.rating, puzzle.rating()));
+        puzzleThemesTextView.setText(context.getString(R.string.themes, puzzle.themes()));
+        puzzleMovesTextView.setText(context.getString(R.string.moves, puzzle.moves()));
     }
 
     public void loadPreviousPuzzle() {
@@ -62,5 +66,15 @@ public class ChessboardController {
             currentPuzzleIndex = 0;
         }
         renderPuzzle();
+    }
+
+    @Override
+    public void onPuzzleSolved(Puzzle puzzle) {
+        loadNextPuzzle();
+    }
+
+    @Override
+    public void onPuzzleNotSolved(Puzzle puzzle) {
+        loadNextPuzzle();
     }
 }

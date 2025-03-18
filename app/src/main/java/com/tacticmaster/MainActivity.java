@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(this);
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
 
-        chessboardController = new ChessboardController(databaseAccessor, chessboardView, findViewById(R.id.puzzle_id), findViewById(R.id.puzzle_rating), findViewById(R.id.puzzle_themes), findViewById(R.id.puzzle_moves));
+        chessboardController = new ChessboardController(this, databaseAccessor, chessboardView, findViewById(R.id.puzzle_id), findViewById(R.id.puzzle_rating), findViewById(R.id.puzzle_themes), findViewById(R.id.puzzle_moves));
         chessboardController.loadPuzzlesWithRatingGreaterThan(2500);
 
 

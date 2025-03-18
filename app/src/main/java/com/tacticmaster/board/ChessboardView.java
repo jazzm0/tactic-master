@@ -1,3 +1,4 @@
+// src/main/java/com/tacticmaster/board/ChessboardView.java
 package com.tacticmaster.board;
 
 import android.content.Context;
@@ -6,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +20,13 @@ import com.tacticmaster.puzzle.Puzzle;
 
 public class ChessboardView extends View {
 
+    public interface PuzzleFinishedListener {
+        void onPuzzleSolved(Puzzle puzzle);
+
+        void onPuzzleNotSolved(Puzzle puzzle);
+    }
+
+    private static final int NEXT_PUZZLE_DELAY = 3000;
     private Puzzle puzzle;
     private Chessboard chessboard;
     private static final int BOARD_SIZE = 8;
@@ -30,6 +39,8 @@ public class ChessboardView extends View {
     private int selectedRow = -1;
     private int selectedCol = -1;
     private Paint textPaint;
+    private final Handler handler = new Handler();
+    private PuzzleFinishedListener puzzleFinishedListener;
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -78,6 +89,10 @@ public class ChessboardView extends View {
         this.selectedCol = -1;
 
         invalidate(); // Request a redraw
+    }
+
+    public void setPuzzleSolvedListener(PuzzleFinishedListener listener) {
+        this.puzzleFinishedListener = listener;
     }
 
     @Override
@@ -166,6 +181,10 @@ public class ChessboardView extends View {
                     }
                 }
             }
+            // Check if the puzzle is solved
+            if (chessboard.solved() && puzzleFinishedListener != null) {
+                handler.postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(this.puzzle), NEXT_PUZZLE_DELAY);
+            }
         }
     }
 
@@ -200,13 +219,36 @@ public class ChessboardView extends View {
             char piece = chessboard.getBoard()[row][col];
             boolean isWhiteToMove = chessboard.isWhiteToMove();
 
-            if (piece != ' ' && ((isWhiteToMove && Character.isUpperCase(piece)) || (!isWhiteToMove && Character.isLowerCase(piece)))) {
-                selectedRow = row;
-                selectedCol = col;
-                invalidate(); // Request a redraw
-            }
+            if (selectedRow == -1 && selectedCol == -1) {
+                // Select a piece
+                if (piece != ' ' && ((isWhiteToMove && Character.isUpperCase(piece)) || (!isWhiteToMove && Character.isLowerCase(piece)))) {
+                    selectedRow = row;
+                    selectedCol = col;
 
-            Toast.makeText(getContext(), "Clicked: (" + row + ", " + col + ")", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
+                    // Move the selected piece
+                    if (chessboard.movePiece(selectedRow, selectedCol, row, col)) {
+                        selectedRow = -1;
+                        selectedCol = -1;
+
+                        // Post a delayed task to trigger the opponent's move
+                        handler.postDelayed(() -> {
+                            // Trigger the opponent's move
+                            chessboard.makeNextMove();
+                            invalidate();
+                        }, 1300);
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Wrong solution", Toast.LENGTH_SHORT).show();
+
+                    handler.postDelayed(() -> {
+                        puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
+                    }, NEXT_PUZZLE_DELAY);
+                }
+            }
+            invalidate();
             return true;
         }
         return super.onTouchEvent(event);
