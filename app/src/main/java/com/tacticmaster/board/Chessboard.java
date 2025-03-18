@@ -28,7 +28,15 @@ public class Chessboard {
                 }
             }
         }
+
         whiteToMove = parts[1].equals("w");
+        if (!whiteToMove) {
+            for (int i = 0; i < 4; i++) {
+                var src = board[i];
+                board[i] = board[7 - i];
+                board[7 - i] = src;
+            }
+        }
     }
 
     public char[][] getBoard() {

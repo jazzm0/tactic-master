@@ -29,6 +29,7 @@ public class ChessboardView extends View {
     private Bitmap scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook, scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn;
     private int selectedRow = -1;
     private int selectedCol = -1;
+    private Paint textPaint;
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -40,7 +41,7 @@ public class ChessboardView extends View {
         lightBrownPaint.setColor(Color.parseColor("#D2B48C")); // Light brown color
         darkBrownPaint = new Paint();
         darkBrownPaint.setColor(Color.parseColor("#8B4513")); // Darker brown color
-        Paint textPaint = new Paint();
+        textPaint = new Paint();
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(30);
         textPaint.setAntiAlias(true);
@@ -108,10 +109,15 @@ public class ChessboardView extends View {
         int height = getHeight();
         int tileSize = Math.min(width, height) / BOARD_SIZE;
 
+        boolean isWhiteToMove = chessboard.isWhiteToMove();
+
         // Draw the chessboard
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
-                Paint paint = (row + col) % 2 == 0 ? lightBrownPaint : darkBrownPaint;
+                var colorChoice = (col + row) % 2 == 0;
+                if (!isWhiteToMove)
+                    colorChoice = !colorChoice;
+                Paint paint = colorChoice ? lightBrownPaint : darkBrownPaint;
                 int left = col * tileSize;
                 int top = row * tileSize;
                 int right = left + tileSize;
@@ -127,6 +133,22 @@ public class ChessboardView extends View {
             int right = left + tileSize;
             int bottom = top + tileSize;
             canvas.drawRect(left, top, right, bottom, selectionPaint);
+        }
+
+        // Draw the column labels (a-h)
+        for (int col = 0; col < BOARD_SIZE; col++) {
+            String label = String.valueOf((char) ('a' + col));
+            float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.6f;
+            float y = height - 10;
+            canvas.drawText(label, x, y, textPaint);
+        }
+
+        // Draw the row labels (1-8)
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            String label = isWhiteToMove ? String.valueOf(BOARD_SIZE - row) : String.valueOf(row + 1);
+            float x = 10;
+            float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .5f;
+            canvas.drawText(label, x, y, textPaint);
         }
 
         // Draw the pieces
@@ -175,7 +197,10 @@ public class ChessboardView extends View {
             int col = (int) (event.getX() / tileSize);
             int row = (int) (event.getY() / tileSize);
 
-            if (chessboard.getBoard()[row][col] != ' ') {
+            char piece = chessboard.getBoard()[row][col];
+            boolean isWhiteToMove = chessboard.isWhiteToMove();
+
+            if (piece != ' ' && ((isWhiteToMove && Character.isUpperCase(piece)) || (!isWhiteToMove && Character.isLowerCase(piece)))) {
                 selectedRow = row;
                 selectedCol = col;
                 invalidate(); // Request a redraw
