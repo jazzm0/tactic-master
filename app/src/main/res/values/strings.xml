@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TacticMaster</string>
+    <string name="rating">Rating</string>
+    <string name="themes">Themes</string>
+    <string name="moves">Moves</string>
+    <string name="puzzle_id">Puzzle ID</string>
 </resources>

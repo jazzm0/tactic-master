@@ -13,6 +13,48 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="start"
+        app:layout_constraintBottom_toTopOf="@id/button_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/puzzle_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/puzzle_id"
+            android:textSize="14sp"
+            android:gravity="start" />
+
+        <TextView
+            android:id="@+id/puzzle_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rating"
+            android:textSize="14sp"
+            android:gravity="start" />
+
+        <TextView
+            android:id="@+id/puzzle_themes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/themes"
+            android:textSize="14sp"
+            android:gravity="start" />
+
+        <TextView
+            android:id="@+id/puzzle_moves"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/moves"
+            android:textSize="14sp"
+            android:gravity="start" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/button_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +63,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-
 
         <ImageButton
             android:id="@+id/previous_puzzle"

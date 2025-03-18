@@ -23,7 +23,6 @@ public class ChessboardView extends View {
     private static final int BOARD_SIZE = 8;
     private Paint lightBrownPaint;
     private Paint darkBrownPaint;
-    private Paint textPaint;
     private Paint bitmapPaint;
     private Paint selectionPaint;
     private Bitmap whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook, whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn;
@@ -41,7 +40,7 @@ public class ChessboardView extends View {
         lightBrownPaint.setColor(Color.parseColor("#D2B48C")); // Light brown color
         darkBrownPaint = new Paint();
         darkBrownPaint.setColor(Color.parseColor("#8B4513")); // Darker brown color
-        textPaint = new Paint();
+        Paint textPaint = new Paint();
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(30);
         textPaint.setAntiAlias(true);
@@ -74,6 +73,9 @@ public class ChessboardView extends View {
     public void setPuzzle(Puzzle puzzle) {
         this.puzzle = puzzle;
         this.chessboard = new Chessboard(puzzle);
+        this.selectedRow = -1;
+        this.selectedCol = -1;
+
         invalidate(); // Request a redraw
     }
 
