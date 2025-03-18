@@ -1,4 +1,4 @@
-package com.tacticmaster;
+package com.tacticmaster.board;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,8 +11,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.tacticmaster.puzzle.Puzzle;
+
 public class ChessboardView extends View {
 
+    private Puzzle puzzle;
+    private Chessboard chessboard;
     private static final int BOARD_SIZE = 8;
     private Paint lightBrownPaint;
     private Paint darkBrownPaint;
@@ -32,6 +36,12 @@ public class ChessboardView extends View {
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(30);
         textPaint.setAntiAlias(true);
+    }
+
+    public void setPuzzle(Puzzle puzzle) {
+        this.puzzle = puzzle;
+        this.chessboard = new Chessboard(puzzle);
+        invalidate(); // Request a redraw
     }
 
     @Override
@@ -73,6 +83,19 @@ public class ChessboardView extends View {
             float x = 10;
             float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .4f;
             canvas.drawText(label, x, y, textPaint);
+        }
+
+        if (chessboard != null) {
+            for (int row = 0; row < BOARD_SIZE; row++) {
+                for (int col = 0; col < BOARD_SIZE; col++) {
+                    char piece = chessboard.getBoard()[row][col];
+                    if (piece != ' ') {
+                        float x = col * tileSize + (tileSize / 2 - textPaint.measureText(String.valueOf(piece)) / 2);
+                        float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2);
+                        canvas.drawText(String.valueOf(piece), x, y, textPaint);
+                    }
+                }
+            }
         }
     }
 
