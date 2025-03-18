@@ -41,6 +41,7 @@ public class ChessboardView extends View {
     private Paint textPaint;
     private final Handler handler = new Handler();
     private PuzzleFinishedListener puzzleFinishedListener;
+    private boolean puzzleSolved = false;
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -87,8 +88,15 @@ public class ChessboardView extends View {
         this.chessboard = new Chessboard(puzzle);
         this.selectedRow = -1;
         this.selectedCol = -1;
+        this.puzzleSolved = false;
 
         invalidate(); // Request a redraw
+
+        // Post a delayed task to trigger the first move
+        handler.postDelayed(() -> {
+            chessboard.makeNextMove();
+            invalidate();
+        }, 2000); // Adjust the delay as needed
     }
 
     public void setPuzzleSolvedListener(PuzzleFinishedListener listener) {
@@ -182,7 +190,8 @@ public class ChessboardView extends View {
                 }
             }
             // Check if the puzzle is solved
-            if (chessboard.solved() && puzzleFinishedListener != null) {
+            if (chessboard.solved() && puzzleFinishedListener != null && !puzzleSolved) {
+                puzzleSolved = true;
                 handler.postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(this.puzzle), NEXT_PUZZLE_DELAY);
             }
         }

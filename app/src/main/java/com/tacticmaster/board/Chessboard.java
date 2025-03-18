@@ -54,7 +54,7 @@ public class Chessboard {
             }
         }
 
-        whiteToMove = parts[1].equals("w");
+        whiteToMove = parts[1].equals("b");//first move is made by opponent
         if (!whiteToMove) {
             for (int i = 0; i < 4; i++) {
                 var src = board[i];
@@ -81,6 +81,9 @@ public class Chessboard {
     }
 
     public void makeNextMove() {
+        if (movesIndex >= moves.size()) {
+            return;
+        }
         int[] move = moves.get(movesIndex);
         movePiece(move[0], move[1], move[2], move[3]);
     }

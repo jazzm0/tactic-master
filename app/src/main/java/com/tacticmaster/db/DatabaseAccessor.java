@@ -27,13 +27,11 @@ public class DatabaseAccessor {
         } catch (IOException e) {
             Log.e("The following error occurred: ", e.getMessage());
         }
-
-        SQLiteDatabase db = dbHelper.openDatabase();
     }
 
     public List<Puzzle> getPuzzlesWithRatingGreaterThan(int rating) {
         SQLiteDatabase db = dbHelper.openDatabase();
-        return executeQuery(db, "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_RATING + " > " + rating);
+        return executeQuery(db, "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_RATING + " > " + rating + " ORDER BY " + COLUMN_RATING + " DESC LIMIT 10000");
     }
 
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query) {
