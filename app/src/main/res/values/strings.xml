@@ -4,4 +4,6 @@
     <string name="themes">Themes: %s</string>
     <string name="moves">Moves: %s</string>
     <string name="puzzle_id">Puzzle ID: %s</string>
+    <string name="puzzle_popularity">Popularity: %d</string>
+    <string name="puzzle_nbplays">Plays: %d</string>
 </resources>

@@ -15,8 +15,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:gravity="start"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/button_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -25,33 +25,49 @@
             android:id="@+id/puzzle_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:text="@string/puzzle_id"
-            android:textSize="14sp"
-            android:gravity="start" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/puzzle_rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:text="@string/rating"
-            android:textSize="14sp"
-            android:gravity="start" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/puzzle_themes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:text="@string/themes"
-            android:textSize="14sp"
-            android:gravity="start" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/puzzle_moves"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:text="@string/moves"
-            android:textSize="14sp"
-            android:gravity="start" />
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/puzzle_popularity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="@string/puzzle_popularity"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/puzzle_nbplays"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="@string/puzzle_nbplays"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout

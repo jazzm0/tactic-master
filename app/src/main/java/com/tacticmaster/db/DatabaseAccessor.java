@@ -4,7 +4,7 @@ import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_SOLVED;
 
-import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -21,14 +21,20 @@ public class DatabaseAccessor {
 
     public static final String TABLE_NAME = "lichess_db_puzzle";
     private final DatabaseHelper dbHelper;
+    private final ContextWrapper context;
 
-    public DatabaseAccessor(Context context) {
+    public DatabaseAccessor(ContextWrapper context) {
         dbHelper = new DatabaseHelper(context);
         try {
             dbHelper.createDatabase();
         } catch (IOException e) {
             Log.e("The following error occurred: ", e.getMessage());
         }
+        this.context = context;
+    }
+
+    public void deleteDatabase() {
+        context.deleteDatabase(dbHelper.getDatabasePath());
     }
 
     public void setSolved(String puzzleId) {
@@ -47,7 +53,7 @@ public class DatabaseAccessor {
             int puzzleIdIndex = cursor.getColumnIndex(COLUMN_PUZZLE_ID);
             int fenIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_FEN);
             int movesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_MOVES);
-            int ratingIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_RATING);
+            int ratingIndex = cursor.getColumnIndex(COLUMN_RATING);
             int ratingDeviationIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_RATING_DEVIATION);
             int popularityIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_POPULARITY);
             int nbPlaysIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_NB_PLAYS);

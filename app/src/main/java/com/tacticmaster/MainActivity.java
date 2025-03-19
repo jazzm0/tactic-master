@@ -16,12 +16,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        deleteDatabase("puzzle.db");
 
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(this);
+//        databaseAccessor.deleteDatabase();
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
 
-        chessboardController = new ChessboardController(this, databaseAccessor, chessboardView, findViewById(R.id.puzzle_id), findViewById(R.id.puzzle_rating), findViewById(R.id.puzzle_themes), findViewById(R.id.puzzle_moves));
+        chessboardController = new ChessboardController(this,
+                databaseAccessor,
+                chessboardView,
+                findViewById(R.id.puzzle_id),
+                findViewById(R.id.puzzle_rating),
+                findViewById(R.id.puzzle_themes),
+                findViewById(R.id.puzzle_moves),
+                findViewById(R.id.puzzle_popularity),
+                findViewById(R.id.puzzle_nbplays));
         chessboardController.loadPuzzlesWithRatingGreaterThan(2000);
 
 

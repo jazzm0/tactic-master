@@ -18,12 +18,22 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final TextView puzzleRatingTextView;
     private final TextView puzzleThemesTextView;
     private final TextView puzzleMovesTextView;
+    private final TextView puzzlePopularityTextView;
+    private final TextView puzzleNbPlaysTextView;
     private final Context context;
 
     private int currentPuzzleIndex = 0;
     private List<Puzzle> puzzles;
 
-    public ChessboardController(Context context, DatabaseAccessor databaseAccessor, ChessboardView chessboardView, TextView puzzleIdTextView, TextView puzzleRatingTextView, TextView puzzleThemesTextView, TextView puzzleMovesTextView) {
+    public ChessboardController(Context context,
+                                DatabaseAccessor databaseAccessor,
+                                ChessboardView chessboardView,
+                                TextView puzzleIdTextView,
+                                TextView puzzleRatingTextView,
+                                TextView puzzleThemesTextView,
+                                TextView puzzleMovesTextView,
+                                TextView puzzlePopularityTextView,
+                                TextView puzzleNbPlaysTextView) {
         this.context = context;
         this.databaseAccessor = databaseAccessor;
         this.chessboardView = chessboardView;
@@ -31,11 +41,13 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.puzzleRatingTextView = puzzleRatingTextView;
         this.puzzleThemesTextView = puzzleThemesTextView;
         this.puzzleMovesTextView = puzzleMovesTextView;
+        this.puzzlePopularityTextView = puzzlePopularityTextView;
+        this.puzzleNbPlaysTextView = puzzleNbPlaysTextView;
         this.chessboardView.setPuzzleSolvedListener(this);
     }
 
     public void loadPuzzlesWithRatingGreaterThan(int rating) {
-        this.puzzles = databaseAccessor.getPuzzlesWithRatingGreaterThan(rating);
+        this.puzzles = databaseAccessor.getPuzzlesWithRatingGreaterThan(0);
         if (!puzzles.isEmpty()) {
             // Assuming you want to display the first puzzle for simplicity
             renderPuzzle();
@@ -50,6 +62,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleRatingTextView.setText(context.getString(R.string.rating, puzzle.rating()));
         puzzleThemesTextView.setText(context.getString(R.string.themes, puzzle.themes()));
         puzzleMovesTextView.setText(context.getString(R.string.moves, puzzle.moves()));
+        puzzlePopularityTextView.setText(context.getString(R.string.puzzle_popularity, puzzle.popularity()));
+        puzzleNbPlaysTextView.setText(context.getString(R.string.puzzle_nbplays, puzzle.nbPlays()));
     }
 
     public void loadPreviousPuzzle() {

@@ -128,6 +128,7 @@ public class ChessboardView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
+
         int width = getWidth();
         int height = getHeight();
         int tileSize = Math.min(width, height) / BOARD_SIZE;

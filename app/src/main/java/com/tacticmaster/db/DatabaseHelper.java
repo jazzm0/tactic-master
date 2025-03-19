@@ -15,7 +15,7 @@ import java.io.OutputStream;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "puzzle.db";
+    public static final String DATABASE_NAME = "puzzle.db";
     private static final int DATABASE_VERSION = 2;
     private final Context context;
     private final String databasePath;
@@ -24,6 +24,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
         this.databasePath = context.getFilesDir().getPath() + "/" + DATABASE_NAME;
+    }
+
+    public String getDatabasePath() {
+        return databasePath;
     }
 
     @Override
