@@ -12,4 +12,5 @@ public class PuzzleTable {
     public static final String COLUMN_THEMES = "Themes";
     public static final String COLUMN_GAME_URL = "GameUrl";
     public static final String COLUMN_OPENING_TAGS = "OpeningTags";
+    public static final String COLUMN_SOLVED = "Solved";
 }

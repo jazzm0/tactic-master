@@ -1,5 +1,8 @@
 package com.tacticmaster.db;
 
+import static com.tacticmaster.db.DatabaseAccessor.TABLE_NAME;
+import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_SOLVED;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -13,7 +16,7 @@ import java.io.OutputStream;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "puzzle.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private final Context context;
     private final String databasePath;
 
@@ -25,12 +28,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // No need to create tables here, as we are using a pre-existing database
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Handle database upgrade if needed
     }
 
     public void createDatabase() throws IOException {
@@ -39,6 +40,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             this.getReadableDatabase();
             try {
                 copyDatabase();
+                SQLiteDatabase db = openDatabase();
+                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_SOLVED + " INTEGER DEFAULT 0");
+                db.close();
             } catch (IOException e) {
                 throw new Error("Error copying database");
             }

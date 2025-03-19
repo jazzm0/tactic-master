@@ -1,6 +1,8 @@
 package com.tacticmaster.db;
 
+import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_RATING;
+import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_SOLVED;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -17,7 +19,7 @@ import java.util.List;
 public class DatabaseAccessor {
 
 
-    private static final String TABLE_NAME = "lichess_db_puzzle";
+    public static final String TABLE_NAME = "lichess_db_puzzle";
     private final DatabaseHelper dbHelper;
 
     public DatabaseAccessor(Context context) {
@@ -29,15 +31,20 @@ public class DatabaseAccessor {
         }
     }
 
+    public void setSolved(String puzzleId) {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        db.execSQL("UPDATE " + TABLE_NAME + " SET solved = 1 WHERE " + COLUMN_PUZZLE_ID + " = '" + puzzleId + "'");
+    }
+
     public List<Puzzle> getPuzzlesWithRatingGreaterThan(int rating) {
         SQLiteDatabase db = dbHelper.openDatabase();
-        return executeQuery(db, "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_RATING + " > " + rating + " ORDER BY " + COLUMN_RATING + " DESC LIMIT 10000");
+        return executeQuery(db, "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_RATING + " > " + rating + " AND " + COLUMN_SOLVED + " = 0 ORDER BY " + COLUMN_RATING + " DESC LIMIT 10000");
     }
 
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query) {
         List<Puzzle> puzzles = new ArrayList<>();
         try (Cursor cursor = db.rawQuery(query, null)) {
-            int puzzleIdIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_PUZZLE_ID);
+            int puzzleIdIndex = cursor.getColumnIndex(COLUMN_PUZZLE_ID);
             int fenIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_FEN);
             int movesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_MOVES);
             int ratingIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_RATING);

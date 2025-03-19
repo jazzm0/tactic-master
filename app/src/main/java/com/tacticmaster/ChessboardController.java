@@ -70,6 +70,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     @Override
     public void onPuzzleSolved(Puzzle puzzle) {
+        databaseAccessor.setSolved(puzzle.puzzleId());
+        this.puzzles.remove(currentPuzzleIndex);
         loadNextPuzzle();
     }
 
