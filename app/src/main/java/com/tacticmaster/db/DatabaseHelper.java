@@ -3,6 +3,7 @@ package com.tacticmaster.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,12 +14,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "puzzle.db";
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_PATH = "/data/data/com.tacticmaster/databases/";
     private final Context context;
+    private final String databasePath;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
+        this.databasePath = context.getFilesDir().getPath() + "/" + DATABASE_NAME;
     }
 
     @Override
@@ -46,10 +48,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private boolean checkDatabase() {
         SQLiteDatabase checkDB = null;
         try {
-            String path = DATABASE_PATH + DATABASE_NAME;
-            checkDB = SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READONLY);
+            checkDB = SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READONLY);
         } catch (Exception e) {
-            // Database does not exist yet
+            Log.i("DatabaseHelper", "Database does not exist yet, creating one");
         }
         if (checkDB != null) {
             checkDB.close();
@@ -59,8 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void copyDatabase() throws IOException {
         InputStream input = context.getAssets().open(DATABASE_NAME);
-        String outFileName = DATABASE_PATH + DATABASE_NAME;
-        OutputStream output = new FileOutputStream(outFileName);
+        OutputStream output = new FileOutputStream(databasePath);
         byte[] buffer = new byte[1024];
         int length;
         while ((length = input.read(buffer)) > 0) {
@@ -72,7 +72,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public SQLiteDatabase openDatabase() {
-        String path = DATABASE_PATH + DATABASE_NAME;
-        return SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READWRITE);
+        return SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE);
     }
 }
