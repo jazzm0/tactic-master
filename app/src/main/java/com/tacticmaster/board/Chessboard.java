@@ -1,4 +1,3 @@
-// src/main/java/com/tacticmaster/board/Chessboard.java
 package com.tacticmaster.board;
 
 import com.tacticmaster.puzzle.Puzzle;

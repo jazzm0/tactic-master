@@ -1,4 +1,3 @@
-// src/main/java/com/tacticmaster/board/ChessboardView.java
 package com.tacticmaster.board;
 
 import android.content.Context;
@@ -8,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,7 +39,7 @@ public class ChessboardView extends View {
     private int selectedRow = -1;
     private int selectedCol = -1;
     private Paint textPaint;
-    private final Handler handler = new Handler();
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private PuzzleFinishedListener puzzleFinishedListener;
     private boolean puzzleSolved = false;
 

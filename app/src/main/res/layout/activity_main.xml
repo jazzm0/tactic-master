@@ -8,22 +8,37 @@
         android:id="@+id/header_space"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.1" />
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/puzzle_rating"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/rating"
-        android:textSize="14sp"
-        app:layout_constraintTop_toTopOf="@id/header_space"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@id/header_space"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/header_space">
+
+        <TextView
+            android:id="@+id/puzzle_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/rating"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/puzzles_solved"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center"
+            android:text="@string/puzzles_solved"
+            android:textSize="14sp" />
+    </LinearLayout>
 
     <com.tacticmaster.board.ChessboardView
         android:id="@+id/chessboard_view"
@@ -99,17 +114,19 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="8dp"
+            android:background="@color/button_background_color"
+            android:contentDescription="@string/show_previous_puzzle"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_left"
-            android:background="@color/button_background_color" />
+            android:src="@drawable/ic_left" />
 
         <ImageButton
             android:id="@+id/next_puzzle"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="8dp"
+            android:background="@color/button_background_color"
+            android:contentDescription="@string/show_next_puzzle"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_right"
-            android:background="@color/button_background_color" />
+            android:src="@drawable/ic_right" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

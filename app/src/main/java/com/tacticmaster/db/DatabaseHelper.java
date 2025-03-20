@@ -26,10 +26,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.databasePath = context.getFilesDir().getPath() + "/" + DATABASE_NAME;
     }
 
-    public String getDatabasePath() {
-        return databasePath;
-    }
-
     @Override
     public void onCreate(SQLiteDatabase db) {
     }

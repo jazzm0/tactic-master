@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(this);
-//        databaseAccessor.deleteDatabase();
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
 
         chessboardController = new ChessboardController(this,
@@ -26,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
                 chessboardView,
                 findViewById(R.id.puzzle_id),
                 findViewById(R.id.puzzle_rating),
+                findViewById(R.id.puzzles_solved),
                 findViewById(R.id.puzzle_themes),
                 findViewById(R.id.puzzle_moves),
                 findViewById(R.id.puzzle_popularity),

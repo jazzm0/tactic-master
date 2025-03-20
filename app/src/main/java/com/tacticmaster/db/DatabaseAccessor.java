@@ -21,7 +21,6 @@ public class DatabaseAccessor {
 
     public static final String TABLE_NAME = "lichess_db_puzzle";
     private final DatabaseHelper dbHelper;
-    private final ContextWrapper context;
 
     public DatabaseAccessor(ContextWrapper context) {
         dbHelper = new DatabaseHelper(context);
@@ -30,11 +29,6 @@ public class DatabaseAccessor {
         } catch (IOException e) {
             Log.e("The following error occurred: ", e.getMessage());
         }
-        this.context = context;
-    }
-
-    public void deleteDatabase() {
-        context.deleteDatabase(dbHelper.getDatabasePath());
     }
 
     public void setSolved(String puzzleId) {

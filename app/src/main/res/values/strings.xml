@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">TacticMaster</string>
     <string name="rating">Rating: %d</string>
+    <string name="puzzles_solved">Puzzles solved: %d</string>
     <string name="themes">Themes: %s</string>
     <string name="moves">Moves: %s</string>
     <string name="puzzle_id">Puzzle ID: %s</string>
     <string name="puzzle_popularity">Popularity: %d</string>
     <string name="puzzle_nbplays">Plays: %d</string>
+    <string name="show_previous_puzzle">Show previous puzzle</string>
+    <string name="show_next_puzzle">Show next puzzle</string>
 </resources>
