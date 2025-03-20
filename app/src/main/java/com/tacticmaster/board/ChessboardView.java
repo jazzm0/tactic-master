@@ -68,7 +68,6 @@ public class ChessboardView extends View {
         selectionPaint.setStyle(Paint.Style.STROKE);
         selectionPaint.setStrokeWidth(5);
 
-        // Load piece images
         whiteKing = BitmapFactory.decodeResource(getResources(), R.drawable.wk);
         blackKing = BitmapFactory.decodeResource(getResources(), R.drawable.bk);
         whiteQueen = BitmapFactory.decodeResource(getResources(), R.drawable.wq);
@@ -106,7 +105,6 @@ public class ChessboardView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         int tileSize = Math.min(w, h) / BOARD_SIZE;
 
-        // Scale piece images to fit the tiles
         scaledWhiteKing = Bitmap.createScaledBitmap(whiteKing, tileSize, tileSize, true);
         scaledBlackKing = Bitmap.createScaledBitmap(blackKing, tileSize, tileSize, true);
         scaledWhiteQueen = Bitmap.createScaledBitmap(whiteQueen, tileSize, tileSize, true);
@@ -120,7 +118,7 @@ public class ChessboardView extends View {
         scaledWhitePawn = Bitmap.createScaledBitmap(whitePawn, tileSize, tileSize, true);
         scaledBlackPawn = Bitmap.createScaledBitmap(blackPawn, tileSize, tileSize, true);
 
-        invalidate(); // Request a redraw when the size changes
+        invalidate();
     }
 
     @Override
@@ -133,7 +131,6 @@ public class ChessboardView extends View {
 
         boolean isWhiteToMove = chessboard.isWhiteToMove();
 
-        // Draw the chessboard
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 var colorChoice = (col + row) % 2 == 0;
@@ -148,7 +145,6 @@ public class ChessboardView extends View {
             }
         }
 
-        // Draw the selection rectangle
         if (selectedRow != -1 && selectedCol != -1) {
             int left = selectedCol * tileSize;
             int top = selectedRow * tileSize;
@@ -157,7 +153,6 @@ public class ChessboardView extends View {
             canvas.drawRect(left, top, right, bottom, selectionPaint);
         }
 
-        // Draw the column labels (a-h)
         for (int col = 0; col < BOARD_SIZE; col++) {
             String label = String.valueOf((char) ('a' + col));
             float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.6f;
@@ -165,7 +160,6 @@ public class ChessboardView extends View {
             canvas.drawText(label, x, y, textPaint);
         }
 
-        // Draw the row labels (1-8)
         for (int row = 0; row < BOARD_SIZE; row++) {
             String label = isWhiteToMove ? String.valueOf(BOARD_SIZE - row) : String.valueOf(row + 1);
             float x = 10;
@@ -173,7 +167,6 @@ public class ChessboardView extends View {
             canvas.drawText(label, x, y, textPaint);
         }
 
-        // Draw the pieces
         if (chessboard != null) {
             for (int row = 0; row < BOARD_SIZE; row++) {
                 for (int col = 0; col < BOARD_SIZE; col++) {
@@ -188,7 +181,6 @@ public class ChessboardView extends View {
                     }
                 }
             }
-            // Check if the puzzle is solved
             if (chessboard.solved() && puzzleFinishedListener != null && !puzzleSolved) {
                 puzzleSolved = true;
                 handler.postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(this.puzzle), NEXT_PUZZLE_DELAY);
@@ -228,21 +220,19 @@ public class ChessboardView extends View {
             boolean isWhiteToMove = chessboard.isWhiteToMove();
 
             if (selectedRow == -1 && selectedCol == -1) {
-                // Select a piece
                 if (piece != ' ' && ((isWhiteToMove && Character.isUpperCase(piece)) || (!isWhiteToMove && Character.isLowerCase(piece)))) {
                     selectedRow = row;
                     selectedCol = col;
                 }
             } else if (chessboard.isFirstMoveDone()) {
                 if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
-                    // Move the selected piece
+
                     if (chessboard.movePiece(selectedRow, selectedCol, row, col)) {
                         selectedRow = -1;
                         selectedCol = -1;
 
-                        // Post a delayed task to trigger the opponent's move
+
                         handler.postDelayed(() -> {
-                            // Trigger the opponent's move
                             chessboard.makeNextMove();
                             invalidate();
                         }, 1300);
