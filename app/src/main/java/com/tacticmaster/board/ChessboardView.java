@@ -233,7 +233,7 @@ public class ChessboardView extends View {
                     selectedRow = row;
                     selectedCol = col;
                 }
-            } else {
+            } else if (chessboard.isFirstMoveDone()) {
                 if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
                     // Move the selected piece
                     if (chessboard.movePiece(selectedRow, selectedCol, row, col)) {

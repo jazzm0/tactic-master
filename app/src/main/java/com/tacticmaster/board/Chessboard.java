@@ -88,7 +88,14 @@ public class Chessboard {
         makeNextMove();
     }
 
+    public boolean isFirstMoveDone() {
+        return firstMoveDone;
+    }
+
     public void makeNextMove() {
+        if(!firstMoveDone) {
+            return;
+        }
         if (movesIndex >= moves.size()) {
             return;
         }
