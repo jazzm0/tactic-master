@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
                 chessboardView,
                 findViewById(R.id.puzzle_id),
                 findViewById(R.id.puzzle_rating),
-                findViewById(R.id.puzzles_solved),
+                findViewById(R.id.puzzles_count),
                 findViewById(R.id.puzzle_themes),
                 findViewById(R.id.puzzle_moves),
                 findViewById(R.id.puzzle_popularity),

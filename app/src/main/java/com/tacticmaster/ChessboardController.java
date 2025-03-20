@@ -30,7 +30,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                                 ChessboardView chessboardView,
                                 TextView puzzleIdTextView,
                                 TextView puzzleRatingTextView,
-                                TextView puzzlesSolvedTextView,
+                                TextView puzzleCountTextView,
                                 TextView puzzleThemesTextView,
                                 TextView puzzleMovesTextView,
                                 TextView puzzlePopularityTextView,
@@ -40,7 +40,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.chessboardView = chessboardView;
         this.puzzleIdTextView = puzzleIdTextView;
         this.puzzleRatingTextView = puzzleRatingTextView;
-        this.puzzlesSolvedTextView = puzzlesSolvedTextView;
+        this.puzzlesSolvedTextView = puzzleCountTextView;
         this.puzzleThemesTextView = puzzleThemesTextView;
         this.puzzleMovesTextView = puzzleMovesTextView;
         this.puzzlePopularityTextView = puzzlePopularityTextView;
@@ -62,7 +62,9 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
         puzzleIdTextView.setText(context.getString(R.string.puzzle_id, puzzle.puzzleId()));
         puzzleRatingTextView.setText(context.getString(R.string.rating, puzzle.rating()));
-        puzzlesSolvedTextView.setText(context.getString(R.string.puzzles_solved, databaseAccessor.getSolvedPuzzleCount()));
+        puzzlesSolvedTextView.setText(context.getString(R.string.puzzles_solved,
+                databaseAccessor.getSolvedPuzzleCount(),
+                databaseAccessor.getAllPuzzleCount()));
         puzzleThemesTextView.setText(context.getString(R.string.themes, puzzle.themes()));
         puzzleMovesTextView.setText(context.getString(R.string.moves, puzzle.moves()));
         puzzlePopularityTextView.setText(context.getString(R.string.puzzle_popularity, puzzle.popularity()));

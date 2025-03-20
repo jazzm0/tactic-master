@@ -31,7 +31,7 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/puzzles_solved"
+            android:id="@+id/puzzles_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
