@@ -12,6 +12,7 @@ public class Chessboard {
     private boolean whiteToMove;
     private final List<int[]> moves;
     private int movesIndex = 0;
+    private boolean firstMoveDone = false;
 
     public Chessboard(Puzzle puzzle) {
         this.board = new char[8][8];
@@ -78,6 +79,14 @@ public class Chessboard {
         }
         int[] move = moves.get(movesIndex);
         return move[0] == fromRow && move[1] == fromCol && move[2] == toRow && move[3] == toCol;
+    }
+
+    public synchronized void makeFirstMove() {
+        if (firstMoveDone) {
+            return;
+        }
+        firstMoveDone = true;
+        makeNextMove();
     }
 
     public void makeNextMove() {

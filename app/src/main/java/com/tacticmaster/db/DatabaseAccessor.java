@@ -42,6 +42,16 @@ public class DatabaseAccessor {
         db.execSQL("UPDATE " + TABLE_NAME + " SET solved = 1 WHERE " + COLUMN_PUZZLE_ID + " = '" + puzzleId + "'");
     }
 
+    public int getSolvedPuzzleCount() {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+        }
+        return 0;
+    }
+
     public List<Puzzle> getPuzzlesWithRatingGreaterThan(int rating) {
         SQLiteDatabase db = dbHelper.openDatabase();
         return executeQuery(db, "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_RATING + " > " + rating + " AND " + COLUMN_SOLVED + " = 0 ORDER BY " + COLUMN_RATING + " DESC LIMIT 10000");

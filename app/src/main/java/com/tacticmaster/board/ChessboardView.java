@@ -90,13 +90,11 @@ public class ChessboardView extends View {
         this.selectedCol = -1;
         this.puzzleSolved = false;
 
-        invalidate(); // Request a redraw
-
-        // Post a delayed task to trigger the first move
+        invalidate();
         handler.postDelayed(() -> {
-            chessboard.makeNextMove();
+            this.chessboard.makeFirstMove();
             invalidate();
-        }, 2000); // Adjust the delay as needed
+        }, 2000);
     }
 
     public void setPuzzleSolvedListener(PuzzleFinishedListener listener) {
@@ -234,7 +232,6 @@ public class ChessboardView extends View {
                 if (piece != ' ' && ((isWhiteToMove && Character.isUpperCase(piece)) || (!isWhiteToMove && Character.isLowerCase(piece)))) {
                     selectedRow = row;
                     selectedCol = col;
-
                 }
             } else {
                 if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
@@ -259,8 +256,14 @@ public class ChessboardView extends View {
                 }
             }
             invalidate();
+            performClick();
             return true;
         }
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }
