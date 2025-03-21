@@ -29,8 +29,9 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.puzzle_themes),
                 findViewById(R.id.puzzle_moves),
                 findViewById(R.id.puzzle_popularity),
-                findViewById(R.id.puzzle_nbplays));
-        chessboardController.loadPuzzlesWithRatingGreaterThan(2000);
+                findViewById(R.id.puzzle_nbplays),
+                findViewById(R.id.player_rating));
+        chessboardController.loadNextPuzzles();
 
 
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);

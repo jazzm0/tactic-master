@@ -6,6 +6,7 @@ import android.widget.TextView;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.Puzzle;
+import com.tacticmaster.rating.EloRatingCalculator;
 
 import java.util.List;
 
@@ -20,10 +21,12 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final TextView puzzleMovesTextView;
     private final TextView puzzlePopularityTextView;
     private final TextView puzzleNbPlaysTextView;
+    private final TextView playerRatingTextView;
     private final Context context;
 
     private int currentPuzzleIndex = 0;
     private List<Puzzle> puzzles;
+    private int playerRating;
 
     public ChessboardController(Context context,
                                 DatabaseAccessor databaseAccessor,
@@ -34,7 +37,9 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                                 TextView puzzleThemesTextView,
                                 TextView puzzleMovesTextView,
                                 TextView puzzlePopularityTextView,
-                                TextView puzzleNbPlaysTextView) {
+                                TextView puzzleNbPlaysTextView,
+                                TextView playerRatingTextView
+    ) {
         this.context = context;
         this.databaseAccessor = databaseAccessor;
         this.chessboardView = chessboardView;
@@ -45,13 +50,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.puzzleMovesTextView = puzzleMovesTextView;
         this.puzzlePopularityTextView = puzzlePopularityTextView;
         this.puzzleNbPlaysTextView = puzzleNbPlaysTextView;
+        this.playerRatingTextView = playerRatingTextView;
         this.chessboardView.setPuzzleSolvedListener(this);
+        this.playerRating = databaseAccessor.getPlayerRating();
     }
 
-    public void loadPuzzlesWithRatingGreaterThan(int rating) {
-        this.puzzles = databaseAccessor.getPuzzlesWithRatingGreaterThan(0);
+    public void loadNextPuzzles() {
+        this.puzzles = databaseAccessor.getPuzzlesWithinRange(0, 2500);
         if (!puzzles.isEmpty()) {
-            // Assuming you want to display the first puzzle for simplicity
             renderPuzzle();
         }
     }
@@ -69,6 +75,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleMovesTextView.setText(context.getString(R.string.moves, puzzle.moves()));
         puzzlePopularityTextView.setText(context.getString(R.string.puzzle_popularity, puzzle.popularity()));
         puzzleNbPlaysTextView.setText(context.getString(R.string.puzzle_nbplays, puzzle.nbPlays()));
+        playerRatingTextView.setText(context.getString(R.string.player_rating, playerRating));
     }
 
     public void loadPreviousPuzzle() {
@@ -90,12 +97,20 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     @Override
     public void onPuzzleSolved(Puzzle puzzle) {
         databaseAccessor.setSolved(puzzle.puzzleId());
+        updatePlayerRating(puzzle.rating(), 1.0); // Assuming a win
         this.puzzles.remove(currentPuzzleIndex);
         loadNextPuzzle();
     }
 
     @Override
     public void onPuzzleNotSolved(Puzzle puzzle) {
+        updatePlayerRating(puzzle.rating(), 0.0); // Assuming a loss
         loadNextPuzzle();
+    }
+
+    private void updatePlayerRating(int opponentRating, double result) {
+        playerRating = EloRatingCalculator.calculateNewRating(playerRating, opponentRating, result);
+        databaseAccessor.storePlayerRating(playerRating);
+        playerRatingTextView.setText(context.getString(R.string.player_rating, playerRating));
     }
 }

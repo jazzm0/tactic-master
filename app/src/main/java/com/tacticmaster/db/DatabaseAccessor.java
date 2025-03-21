@@ -1,16 +1,20 @@
 package com.tacticmaster.db;
 
-import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_PUZZLE_ID;
-import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_RATING;
-import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_SOLVED;
+import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
+import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
+import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
+import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
+import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
+import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
+import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 
+import android.content.ContentValues;
 import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.tacticmaster.puzzle.Puzzle;
-import com.tacticmaster.puzzle.PuzzleTable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,8 +22,6 @@ import java.util.List;
 
 public class DatabaseAccessor {
 
-
-    public static final String TABLE_NAME = "lichess_db_puzzle";
     private final DatabaseHelper dbHelper;
 
     public DatabaseAccessor(ContextWrapper context) {
@@ -33,23 +35,22 @@ public class DatabaseAccessor {
 
     public void setSolved(String puzzleId) {
         SQLiteDatabase db = dbHelper.openDatabase();
-        db.execSQL("UPDATE " + TABLE_NAME + " SET solved = 1 WHERE " + COLUMN_PUZZLE_ID + " = '" + puzzleId + "'");
+        db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET solved = 1 WHERE " + COLUMN_PUZZLE_ID + " = '" + puzzleId + "'");
     }
 
     public int getSolvedPuzzleCount() {
         SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
+        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
             if (cursor.moveToFirst()) {
                 return cursor.getInt(0);
             }
         }
         return 0;
     }
-
 
     public int getAllPuzzleCount() {
         SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME, null)) {
+        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME, null)) {
             if (cursor.moveToFirst()) {
                 return cursor.getInt(0);
             }
@@ -57,9 +58,12 @@ public class DatabaseAccessor {
         return 0;
     }
 
-    public List<Puzzle> getPuzzlesWithRatingGreaterThan(int rating) {
+    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating) {
         SQLiteDatabase db = dbHelper.openDatabase();
-        return executeQuery(db, "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_RATING + " > " + rating + " AND " + COLUMN_SOLVED + " = 0 ORDER BY " + COLUMN_RATING + " DESC LIMIT 10000");
+        return executeQuery(db, "SELECT * FROM " + PUZZLE_TABLE_NAME +
+                " WHERE " + COLUMN_RATING + " >= " + lowestRating +
+                " AND " + COLUMN_RATING + " <= " + highestRating + " AND "
+                + COLUMN_SOLVED + " = 0 ORDER BY " + COLUMN_RATING + " DESC LIMIT 100");
     }
 
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query) {
@@ -96,5 +100,23 @@ public class DatabaseAccessor {
             }
         }
         return puzzles;
+    }
+
+    public void storePlayerRating(int rating) {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PLAYER_RATING, rating);
+        db.insertWithOnConflict(PLAYER_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    public int getPlayerRating() {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        try (Cursor cursor = db.rawQuery("SELECT * FROM " + PLAYER_TABLE_NAME, null)) {
+            if (cursor.moveToFirst()) {
+                int ratingIndex = cursor.getColumnIndex(COLUMN_PLAYER_RATING);
+                return cursor.getInt(ratingIndex);
+            }
+        }
+        return DEFAULT_PLAYER_RATING;
     }
 }

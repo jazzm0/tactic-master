@@ -1,7 +1,11 @@
 package com.tacticmaster.db;
 
-import static com.tacticmaster.db.DatabaseAccessor.TABLE_NAME;
-import static com.tacticmaster.puzzle.PuzzleTable.COLUMN_SOLVED;
+import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_ID;
+import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
+import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
+import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
+import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
+import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,10 +32,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        createPlayerRatingTable(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Handle database upgrade if needed
     }
 
     public void createDatabase() throws IOException {
@@ -41,7 +47,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 copyDatabase();
                 SQLiteDatabase db = openDatabase();
-                db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_SOLVED + " INTEGER DEFAULT 0");
+                db.execSQL("ALTER TABLE " + PUZZLE_TABLE_NAME + " ADD COLUMN " + COLUMN_SOLVED + " INTEGER DEFAULT 0");
+                createPlayerRatingTable(db);
                 db.close();
             } catch (IOException e) {
                 throw new Error("Error copying database");
@@ -77,5 +84,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public SQLiteDatabase openDatabase() {
         return SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE);
+    }
+
+    private void createPlayerRatingTable(SQLiteDatabase db) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS " + PLAYER_TABLE_NAME + " (" +
+                COLUMN_PLAYER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_PLAYER_RATING + " INTEGER NOT NULL DEFAULT " + DEFAULT_PLAYER_RATING + ")";
+        db.execSQL(createTableSQL);
     }
 }
