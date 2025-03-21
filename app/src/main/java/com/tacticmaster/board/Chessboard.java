@@ -119,11 +119,9 @@ public class Chessboard {
         board[fromRow][fromCol] = ' ';
 
         if (board[toRow][toCol] == 'P' && toRow == 0 || board[toRow][toCol] == 'P' && toRow == 7) {
-            board[toRow][toCol] = Character.toUpperCase(promotions.get(0));
-            promotions.remove(0);
+            board[toRow][toCol] = promotions.isEmpty() ? 'Q' : Character.toUpperCase(promotions.remove(0));
         } else if (board[toRow][toCol] == 'p' && toRow == 0 || board[toRow][toCol] == 'p' && toRow == 7) {
-            board[toRow][toCol] = Character.toLowerCase(promotions.get(0));
-            promotions.remove(0);
+            board[toRow][toCol] = promotions.isEmpty() ? 'q' : Character.toLowerCase(promotions.remove(0));
         }
 
         movesIndex++;

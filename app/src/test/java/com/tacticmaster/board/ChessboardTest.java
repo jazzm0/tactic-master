@@ -151,31 +151,26 @@ public class ChessboardTest {
 
     @Test
     public void testMultiplePromotionsInOneBoard() {
-        // Setup a board where multiple promotions can occur
         String fen = "8/P1P1P1P1/8/5k2/2K5/8/1p1p1p1p/8 w - - 0 1";
         String moves = "a7a8q b2b1q c7c8r d2d1r e7e8b f2f1b g7g8n h2h1n";
         Puzzle puzzle = new Puzzle("1", fen, moves, 1049, 80, 85, 208, "promotion", "url", "tags");
         Chessboard chessboard = new Chessboard(puzzle);
 
-        // Test promotion to queen
         chessboard.makeFirstMove();
         assertEquals('Q', chessboard.getBoard()[7][0]);
         chessboard.makeNextMove();
         assertEquals('q', chessboard.getBoard()[0][1]);
 
-        // Test promotion to rook
         chessboard.makeNextMove();
         assertEquals('R', chessboard.getBoard()[7][2]);
         chessboard.makeNextMove();
         assertEquals('r', chessboard.getBoard()[0][3]);
 
-        // Test promotion to bishop
         chessboard.makeNextMove();
         assertEquals('B', chessboard.getBoard()[7][4]);
         chessboard.makeNextMove();
         assertEquals('b', chessboard.getBoard()[0][5]);
 
-        // Test promotion to knight
         chessboard.makeNextMove();
         assertEquals('N', chessboard.getBoard()[7][6]);
         chessboard.makeNextMove();
