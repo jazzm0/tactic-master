@@ -8,7 +8,9 @@ import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.Puzzle;
 import com.tacticmaster.rating.EloRatingCalculator;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ChessboardController implements ChessboardView.PuzzleFinishedListener {
 
@@ -25,6 +27,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final Context context;
 
     private int currentPuzzleIndex = 0;
+    private final Set<String> loadedPuzzleIds = new HashSet<>();
     private List<Puzzle> puzzles;
     private int playerRating;
 
@@ -56,10 +59,19 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     public void loadNextPuzzles() {
-        this.puzzles = databaseAccessor.getPuzzlesWithinRange(0, 2500);
+        this.puzzles = fetchNextPuzzles();
         if (!puzzles.isEmpty()) {
             renderPuzzle();
         }
+    }
+
+    private List<Puzzle> fetchNextPuzzles() {
+        var nextPuzzles = databaseAccessor
+                .getPuzzlesWithinRange(
+                        this.playerRating - 200,
+                        this.playerRating + 200, loadedPuzzleIds);
+        nextPuzzles.forEach(puzzle -> loadedPuzzleIds.add(puzzle.puzzleId()));
+        return nextPuzzles;
     }
 
     private void renderPuzzle() {
@@ -89,7 +101,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void loadNextPuzzle() {
         currentPuzzleIndex += 1;
         if (currentPuzzleIndex >= puzzles.size()) {
-            currentPuzzleIndex = 0;
+            var newPuzzles = fetchNextPuzzles();
+            this.puzzles.addAll(newPuzzles);
         }
         renderPuzzle();
     }

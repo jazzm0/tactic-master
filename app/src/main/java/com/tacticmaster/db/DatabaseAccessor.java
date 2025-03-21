@@ -19,6 +19,7 @@ import com.tacticmaster.puzzle.Puzzle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class DatabaseAccessor {
 
@@ -58,12 +59,25 @@ public class DatabaseAccessor {
         return 0;
     }
 
-    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating) {
+    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, Set<String> excludedPuzzleIds) {
         SQLiteDatabase db = dbHelper.openDatabase();
-        return executeQuery(db, "SELECT * FROM " + PUZZLE_TABLE_NAME +
+        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_RATING + " >= " + lowestRating +
-                " AND " + COLUMN_RATING + " <= " + highestRating + " AND "
-                + COLUMN_SOLVED + " = 0 ORDER BY " + COLUMN_RATING + " DESC LIMIT 100");
+                " AND " + COLUMN_RATING + " <= " + highestRating +
+                " AND " + COLUMN_SOLVED + " = 0");
+
+        if (!excludedPuzzleIds.isEmpty()) {
+            queryBuilder.append(" AND ").append(COLUMN_PUZZLE_ID).append(" NOT IN (");
+            for (String id : excludedPuzzleIds) {
+                queryBuilder.append("'").append(id).append("',");
+            }
+            queryBuilder.setLength(queryBuilder.length() - 1); // Remove the trailing comma
+            queryBuilder.append(")");
+        }
+
+        queryBuilder.append(" ORDER BY ").append(COLUMN_RATING).append(" DESC LIMIT 5");
+
+        return executeQuery(db, queryBuilder.toString());
     }
 
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query) {
@@ -104,9 +118,10 @@ public class DatabaseAccessor {
 
     public void storePlayerRating(int rating) {
         SQLiteDatabase db = dbHelper.openDatabase();
+        db.execSQL("DELETE FROM " + PLAYER_TABLE_NAME); // Delete any existing rows
         ContentValues values = new ContentValues();
         values.put(COLUMN_PLAYER_RATING, rating);
-        db.insertWithOnConflict(PLAYER_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        db.insert(PLAYER_TABLE_NAME, null, values);
     }
 
     public int getPlayerRating() {
