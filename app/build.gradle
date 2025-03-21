@@ -28,13 +28,18 @@ android {
     buildFeatures {
         prefab true
     }
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
-    implementation libs.commons.compress
     implementation libs.appcompat
     implementation libs.material
-    testImplementation libs.junit
-    androidTestImplementation libs.ext.junit
-    androidTestImplementation libs.espresso.core
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
+    testImplementation libs.junit.jupiter.params
+    testImplementation libs.junit.platform.launcher
 }

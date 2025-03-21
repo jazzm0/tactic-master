@@ -12,11 +12,18 @@ public class Chessboard {
     private final List<int[]> moves;
     private int movesIndex = 0;
     private boolean firstMoveDone = false;
+    private final List<Character> promotions = new ArrayList<>();
 
     public Chessboard(Puzzle puzzle) {
         this.board = new char[8][8];
         setupBoard(puzzle.fen());
-        this.moves = convertMovesToCoordinates(List.of(puzzle.moves().split(" ")));
+        var movesList = List.of(puzzle.moves().split(" "));
+        for (var move : movesList) {
+            if (move.length() == 5) {
+                promotions.add(move.charAt(4));
+            }
+        }
+        this.moves = convertMovesToCoordinates(movesList);
     }
 
     private List<int[]> convertMovesToCoordinates(List<String> moves) {
@@ -93,7 +100,7 @@ public class Chessboard {
     }
 
     public void makeNextMove() {
-        if(!firstMoveDone) {
+        if (!firstMoveDone) {
             return;
         }
         if (movesIndex >= moves.size()) {
@@ -110,6 +117,15 @@ public class Chessboard {
         }
         board[toRow][toCol] = board[fromRow][fromCol];
         board[fromRow][fromCol] = ' ';
+
+        if (board[toRow][toCol] == 'P' && toRow == 0 || board[toRow][toCol] == 'P' && toRow == 7) {
+            board[toRow][toCol] = Character.toUpperCase(promotions.get(0));
+            promotions.remove(0);
+        } else if (board[toRow][toCol] == 'p' && toRow == 0 || board[toRow][toCol] == 'p' && toRow == 7) {
+            board[toRow][toCol] = Character.toLowerCase(promotions.get(0));
+            promotions.remove(0);
+        }
+
         movesIndex++;
         return true;
     }
