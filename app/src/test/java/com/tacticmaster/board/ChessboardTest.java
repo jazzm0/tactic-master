@@ -176,4 +176,43 @@ public class ChessboardTest {
         chessboard.makeNextMove();
         assertEquals('n', chessboard.getBoard()[0][7]);
     }
+
+    @Test
+    public void testEnPassant() {
+        String fen = "4k3/2p5/8/3P4/8/8/8/4K3 w - - 0 1";
+        String move = "c7c5 d5c6";
+        Puzzle puzzle = new Puzzle("1", fen, move, 1049, 80, 85, 208, "promotion", "url", "tags");
+        Chessboard chessboard = new Chessboard(puzzle);
+        chessboard.makeFirstMove();
+        assertEquals('p', chessboard.getBoard()[4][2]);
+        chessboard.makeNextMove();
+        assertEquals(' ', chessboard.getBoard()[4][3]);
+        assertEquals('P', chessboard.getBoard()[5][2]);
+    }
+
+    @Test
+    public void testCastling() {
+        String fen = "r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1";
+        String move = "e1g1 e8c8";
+        Puzzle puzzle = new Puzzle("1", fen, move, 1049, 80, 85, 208, "promotion", "url", "tags");
+        Chessboard chessboard = new Chessboard(puzzle);
+        chessboard.makeFirstMove();
+        assertEquals('R', chessboard.getBoard()[0][5]);
+        assertEquals('K', chessboard.getBoard()[0][6]);
+        chessboard.makeNextMove();
+        assertEquals('r', chessboard.getBoard()[7][3]);
+        assertEquals('k', chessboard.getBoard()[7][2]);
+
+        fen = "r3k2r/8/8/8/8/8/8/R3K2R b - - 0 1";
+        move = "e8g8 e1c1";
+        puzzle = new Puzzle("1", fen, move, 1049, 80, 85, 208, "promotion", "url", "tags");
+        chessboard = new Chessboard(puzzle);
+        chessboard.makeFirstMove();
+        assertEquals('r', chessboard.getBoard()[0][5]);
+        assertEquals('k', chessboard.getBoard()[0][6]);
+        chessboard.makeNextMove();
+        assertEquals('K', chessboard.getBoard()[7][2]);
+        assertEquals('R', chessboard.getBoard()[7][3]);
+
+    }
 }

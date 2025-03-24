@@ -1,5 +1,7 @@
 package com.tacticmaster.board;
 
+import static java.lang.Math.abs;
+
 import com.tacticmaster.puzzle.Puzzle;
 
 import java.util.ArrayList;
@@ -115,6 +117,33 @@ public class Chessboard {
                 Character.isLowerCase(board[fromRow][fromCol]) && Character.isLowerCase(board[toRow][toCol]) || board[fromRow][fromCol] == ' ') {
             return false;
         }
+        if ((board[fromRow][fromCol] == 'p' || board[fromRow][fromCol] == 'P') && board[toRow][toCol] == ' ' && fromCol != toCol) {
+            if (board[fromRow][fromCol] == 'p' && board[fromRow][toCol] == 'P' ||
+                    board[fromRow][fromCol] == 'P' && board[fromRow][toCol] == 'p') {
+                board[fromRow][toCol] = ' ';
+            } else {
+                return false;
+            }
+        }
+
+        if (board[fromRow][fromCol] == 'K' && abs(fromCol - toCol) == 2 && fromRow == toRow) {
+            if (toCol == 6 && board[toRow][7] == 'R') {
+                board[toRow][5] = 'R';
+                board[toRow][7] = ' ';
+            } else if (toCol == 2 && board[toRow][0] == 'R') {
+                board[toRow][3] = 'R';
+                board[toRow][0] = ' ';
+            }
+        } else if (board[fromRow][fromCol] == 'k' && abs(fromCol - toCol) == 2 && fromRow == toRow) {
+            if (toCol == 6 && board[toRow][7] == 'r') {
+                board[toRow][5] = 'r';
+                board[toRow][7] = ' ';
+            } else if (toCol == 2 && board[toRow][0] == 'r') {
+                board[toRow][3] = 'r';
+                board[toRow][0] = ' ';
+            }
+        }
+
         board[toRow][toCol] = board[fromRow][fromCol];
         board[fromRow][fromCol] = ' ';
 
