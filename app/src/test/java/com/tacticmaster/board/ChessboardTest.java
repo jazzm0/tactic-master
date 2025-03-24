@@ -303,7 +303,7 @@ public class ChessboardTest {
     public void testCastling(String fen, String moves) {
         Puzzle puzzle = new Puzzle("1", fen, moves, 1049, 80, 85, 208, "castling", "url", "tags");
         Chessboard chessboard = new Chessboard(puzzle);
-
+        assertTrue(false);
         char[] firstRowBefore = chessboard.getBoard()[0].clone();
         char[] lastRowBefore = chessboard.getBoard()[7].clone();
 
