@@ -100,6 +100,73 @@ public class ChessboardView extends View {
         this.puzzleFinishedListener = listener;
     }
 
+    public Puzzle getPuzzle() {
+        return puzzle;
+    }
+
+    public Chessboard getChessboard() {
+        return chessboard;
+    }
+
+    public int getSelectedCol() {
+        return selectedCol;
+    }
+
+    public int getSelectedRow() {
+        return selectedRow;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            int width = getWidth();
+            int height = getHeight();
+            int tileSize = Math.min(width, height) / BOARD_SIZE;
+
+            int col = (int) (event.getX() / tileSize);
+            int row = (int) (event.getY() / tileSize);
+
+            char piece = chessboard.getBoard()[row][col];
+            boolean isWhiteToMove = chessboard.isWhiteToMove();
+
+            if (selectedRow == -1 && selectedCol == -1) {
+                if (piece != ' ' && ((isWhiteToMove && Character.isUpperCase(piece)) || (!isWhiteToMove && Character.isLowerCase(piece)))) {
+                    selectedRow = row;
+                    selectedCol = col;
+                }
+            } else if (chessboard.isFirstMoveDone()) {
+                if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
+
+                    if (chessboard.movePiece(selectedRow, selectedCol, row, col)) {
+                        selectedRow = -1;
+                        selectedCol = -1;
+
+
+                        handler.postDelayed(() -> {
+                            chessboard.makeNextMove();
+                            invalidate();
+                        }, 1300);
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Wrong solution", Toast.LENGTH_SHORT).show();
+
+                    handler.postDelayed(() -> {
+                        puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
+                    }, NEXT_PUZZLE_DELAY);
+                }
+            }
+            invalidate();
+            performClick();
+            return true;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -204,56 +271,5 @@ public class ChessboardView extends View {
             case 'p' -> scaledBlackPawn;
             default -> null;
         };
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            int width = getWidth();
-            int height = getHeight();
-            int tileSize = Math.min(width, height) / BOARD_SIZE;
-
-            int col = (int) (event.getX() / tileSize);
-            int row = (int) (event.getY() / tileSize);
-
-            char piece = chessboard.getBoard()[row][col];
-            boolean isWhiteToMove = chessboard.isWhiteToMove();
-
-            if (selectedRow == -1 && selectedCol == -1) {
-                if (piece != ' ' && ((isWhiteToMove && Character.isUpperCase(piece)) || (!isWhiteToMove && Character.isLowerCase(piece)))) {
-                    selectedRow = row;
-                    selectedCol = col;
-                }
-            } else if (chessboard.isFirstMoveDone()) {
-                if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
-
-                    if (chessboard.movePiece(selectedRow, selectedCol, row, col)) {
-                        selectedRow = -1;
-                        selectedCol = -1;
-
-
-                        handler.postDelayed(() -> {
-                            chessboard.makeNextMove();
-                            invalidate();
-                        }, 1300);
-                    }
-                } else {
-                    Toast.makeText(getContext(), "Wrong solution", Toast.LENGTH_SHORT).show();
-
-                    handler.postDelayed(() -> {
-                        puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
-                    }, NEXT_PUZZLE_DELAY);
-                }
-            }
-            invalidate();
-            performClick();
-            return true;
-        }
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean performClick() {
-        return super.performClick();
     }
 }

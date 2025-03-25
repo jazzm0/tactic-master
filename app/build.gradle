@@ -29,6 +29,8 @@ android {
         prefab true
     }
     testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
         unitTests.all {
             useJUnitPlatform()
         }
@@ -38,8 +40,19 @@ android {
 dependencies {
     implementation libs.appcompat
     implementation libs.material
+
     testImplementation libs.junit.jupiter.api
+    testImplementation libs.androidx.junit
     testRuntimeOnly libs.junit.jupiter.engine
     testImplementation libs.junit.jupiter.params
     testImplementation libs.junit.platform.launcher
+
+
+    testImplementation libs.junit
+
+    androidTestImplementation libs.androidx.core
+    androidTestImplementation libs.androidx.junit
+    androidTestImplementation libs.androidx.runner
+    androidTestImplementation libs.androidx.espresso.core
 }
+
