@@ -1,0 +1,18 @@
+<p><hr></p>
+<p><strong>Tactic Trainer</strong></p>
+<p>Tactic Trainer is an advanced chess training application designed to help players of all levels improve their tactical skills. With a comprehensive set of features, Tactic Trainer offers an engaging and effective way to practice and master chess tactics.</p>
+
+<p><strong>Key Features:</strong></p>
+<ul>
+  <li><strong>Interactive Chessboard:</strong> The app features an interactive chessboard that allows users to solve puzzles and practice moves directly on the board.</li>
+  <li><strong>Extensive Puzzle Library:</strong> Access a vast library (100k puzzles) of chess puzzles ranging from 1600 to 3000 levels. Each puzzle is designed to challenge and improve your tactical thinking.</li>
+  <li><strong>Puzzle Categories:</strong> Puzzles are categorized by themes such as openings, middlegame tactics, and endgames.</li>
+  <li><strong>Detailed Puzzle Information:</strong> Each puzzle comes with detailed information, including the position, moves, rating, and tags, providing context and helping users understand the tactical themes.</li>
+  <li><strong>Performance Tracking:</strong> Track your progress with detailed statistics and performance metrics. See how you improve over time and identify areas that need more practice.</li>
+  <li><strong>User-Friendly Interface:</strong> The app features a clean and intuitive interface, making it easy to navigate and use for players of all ages.</li>
+  <li><strong>Offline Access:</strong> Puzzles can be practiced offline, ensuring you can train your tactics anytime, anywhere.</li>
+  <li><strong>Regular Updates:</strong> The app is regularly updated with new puzzles and features, ensuring a fresh and engaging experience.</li>
+</ul>
+
+<p>Whether you are a beginner looking to learn the basics or an advanced player aiming to sharpen your skills, Tactic Trainer provides the tools and resources you need to become a better chess player. Download Tactic Trainer today and start your journey to mastering chess tactics!</p>
+<p><hr></p>
