@@ -75,7 +75,7 @@ public class DatabaseAccessor {
             queryBuilder.append(")");
         }
 
-        queryBuilder.append(" ORDER BY ").append(COLUMN_RATING).append(" DESC LIMIT 5");
+        queryBuilder.append(" ORDER BY ").append(COLUMN_RATING).append(" ASC LIMIT 5");
 
         return executeQuery(db, queryBuilder.toString());
     }
