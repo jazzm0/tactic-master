@@ -11,5 +11,14 @@ public record Puzzle(
         String themes,
         String gameUrl,
         String openingTags
-) {
+) implements Comparable<Puzzle> {
+
+    @Override
+    public int compareTo(Puzzle o) {
+        int ratingComparison = Integer.compare(this.rating, o.rating);
+        if (ratingComparison != 0) {
+            return ratingComparison;
+        }
+        return this.puzzleId.compareTo(o.puzzleId);
+    }
 }

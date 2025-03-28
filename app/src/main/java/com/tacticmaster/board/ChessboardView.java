@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,6 +37,7 @@ public class ChessboardView extends View {
     private Paint selectionPaint;
     private Bitmap whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook, whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn;
     private Bitmap scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook, scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn;
+    private ImageView playerTurnIcon;
     private int selectedRow = -1;
     private int selectedCol = -1;
     private Paint textPaint;
@@ -80,6 +82,18 @@ public class ChessboardView extends View {
         blackKnight = BitmapFactory.decodeResource(getResources(), R.drawable.bn);
         whitePawn = BitmapFactory.decodeResource(getResources(), R.drawable.wp);
         blackPawn = BitmapFactory.decodeResource(getResources(), R.drawable.bp);
+    }
+
+    private void updatePlayerTurnIcon(boolean isWhiteTurn) {
+        if (isWhiteTurn) {
+            playerTurnIcon.setImageResource(R.drawable.ic_white_turn);
+        } else {
+            playerTurnIcon.setImageResource(R.drawable.ic_black_turn);
+        }
+    }
+
+    public void setPlayerTurnIcon(ImageView playerTurnIcon) {
+        this.playerTurnIcon = playerTurnIcon;
     }
 
     public void setPuzzle(Puzzle puzzle) {
@@ -170,7 +184,7 @@ public class ChessboardView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        int tileSize = Math.min(w, h) / BOARD_SIZE;
+        int tileSize = (int) ((Math.min(w, h) * 0.95f / BOARD_SIZE));
 
         scaledWhiteKing = Bitmap.createScaledBitmap(whiteKing, tileSize, tileSize, true);
         scaledBlackKing = Bitmap.createScaledBitmap(blackKing, tileSize, tileSize, true);
@@ -197,6 +211,7 @@ public class ChessboardView extends View {
         int tileSize = Math.min(width, height) / BOARD_SIZE;
 
         boolean isWhiteToMove = chessboard.isWhiteToMove();
+        updatePlayerTurnIcon(isWhiteToMove);
 
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
@@ -222,7 +237,7 @@ public class ChessboardView extends View {
 
         for (int col = 0; col < BOARD_SIZE; col++) {
             String label = String.valueOf((char) ('a' + col));
-            float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.6f;
+            float x = col * tileSize + ((float) tileSize / 2 - textPaint.measureText(label) / 2) * 1.9f;
             float y = height - 10;
             canvas.drawText(label, x, y, textPaint);
         }
@@ -230,7 +245,7 @@ public class ChessboardView extends View {
         for (int row = 0; row < BOARD_SIZE; row++) {
             String label = isWhiteToMove ? String.valueOf(BOARD_SIZE - row) : String.valueOf(row + 1);
             float x = 10;
-            float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .5f;
+            float y = row * tileSize + ((float) tileSize / 2 + textPaint.getTextSize() / 2) * .4f;
             canvas.drawText(label, x, y, textPaint);
         }
 
