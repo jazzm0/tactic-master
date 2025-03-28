@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(this);
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
+        chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
 
         chessboardController = new ChessboardController(
                 databaseAccessor,
@@ -26,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
                 new PuzzleTextViews(this));
 
         chessboardController.loadNextPuzzle();
-
 
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
