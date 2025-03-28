@@ -170,7 +170,7 @@ public class ChessboardView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        int tileSize = Math.min(w, h) / BOARD_SIZE;
+        int tileSize = (int) ((Math.min(w, h) * 0.95f / BOARD_SIZE));
 
         scaledWhiteKing = Bitmap.createScaledBitmap(whiteKing, tileSize, tileSize, true);
         scaledBlackKing = Bitmap.createScaledBitmap(blackKing, tileSize, tileSize, true);
@@ -222,7 +222,7 @@ public class ChessboardView extends View {
 
         for (int col = 0; col < BOARD_SIZE; col++) {
             String label = String.valueOf((char) ('a' + col));
-            float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.6f;
+            float x = col * tileSize + ((float) tileSize / 2 - textPaint.measureText(label) / 2) * 1.9f;
             float y = height - 10;
             canvas.drawText(label, x, y, textPaint);
         }
@@ -230,7 +230,7 @@ public class ChessboardView extends View {
         for (int row = 0; row < BOARD_SIZE; row++) {
             String label = isWhiteToMove ? String.valueOf(BOARD_SIZE - row) : String.valueOf(row + 1);
             float x = 10;
-            float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .5f;
+            float y = row * tileSize + ((float) tileSize / 2 + textPaint.getTextSize() / 2) * .4f;
             canvas.drawText(label, x, y, textPaint);
         }
 

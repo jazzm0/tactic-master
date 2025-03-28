@@ -5,9 +5,11 @@ import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.Puzzle;
 import com.tacticmaster.rating.EloRatingCalculator;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class ChessboardController implements ChessboardView.PuzzleFinishedListener {
 
@@ -17,7 +19,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     private int currentPuzzleIndex = 0;
     private final Set<String> loadedPuzzleIds = new HashSet<>();
-    private List<Puzzle> puzzles;
+    private final TreeSet<Puzzle> loadedPuzzles = new TreeSet<>();
+    private final List<Puzzle> playedPuzzles = new ArrayList<>();
     private int playerRating;
 
     public ChessboardController(
@@ -31,24 +34,23 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.playerRating = databaseAccessor.getPlayerRating();
     }
 
-    public void loadNextPuzzles() {
-        this.puzzles = fetchNextPuzzles();
-        if (!puzzles.isEmpty()) {
-            renderPuzzle();
-        }
+    private void updatePlayerRating(int opponentRating, double result) {
+        playerRating = EloRatingCalculator.calculateNewRating(playerRating, opponentRating, result);
+        databaseAccessor.storePlayerRating(playerRating);
+        puzzleTextViews.setPlayerRating(playerRating);
     }
 
-    private List<Puzzle> fetchNextPuzzles() {
+    private void loadNextPuzzles() {
         var nextPuzzles = databaseAccessor
                 .getPuzzlesWithinRange(
                         this.playerRating - 200,
                         this.playerRating + 200, loadedPuzzleIds);
         nextPuzzles.forEach(puzzle -> loadedPuzzleIds.add(puzzle.puzzleId()));
-        return nextPuzzles;
+        this.loadedPuzzles.addAll(nextPuzzles);
     }
 
     private void renderPuzzle() {
-        Puzzle puzzle = puzzles.get(currentPuzzleIndex);
+        Puzzle puzzle = playedPuzzles.get(currentPuzzleIndex);
         chessboardView.setPuzzle(puzzle);
 
         puzzleTextViews.setPuzzleId(puzzle.puzzleId());
@@ -64,16 +66,21 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void loadPreviousPuzzle() {
         currentPuzzleIndex -= 1;
         if (currentPuzzleIndex < 0) {
-            currentPuzzleIndex = puzzles.size() - 1;
+            currentPuzzleIndex = playedPuzzles.size() - 1;
         }
         renderPuzzle();
     }
 
     public void loadNextPuzzle() {
-        currentPuzzleIndex += 1;
-        if (currentPuzzleIndex >= puzzles.size()) {
-            var newPuzzles = fetchNextPuzzles();
-            this.puzzles.addAll(newPuzzles);
+        if (!this.playedPuzzles.isEmpty()) {
+            currentPuzzleIndex += 1;
+        }
+        if (currentPuzzleIndex >= playedPuzzles.size()) {
+            if (loadedPuzzles.isEmpty()) {
+                loadNextPuzzles();
+            }
+            var nextPuzzle = loadedPuzzles.pollFirst();
+            this.playedPuzzles.add(nextPuzzle);
         }
         renderPuzzle();
     }
@@ -82,7 +89,6 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void onPuzzleSolved(Puzzle puzzle) {
         databaseAccessor.setSolved(puzzle.puzzleId());
         updatePlayerRating(puzzle.rating(), 1.0);
-        this.puzzles.remove(currentPuzzleIndex);
         loadNextPuzzle();
     }
 
@@ -90,11 +96,5 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void onPuzzleNotSolved(Puzzle puzzle) {
         updatePlayerRating(puzzle.rating(), 0.0);
         loadNextPuzzle();
-    }
-
-    private void updatePlayerRating(int opponentRating, double result) {
-        playerRating = EloRatingCalculator.calculateNewRating(playerRating, opponentRating, result);
-        databaseAccessor.storePlayerRating(playerRating);
-        puzzleTextViews.setPlayerRating(playerRating);
     }
 }

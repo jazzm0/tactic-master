@@ -24,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
                 databaseAccessor,
                 chessboardView,
                 new PuzzleTextViews(this));
-        chessboardController.loadNextPuzzles();
+
+        chessboardController.loadNextPuzzle();
 
 
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
