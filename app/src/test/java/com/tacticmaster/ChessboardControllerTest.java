@@ -43,9 +43,13 @@ public class ChessboardControllerTest {
         String fen = "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29";
         String moves = "f8f7 c2h7 g8h7 g7g8q";
         this.puzzle = new Puzzle("1", fen, moves, 1049, 80, 85, 208, "opening", "url", "tags");
-        chessboardController = new ChessboardController(databaseAccessor, chessboardView, puzzleTextViews);
         this.puzzles = new ArrayList<>();
         this.puzzles.add(puzzle);
+        this.puzzles.add(new Puzzle("1", "fen1", "moves1", 1500, 100, 10, 1000, "themes1", "url1", "opening1"));
+        this.puzzles.add(new Puzzle("2", "fen2", "moves2", 1600, 100, 10, 1000, "themes2", "url2", "opening2"));
+        this.puzzles.add(new Puzzle("3", "fen3", "moves3", 1400, 100, 10, 1000, "themes3", "url3", "opening3"));
+        chessboardController = new ChessboardController(databaseAccessor, chessboardView, puzzleTextViews);
+
     }
 
     @Test
@@ -55,7 +59,7 @@ public class ChessboardControllerTest {
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
         when(databaseAccessor.getPlayerRating()).thenReturn(2333);
 
-        chessboardController.loadNextPuzzles();
+        chessboardController.loadNextPuzzle();
 
         verify(chessboardView).setPuzzle(puzzle);
         verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
@@ -77,7 +81,7 @@ public class ChessboardControllerTest {
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet()))
                 .thenReturn(puzzles)
                 .thenReturn(newPuzzles);
-        chessboardController.loadNextPuzzles();
+        chessboardController.loadNextPuzzle();
 
         chessboardController.onPuzzleSolved(puzzle);
 
@@ -89,7 +93,7 @@ public class ChessboardControllerTest {
     @Test
     public void testOnPuzzleNotSolved() {
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzles);
-        chessboardController.loadNextPuzzles();
+        chessboardController.loadNextPuzzle();
 
         chessboardController.onPuzzleNotSolved(puzzle);
 

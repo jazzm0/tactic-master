@@ -10,4 +10,5 @@
     <string name="show_previous_puzzle">Show previous puzzle</string>
     <string name="show_next_puzzle">Show next puzzle</string>
     <string name="player_rating">Player Rating: %d</string>
+    <string name="player_turn">move</string>
 </resources>
