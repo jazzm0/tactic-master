@@ -8,6 +8,7 @@ import com.tacticmaster.rating.EloRatingCalculator;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -21,15 +22,17 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final Set<String> loadedPuzzleIds = new HashSet<>();
     private final TreeSet<Puzzle> loadedPuzzles = new TreeSet<>();
     private final List<Puzzle> playedPuzzles = new ArrayList<>();
+    private final Random randomNumberGenerator;
     private int playerRating;
 
     public ChessboardController(
             DatabaseAccessor databaseAccessor,
             ChessboardView chessboardView,
-            PuzzleTextViews puzzleTextViews) {
+            PuzzleTextViews puzzleTextViews, Random randomNumberGenerator) {
         this.databaseAccessor = databaseAccessor;
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
+        this.randomNumberGenerator = randomNumberGenerator;
         this.chessboardView.setPuzzleSolvedListener(this);
         this.playerRating = databaseAccessor.getPlayerRating();
     }
@@ -79,7 +82,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             if (loadedPuzzles.isEmpty()) {
                 loadNextPuzzles();
             }
-            var nextPuzzle = loadedPuzzles.pollFirst();
+            var nextPuzzle = randomNumberGenerator.nextDouble() < 0.5 ? loadedPuzzles.pollFirst() : loadedPuzzles.pollLast();
             this.playedPuzzles.add(nextPuzzle);
         }
         renderPuzzle();

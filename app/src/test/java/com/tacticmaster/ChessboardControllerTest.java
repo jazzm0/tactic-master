@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ChessboardControllerTest {
 
@@ -29,6 +30,9 @@ public class ChessboardControllerTest {
 
     @Mock
     private PuzzleTextViews puzzleTextViews;
+
+    @Mock
+    private Random randomNumberGenerator;
 
     @InjectMocks
     private ChessboardController chessboardController;
@@ -48,7 +52,7 @@ public class ChessboardControllerTest {
         this.puzzles.add(new Puzzle("1", "fen1", "moves1", 1500, 100, 10, 1000, "themes1", "url1", "opening1"));
         this.puzzles.add(new Puzzle("2", "fen2", "moves2", 1600, 100, 10, 1000, "themes2", "url2", "opening2"));
         this.puzzles.add(new Puzzle("3", "fen3", "moves3", 1400, 100, 10, 1000, "themes3", "url3", "opening3"));
-        chessboardController = new ChessboardController(databaseAccessor, chessboardView, puzzleTextViews);
+        chessboardController = new ChessboardController(databaseAccessor, chessboardView, puzzleTextViews, randomNumberGenerator);
 
     }
 
