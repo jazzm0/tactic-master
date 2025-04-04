@@ -46,7 +46,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private void loadNextPuzzles() {
         var nextPuzzles = databaseAccessor
                 .getPuzzlesWithinRange(
-                        this.playerRating - 200,
+                        this.playerRating - 50,
                         this.playerRating + 200, loadedPuzzleIds);
         nextPuzzles.forEach(puzzle -> loadedPuzzleIds.add(puzzle.puzzleId()));
         this.loadedPuzzles.addAll(nextPuzzles);
@@ -82,7 +82,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             if (loadedPuzzles.isEmpty()) {
                 loadNextPuzzles();
             }
-            var nextPuzzle = randomNumberGenerator.nextDouble() < 0.5 ? loadedPuzzles.pollFirst() : loadedPuzzles.pollLast();
+            var nextPuzzle = randomNumberGenerator.nextDouble() < 0.3 ? loadedPuzzles.pollFirst() : loadedPuzzles.pollLast();
             this.playedPuzzles.add(nextPuzzle);
         }
         renderPuzzle();
