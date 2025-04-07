@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 
+import java.security.SecureRandom;
+
 public class MainActivity extends AppCompatActivity {
 
     private ChessboardController chessboardController;
@@ -24,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
         chessboardController = new ChessboardController(
                 databaseAccessor,
                 chessboardView,
-                new PuzzleTextViews(this));
+                new PuzzleTextViews(this),
+                new SecureRandom());
 
         chessboardController.loadNextPuzzle();
 
