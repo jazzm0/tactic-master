@@ -213,3 +213,4 @@ cython_debug/
 *.csv
 .idea
 *.db-journal
+!puzzle.db

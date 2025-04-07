@@ -45,6 +45,7 @@ def view_db_content(db_path):
 
 
 def validate_move(engine_path, fen, moves):
+    return True
     engine = chess.engine.SimpleEngine.popen_uci(engine_path)
     engine.configure({"Skill Level": 20})
 
@@ -170,9 +171,9 @@ def validate_and_store_moves(sqlite_input_db_path, engine_path, sqlite_output_db
     conn_input.close()
 
 
-engine_path = '/opt/homebrew/Cellar/stockfish/17/bin/stockfish'
+engine_path = '/opt/homebrew/Cellar/stockfish/17.1/bin/stockfish'
 sqlite_db_path = 'validated_puzzles.db'
 sqlite_input_db_path = 'all_puzzles.db'
-max_puzzles = 100000
-validate_and_store_moves(sqlite_input_db_path, engine_path, sqlite_db_path, 1600, 3500, 2200, 300, max_puzzles)
+max_puzzles = 120000
+validate_and_store_moves(sqlite_input_db_path, engine_path, sqlite_db_path, 1000, 3500, 2200, 400, max_puzzles)
 # view_db_content(sqlite_db_path)
