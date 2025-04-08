@@ -81,6 +81,10 @@ public class Chessboard {
         return whiteToMove;
     }
 
+    public boolean isOwnPiece(Character piece) {
+        return Character.isUpperCase(piece) == whiteToMove;
+    }
+
     public boolean isCorrectMove(int fromRow, int fromCol, int toRow, int toCol) {
         if (movesIndex >= moves.size()) {
             return false;

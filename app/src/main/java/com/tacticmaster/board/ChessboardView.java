@@ -149,24 +149,28 @@ public class ChessboardView extends View {
                     selectedCol = col;
                 }
             } else if (chessboard.isFirstMoveDone()) {
-                if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
+                if (piece != ' ' && chessboard.isOwnPiece(piece)) {
+                    selectedRow = row;
+                    selectedCol = col;
+                } else {
+                    if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
 
-                    if (chessboard.movePiece(selectedRow, selectedCol, row, col)) {
-                        selectedRow = -1;
-                        selectedCol = -1;
+                        if (chessboard.movePiece(selectedRow, selectedCol, row, col)) {
+                            selectedRow = -1;
+                            selectedCol = -1;
 
+                            handler.postDelayed(() -> {
+                                chessboard.makeNextMove();
+                                invalidate();
+                            }, 1300);
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Wrong solution", Toast.LENGTH_SHORT).show();
 
                         handler.postDelayed(() -> {
-                            chessboard.makeNextMove();
-                            invalidate();
-                        }, 1300);
+                            puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
+                        }, NEXT_PUZZLE_DELAY);
                     }
-                } else {
-                    Toast.makeText(getContext(), "Wrong solution", Toast.LENGTH_SHORT).show();
-
-                    handler.postDelayed(() -> {
-                        puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
-                    }, NEXT_PUZZLE_DELAY);
                 }
             }
             invalidate();

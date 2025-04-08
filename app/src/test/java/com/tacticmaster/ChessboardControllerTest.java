@@ -77,6 +77,28 @@ public class ChessboardControllerTest {
     }
 
     @Test
+    public void testLoadPreviousPuzzle() {
+        // Mock the database to return a list of puzzles
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzles);
+
+        // Load the first puzzle
+        chessboardController.loadNextPuzzle();
+        verify(chessboardView).setPuzzle(puzzles.get(0));
+
+        // Load the second puzzle
+        chessboardController.loadNextPuzzle();
+        verify(chessboardView).setPuzzle(puzzles.get(3));
+
+        // Go back to the previous puzzle
+        chessboardController.loadPreviousPuzzle();
+        verify(chessboardView, atLeastOnce()).setPuzzle(puzzles.get(0));
+
+        // Wrap around to the last puzzle when going back from the first puzzle
+        chessboardController.loadPreviousPuzzle();
+        verify(chessboardView, atLeastOnce()).setPuzzle(puzzles.get(puzzles.size() - 1));
+    }
+
+    @Test
     public void testOnPuzzleSolved() {
         var newPuzzles = new ArrayList<Puzzle>();
         newPuzzles.add(new Puzzle("2", "fen", "moves", 1000, 80, 85, 208, "opening", "url", "tags"));

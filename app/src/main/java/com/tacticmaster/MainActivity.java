@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
+import com.tacticmaster.db.DatabaseHelper;
 
 import java.security.SecureRandom;
 
@@ -19,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DatabaseAccessor databaseAccessor = new DatabaseAccessor(this);
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(new DatabaseHelper(this));
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
         chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
 
