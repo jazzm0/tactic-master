@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1">
 
-            <com.tacticmaster.board.AntialiasedImageView
+            <com.tacticmaster.board.AntiAliasedImageView
                 android:id="@+id/player_turn_icon"
                 android:layout_width="20dp"
                 android:layout_height="20dp"

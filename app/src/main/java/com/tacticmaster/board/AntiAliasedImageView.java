@@ -12,22 +12,22 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import com.tacticmaster.R;
 
-public class AntialiasedImageView extends AppCompatImageView {
+public class AntiAliasedImageView extends AppCompatImageView {
 
     private Paint paint;
     private Bitmap bitmap;
 
-    public AntialiasedImageView(Context context) {
+    public AntiAliasedImageView(Context context) {
         super(context);
         init();
     }
 
-    public AntialiasedImageView(Context context, @Nullable AttributeSet attrs) {
+    public AntiAliasedImageView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public AntialiasedImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public AntiAliasedImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
