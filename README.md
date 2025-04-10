@@ -32,7 +32,7 @@ I used the piece icons from chess.com
 
 ## License
 
-This project is licensed under the GNU GENERAL PUBLIC LICENSE Version 2 or any later version.
+This project is licensed under the GNU GENERAL PUBLIC LICENSE Version 3.
 
 
 #TODO: Add the following badges
