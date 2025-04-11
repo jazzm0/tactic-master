@@ -105,6 +105,10 @@ public class Chessboard {
         return firstMoveDone;
     }
 
+    public int[] getNextMove() {
+        return movesIndex >= 0 && movesIndex < moves.size() ? moves.get(movesIndex) : null;
+    }
+
     public void makeNextMove() {
         if (!firstMoveDone) {
             return;

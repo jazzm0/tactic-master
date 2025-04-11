@@ -38,6 +38,7 @@ public class ChessboardView extends View {
     private Bitmap whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook, whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn;
     private Bitmap scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook, scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn;
     private ImageView playerTurnIcon;
+    private ArrowView arrowView;
     private int selectedRow = -1;
     private int selectedCol = -1;
     private Paint textPaint;
@@ -96,6 +97,10 @@ public class ChessboardView extends View {
         this.playerTurnIcon = playerTurnIcon;
     }
 
+    public void setArrowView(ArrowView arrowView) {
+        this.arrowView = arrowView;
+    }
+
     public void setPuzzle(Puzzle puzzle) {
         this.puzzle = puzzle;
         this.chessboard = new Chessboard(puzzle);
@@ -128,6 +133,10 @@ public class ChessboardView extends View {
 
     public int getSelectedRow() {
         return selectedRow;
+    }
+
+    public void puzzleHintClicked() {
+        arrowView.drawAnimatedArrow(100, 100, 500, 500);
     }
 
     @Override
