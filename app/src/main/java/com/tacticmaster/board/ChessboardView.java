@@ -1,5 +1,7 @@
 package com.tacticmaster.board;
 
+import static java.util.Objects.isNull;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -136,7 +138,18 @@ public class ChessboardView extends View {
     }
 
     public void puzzleHintClicked() {
-        arrowView.drawAnimatedArrow(100, 100, 500, 500);
+        var move = chessboard.getNextMove();
+        if (!isNull(move)) {
+            int fromRow = move[0] + 2;
+            int fromCol = move[1] + 1;
+            int toRow = move[2] + 2;
+            int toCol = move[3] + 1;
+            var tileSize = getTileSize();
+            var halfTileSize = getTileSize() / 2;
+
+            arrowView.setVisibility(VISIBLE);
+            arrowView.drawAnimatedArrow((fromCol * tileSize) - halfTileSize, fromRow * tileSize * 1.02f, toCol * tileSize - halfTileSize, toRow * tileSize * 1.02f);
+        }
     }
 
     @Override
@@ -219,9 +232,8 @@ public class ChessboardView extends View {
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
 
-        int width = getWidth();
         int height = getHeight();
-        int tileSize = Math.min(width, height) / BOARD_SIZE;
+        var tileSize = getTileSize();
 
         boolean isWhiteToMove = chessboard.isWhiteToMove();
         updatePlayerTurnIcon(isWhiteToMove);
@@ -232,25 +244,25 @@ public class ChessboardView extends View {
                 if (!isWhiteToMove)
                     colorChoice = !colorChoice;
                 Paint paint = colorChoice ? lightBrownPaint : darkBrownPaint;
-                int left = col * tileSize;
-                int top = row * tileSize;
-                int right = left + tileSize;
-                int bottom = top + tileSize;
+                var left = col * tileSize;
+                var top = row * tileSize;
+                var right = left + tileSize;
+                var bottom = top + tileSize;
                 canvas.drawRect(left, top, right, bottom, paint);
             }
         }
 
         if (selectedRow != -1 && selectedCol != -1) {
-            int left = selectedCol * tileSize;
-            int top = selectedRow * tileSize;
-            int right = left + tileSize;
-            int bottom = top + tileSize;
+            var left = selectedCol * tileSize;
+            var top = selectedRow * tileSize;
+            var right = left + tileSize;
+            var bottom = top + tileSize;
             canvas.drawRect(left, top, right, bottom, selectionPaint);
         }
 
         for (int col = 0; col < BOARD_SIZE; col++) {
             String label = String.valueOf((char) ('a' + col));
-            float x = col * tileSize + ((float) tileSize / 2 - textPaint.measureText(label) / 2) * 1.9f;
+            float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.9f;
             float y = height - 10;
             canvas.drawText(label, x, y, textPaint);
         }
@@ -258,7 +270,7 @@ public class ChessboardView extends View {
         for (int row = 0; row < BOARD_SIZE; row++) {
             String label = isWhiteToMove ? String.valueOf(BOARD_SIZE - row) : String.valueOf(row + 1);
             float x = 10;
-            float y = row * tileSize + ((float) tileSize / 2 + textPaint.getTextSize() / 2) * .4f;
+            float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .4f;
             canvas.drawText(label, x, y, textPaint);
         }
 
@@ -269,7 +281,7 @@ public class ChessboardView extends View {
                     if (piece != ' ') {
                         Bitmap pieceBitmap = getPieceBitmap(piece);
                         if (pieceBitmap != null) {
-                            float left = col * tileSize;
+                            float left = col * tileSize + 3.5f;
                             float top = row * tileSize;
                             canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
                         }
@@ -281,6 +293,10 @@ public class ChessboardView extends View {
                 handler.postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(this.puzzle), NEXT_PUZZLE_DELAY);
             }
         }
+    }
+
+    private float getTileSize() {
+        return (float) Math.min(getWidth(), getHeight()) / BOARD_SIZE;
     }
 
     private Bitmap getPieceBitmap(char piece) {
