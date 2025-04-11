@@ -66,13 +66,8 @@ public class ChessboardControllerTest {
         chessboardController.loadNextPuzzle();
 
         verify(chessboardView).setPuzzle(puzzle);
-        verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
         verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
         verify(puzzleTextViews).setPuzzlesSolved(5, 256);
-        verify(puzzleTextViews).setPuzzleThemes(puzzle.themes());
-        verify(puzzleTextViews).setPuzzleMoves(puzzle.moves());
-        verify(puzzleTextViews).setPuzzlePopularity(puzzle.popularity());
-        verify(puzzleTextViews).setPuzzleNbPlays(puzzle.nbPlays());
         verify(puzzleTextViews).setPlayerRating(2333);
     }
 

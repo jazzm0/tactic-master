@@ -133,7 +133,7 @@
         android:background="@color/button_background_color"
         android:contentDescription="@string/hint"
         android:scaleType="centerInside"
-        android:src="@drawable/hint"
+        android:src="@drawable/ic_hint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -44,7 +44,8 @@ public class AntiAliasedImageView extends AppCompatImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (bitmap != null) {
-            canvas.drawBitmap(bitmap, 0, 0, paint);
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, getWidth(), getHeight(), true);
+            canvas.drawBitmap(scaledBitmap, 0, 0, paint);
         }
     }
 }
