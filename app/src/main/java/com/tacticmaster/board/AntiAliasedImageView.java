@@ -1,5 +1,7 @@
 package com.tacticmaster.board;
 
+import static java.util.Objects.isNull;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -43,7 +45,7 @@ public class AntiAliasedImageView extends AppCompatImageView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (bitmap != null) {
+        if (!isNull(bitmap)) {
             canvas.drawBitmap(bitmap, 0, 0, paint);
         }
     }

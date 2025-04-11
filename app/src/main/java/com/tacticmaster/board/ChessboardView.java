@@ -274,13 +274,13 @@ public class ChessboardView extends View {
             canvas.drawText(label, x, y, textPaint);
         }
 
-        if (chessboard != null) {
+        if (!isNull(chessboard)) {
             for (int row = 0; row < BOARD_SIZE; row++) {
                 for (int col = 0; col < BOARD_SIZE; col++) {
                     char piece = chessboard.getPieceAt(row, col);
                     if (piece != ' ') {
                         Bitmap pieceBitmap = getPieceBitmap(piece);
-                        if (pieceBitmap != null) {
+                        if (!isNull(pieceBitmap)) {
                             float left = col * tileSize + 3.5f;
                             float top = row * tileSize;
                             canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
@@ -288,7 +288,7 @@ public class ChessboardView extends View {
                     }
                 }
             }
-            if (chessboard.solved() && puzzleFinishedListener != null && !puzzleSolved) {
+            if (chessboard.solved() && !isNull(puzzleFinishedListener) && !puzzleSolved) {
                 puzzleSolved = true;
                 handler.postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(this.puzzle), NEXT_PUZZLE_DELAY);
             }
