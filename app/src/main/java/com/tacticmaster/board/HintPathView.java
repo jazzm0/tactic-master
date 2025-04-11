@@ -12,7 +12,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-public class ArrowView extends View {
+public class HintPathView extends View {
 
     private Paint arrowPaint;
 
@@ -20,7 +20,7 @@ public class ArrowView extends View {
     private float startX, startY, endX, endY;
     private boolean isArrowVisible = false;
 
-    public ArrowView(Context context, AttributeSet attrs) {
+    public HintPathView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }

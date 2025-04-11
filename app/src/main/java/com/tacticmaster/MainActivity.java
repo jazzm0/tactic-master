@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(new DatabaseHelper(this));
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
         chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
-        chessboardView.setArrowView(findViewById(R.id.arrowView));
+        chessboardView.setArrowView(findViewById(R.id.hint_path_view));
 
         chessboardController = new ChessboardController(
                 databaseAccessor,
