@@ -56,13 +56,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         Puzzle puzzle = playedPuzzles.get(currentPuzzleIndex);
         chessboardView.setPuzzle(puzzle);
 
-        puzzleTextViews.setPuzzleId(puzzle.puzzleId());
         puzzleTextViews.setPuzzleRating(puzzle.rating());
         puzzleTextViews.setPuzzlesSolved(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
-        puzzleTextViews.setPuzzleThemes(puzzle.themes());
-        puzzleTextViews.setPuzzleMoves(puzzle.moves());
-        puzzleTextViews.setPuzzlePopularity(puzzle.popularity());
-        puzzleTextViews.setPuzzleNbPlays(puzzle.nbPlays());
         puzzleTextViews.setPlayerRating(playerRating);
     }
 
@@ -86,6 +81,10 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             this.playedPuzzles.add(nextPuzzle);
         }
         renderPuzzle();
+    }
+
+    public void puzzleHintClicked() {
+        chessboardView.puzzleHintClicked();
     }
 
     @Override

@@ -66,14 +66,31 @@ public class ChessboardControllerTest {
         chessboardController.loadNextPuzzle();
 
         verify(chessboardView).setPuzzle(puzzle);
-        verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
         verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
         verify(puzzleTextViews).setPuzzlesSolved(5, 256);
-        verify(puzzleTextViews).setPuzzleThemes(puzzle.themes());
-        verify(puzzleTextViews).setPuzzleMoves(puzzle.moves());
-        verify(puzzleTextViews).setPuzzlePopularity(puzzle.popularity());
-        verify(puzzleTextViews).setPuzzleNbPlays(puzzle.nbPlays());
         verify(puzzleTextViews).setPlayerRating(2333);
+    }
+
+    @Test
+    public void testLoadPreviousPuzzle() {
+        // Mock the database to return a list of puzzles
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzles);
+
+        // Load the first puzzle
+        chessboardController.loadNextPuzzle();
+        verify(chessboardView).setPuzzle(puzzles.get(0));
+
+        // Load the second puzzle
+        chessboardController.loadNextPuzzle();
+        verify(chessboardView).setPuzzle(puzzles.get(3));
+
+        // Go back to the previous puzzle
+        chessboardController.loadPreviousPuzzle();
+        verify(chessboardView, atLeastOnce()).setPuzzle(puzzles.get(0));
+
+        // Wrap around to the last puzzle when going back from the first puzzle
+        chessboardController.loadPreviousPuzzle();
+        verify(chessboardView, atLeastOnce()).setPuzzle(puzzles.get(puzzles.size() - 1));
     }
 
     @Test
