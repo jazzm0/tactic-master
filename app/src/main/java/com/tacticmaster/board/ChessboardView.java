@@ -162,7 +162,7 @@ public class ChessboardView extends View {
             int col = (int) (event.getX() / tileSize);
             int row = (int) (event.getY() / tileSize);
 
-            char piece = chessboard.getBoard()[row][col];
+            char piece = chessboard.getPieceAt(row, col);
             boolean isWhiteToMove = chessboard.isWhiteToMove();
 
             if (selectedRow == -1 && selectedCol == -1) {
@@ -277,7 +277,7 @@ public class ChessboardView extends View {
         if (chessboard != null) {
             for (int row = 0; row < BOARD_SIZE; row++) {
                 for (int col = 0; col < BOARD_SIZE; col++) {
-                    char piece = chessboard.getBoard()[row][col];
+                    char piece = chessboard.getPieceAt(row, col);
                     if (piece != ' ') {
                         Bitmap pieceBitmap = getPieceBitmap(piece);
                         if (pieceBitmap != null) {

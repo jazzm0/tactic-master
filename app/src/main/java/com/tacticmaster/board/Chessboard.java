@@ -73,6 +73,13 @@ public class Chessboard {
         }
     }
 
+    public Character getPieceAt(int row, int col) {
+        if (row < 0 || row >= 8 || col < 0 || col >= 8) {
+            throw new IllegalArgumentException("Invalid board coordinates");
+        }
+        return board[row][col];
+    }
+
     public char[][] getBoard() {
         return board;
     }
