@@ -148,7 +148,7 @@ public class ChessboardView extends View {
             var halfTileSize = getTileSize() / 2;
 
             hintPathView.setVisibility(VISIBLE);
-            hintPathView.drawAnimatedArrow((fromCol * tileSize) - halfTileSize, fromRow * tileSize * 1.02f, toCol * tileSize - halfTileSize, toRow * tileSize * 1.02f);
+            hintPathView.drawAnimatedHintPath((fromCol * tileSize) - halfTileSize, fromRow * tileSize * 1.02f, toCol * tileSize - halfTileSize, toRow * tileSize * 1.02f);
         }
     }
 

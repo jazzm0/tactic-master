@@ -18,7 +18,7 @@ public class HintPathView extends View {
 
     private float animationProgress = 0f;
     private float startX, startY, endX, endY;
-    private boolean isArrowVisible = false;
+    private boolean isHintPathVisible = false;
 
     public HintPathView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,19 +39,24 @@ public class HintPathView extends View {
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
 
-        if (isArrowVisible) {
+        if (isHintPathVisible) {
             float currentX = startX + (endX - startX) * animationProgress;
             float currentY = startY + (endY - startY) * animationProgress;
+
             canvas.drawLine(startX, startY, currentX, currentY, arrowPaint);
+
+            float radius = arrowPaint.getStrokeWidth() / 2;
+            canvas.drawCircle(startX, startY, radius, arrowPaint);
+            canvas.drawCircle(currentX, currentY, radius, arrowPaint);
         }
     }
 
-    public void drawAnimatedArrow(float startX, float startY, float endX, float endY) {
+    public void drawAnimatedHintPath(float startX, float startY, float endX, float endY) {
         this.startX = startX;
         this.startY = startY;
         this.endX = endX;
         this.endY = endY;
-        this.isArrowVisible = true;
+        this.isHintPathVisible = true;
 
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
         animator.setDuration(1000);
@@ -68,7 +73,7 @@ public class HintPathView extends View {
             @Override
             public void onAnimationEnd(@NonNull android.animation.Animator animation) {
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    isArrowVisible = false;
+                    isHintPathVisible = false;
                     invalidate();
                 }, 1500);
             }
