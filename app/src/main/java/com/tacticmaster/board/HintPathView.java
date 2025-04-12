@@ -27,12 +27,12 @@ public class HintPathView extends View {
 
     private void init() {
         arrowPaint = new Paint();
-        arrowPaint.setColor(Color.LTGRAY);
+        arrowPaint.setColor(0xFFF6A951);
         arrowPaint.setStrokeWidth(9f);
         arrowPaint.setStyle(Paint.Style.STROKE);
         arrowPaint.setAntiAlias(true);
 
-        arrowPaint.setAlpha(150);
+        arrowPaint.setAlpha(125);
     }
 
     @Override
