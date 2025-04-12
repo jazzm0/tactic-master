@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
+import com.tacticmaster.db.DatabaseHelper;
 
 import java.security.SecureRandom;
 
@@ -19,9 +20,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DatabaseAccessor databaseAccessor = new DatabaseAccessor(this);
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(new DatabaseHelper(this));
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
         chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
+        chessboardView.setArrowView(findViewById(R.id.hint_path_view));
 
         chessboardController = new ChessboardController(
                 databaseAccessor,
@@ -33,9 +35,11 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
+        ImageButton hint = findViewById(R.id.puzzle_hint);
 
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());
         nextPuzzle.setOnClickListener(v -> onNextPuzzleClicked());
+        hint.setOnClickListener(v -> onPuzzleHintClicked());
     }
 
     private void onPreviousPuzzleClicked() {
@@ -44,5 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void onNextPuzzleClicked() {
         chessboardController.loadNextPuzzle();
+    }
+
+    private void onPuzzleHintClicked() {
+        chessboardController.puzzleHintClicked();
     }
 }

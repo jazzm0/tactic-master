@@ -3,13 +3,13 @@ package com.tacticmaster.db;
 import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
+import static com.tacticmaster.db.PuzzleTable.COLUMN_POPULARITY;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 
 import android.content.ContentValues;
-import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -25,8 +25,8 @@ public class DatabaseAccessor {
 
     private final DatabaseHelper dbHelper;
 
-    public DatabaseAccessor(ContextWrapper context) {
-        dbHelper = new DatabaseHelper(context);
+    public DatabaseAccessor(DatabaseHelper dbHelper) {
+        this.dbHelper = dbHelper;
         try {
             dbHelper.createDatabase();
         } catch (IOException e) {
@@ -71,11 +71,12 @@ public class DatabaseAccessor {
             for (String id : excludedPuzzleIds) {
                 queryBuilder.append("'").append(id).append("',");
             }
-            queryBuilder.setLength(queryBuilder.length() - 1); // Remove the trailing comma
+            queryBuilder.setLength(queryBuilder.length() - 1);
             queryBuilder.append(")");
         }
 
-        queryBuilder.append(" ORDER BY ").append(COLUMN_RATING).append(" ASC LIMIT 5");
+        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING);
+        queryBuilder.append(" ORDER BY ").append(COLUMN_POPULARITY).append(" ASC LIMIT 5");
 
         return executeQuery(db, queryBuilder.toString());
     }
@@ -88,7 +89,7 @@ public class DatabaseAccessor {
             int movesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_MOVES);
             int ratingIndex = cursor.getColumnIndex(COLUMN_RATING);
             int ratingDeviationIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_RATING_DEVIATION);
-            int popularityIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_POPULARITY);
+            int popularityIndex = cursor.getColumnIndex(COLUMN_POPULARITY);
             int nbPlaysIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_NB_PLAYS);
             int themesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_THEMES);
             int gameUrlIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_GAME_URL);

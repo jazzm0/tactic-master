@@ -187,13 +187,23 @@ public class ChessboardTest {
     public void testEnPassant() {
         String fen = "4k3/2p5/8/3P4/8/8/8/4K3 w - - 0 1";
         String move = "c7c5 d5c6";
-        Puzzle puzzle = new Puzzle("1", fen, move, 1049, 80, 85, 208, "promotion", "url", "tags");
+        Puzzle puzzle = new Puzzle("1", fen, move, 1049, 80, 85, 208, "en passant", "url", "tags");
         Chessboard chessboard = new Chessboard(puzzle);
         chessboard.makeFirstMove();
         assertEquals('p', chessboard.getBoard()[4][2]);
         chessboard.makeNextMove();
         assertEquals(' ', chessboard.getBoard()[4][3]);
         assertEquals('P', chessboard.getBoard()[5][2]);
+
+        fen = "1k6/8/8/pP6/8/8/8/1K6 b - - 0 1";
+        move = "b8c8 b5a6";
+        puzzle = new Puzzle("1", fen, move, 1049, 80, 85, 208, "en passant", "url", "tags");
+        chessboard = new Chessboard(puzzle);
+        chessboard.makeFirstMove();
+        chessboard.makeNextMove();
+        assertEquals(' ', chessboard.getBoard()[3][0]);
+        assertEquals('P', chessboard.getBoard()[2][0]);
+
     }
 
     @ParameterizedTest
