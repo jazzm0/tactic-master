@@ -1,5 +1,4 @@
-[<img src="https://img.shields.io/github/v/release/jazzm0/tactic-master.svg?logo=github" alt="Version" height="40">]
-(https://f-droid.org/packages/com.daemon.ssh/)
+[<img src="https://img.shields.io/github/v/release/jazzm0/tactic-master.svg?logo=github" alt="Version" height="40">](https://f-droid.org/packages/com.daemon.ssh/)
 
 # Tactic Master
 
@@ -24,7 +23,8 @@ the chess tactics data:
 - **`converter.py`**: Processes the downloaded puzzles, convert the from csv to sqlite format.
 - **`analyzer.py`**: Generates statistics from the processed puzzles, such as the number
   of puzzles per rating distribution.
-- **`validator.py`**: Processes the downloaded puzzles to filter and validate them according to certain rules.
+- **`validator.py`**: Processes the downloaded puzzles to filter and validate them according to
+  certain rules.
 
 ## Icons
 
