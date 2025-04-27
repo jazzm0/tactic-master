@@ -1,4 +1,4 @@
-[<img src="https://img.shields.io/github/v/release/jazzm0/tactic-master.svg?logo=github" alt="Version" height="40">](https://f-droid.org/packages/com.daemon.ssh/)
+[<img src="https://img.shields.io/github/v/release/jazzm0/tactic-master.svg?logo=github" alt="Version" height="40">](https://f-droid.org/en/packages/com.tacticmaster/)
 
 # Tactic Master
 
