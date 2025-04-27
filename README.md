@@ -41,4 +41,4 @@ alt="Get it on F-Droid"
 height="80">](https://f-droid.org/en/packages/com.tacticmaster/)
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
 alt="Get it on Google Play"
-height="80">](https://play.google.com/store/apps/details?id=com.daemon.ssh)
+height="80">](https://play.google.com/store/apps/details?id=com.tacticmaster)
