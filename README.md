@@ -38,7 +38,7 @@ This project is licensed under the GNU GENERAL PUBLIC LICENSE Version 2 or any l
 #TODO: Add the following badges
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
 alt="Get it on F-Droid"
-height="80">](https://f-droid.org/packages/com.daemon.ssh/)
+height="80">](https://f-droid.org/en/packages/com.tacticmaster/)
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
 alt="Get it on Google Play"
 height="80">](https://play.google.com/store/apps/details?id=com.daemon.ssh)
