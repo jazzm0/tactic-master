@@ -178,7 +178,6 @@ public class Chessboard {
         if ((board[fromRow][fromCol] == 'p' || board[fromRow][fromCol] == 'P') &&
                 board[toRow][toCol] == ' ' && fromCol != toCol) {
             if (board[fromRow][toCol] == (board[fromRow][fromCol] == 'p' ? 'P' : 'p')) {
-                // Validate en passant: Check if opponent's pawn just moved two squares
                 if (lastMove != null && lastMove[2] == fromRow && lastMove[3] == toCol &&
                         Math.abs(lastMove[0] - lastMove[2]) == 2) {
                     board[fromRow][toCol] = ' ';
