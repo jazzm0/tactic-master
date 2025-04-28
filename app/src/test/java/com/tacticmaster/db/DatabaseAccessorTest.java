@@ -1,6 +1,5 @@
 package com.tacticmaster.db;
 
-import static com.tacticmaster.db.PuzzleTable.COLUMN_POPULARITY;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
@@ -84,9 +83,7 @@ class DatabaseAccessorTest {
                 " WHERE " + COLUMN_RATING + " >= 1600 AND "
                 + COLUMN_RATING + " <= 1800 AND "
                 + COLUMN_SOLVED + " = 0 AND "
-                + COLUMN_PUZZLE_ID + " NOT IN ('123','456') GROUP BY " + COLUMN_RATING
-                + " ORDER BY " + COLUMN_POPULARITY
-                + " ASC LIMIT 5";
+                + COLUMN_PUZZLE_ID + " NOT IN ('123','456') GROUP BY " + COLUMN_RATING + " LIMIT 5";
 
         when(mockDatabase.rawQuery(expectedQuery, null)).thenReturn(mockCursor);
 
@@ -95,12 +92,6 @@ class DatabaseAccessorTest {
         when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_FEN)).thenReturn(1);
         when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_MOVES)).thenReturn(2);
         when(mockCursor.getColumnIndex(COLUMN_RATING)).thenReturn(3);
-        when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_RATING_DEVIATION)).thenReturn(4);
-        when(mockCursor.getColumnIndex(COLUMN_POPULARITY)).thenReturn(5);
-        when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_NB_PLAYS)).thenReturn(6);
-        when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_THEMES)).thenReturn(7);
-        when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_GAME_URL)).thenReturn(8);
-        when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_OPENING_TAGS)).thenReturn(9);
 
         when(mockCursor.getString(0)).thenReturn("puzzle1", "puzzle2", "puzzle3");
         when(mockCursor.getString(1)).thenReturn("fen1", "fen2", "fen3");
