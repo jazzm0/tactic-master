@@ -99,7 +99,7 @@ public class ChessboardView extends View {
         this.playerTurnIcon = playerTurnIcon;
     }
 
-    public void setArrowView(HintPathView hintPathView) {
+    public void setHintPathView(HintPathView hintPathView) {
         this.hintPathView = hintPathView;
     }
 
