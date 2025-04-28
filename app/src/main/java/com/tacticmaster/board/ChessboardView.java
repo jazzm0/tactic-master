@@ -139,7 +139,7 @@ public class ChessboardView extends View {
 
     public void puzzleHintClicked() {
         var move = chessboard.getNextMove();
-        if (!isNull(move)) {
+        if (!isNull(move) && chessboard.isPlayersTurn()) {
             int fromRow = move[0] + 2;
             int fromCol = move[1] + 1;
             int toRow = move[2] + 2;

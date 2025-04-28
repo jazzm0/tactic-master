@@ -52,7 +52,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.loadedPuzzles.addAll(nextPuzzles);
     }
 
-    private void renderPuzzle() {
+    public void renderPuzzle() {
         Puzzle puzzle = playedPuzzles.get(currentPuzzleIndex);
         chessboardView.setPuzzle(puzzle);
 

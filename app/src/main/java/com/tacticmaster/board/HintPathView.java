@@ -3,7 +3,6 @@ package com.tacticmaster.board;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,7 +31,7 @@ public class HintPathView extends View {
         arrowPaint.setStyle(Paint.Style.STROKE);
         arrowPaint.setAntiAlias(true);
 
-        arrowPaint.setAlpha(125);
+        arrowPaint.setAlpha(200);
     }
 
     @Override

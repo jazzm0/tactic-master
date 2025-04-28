@@ -33,13 +33,19 @@ public class MainActivity extends AppCompatActivity {
 
         chessboardController.loadNextPuzzle();
 
+        ImageButton reloadPuzzle = findViewById(R.id.puzzle_reload);
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
         ImageButton hint = findViewById(R.id.puzzle_hint);
 
+        reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());
         nextPuzzle.setOnClickListener(v -> onNextPuzzleClicked());
         hint.setOnClickListener(v -> onPuzzleHintClicked());
+    }
+
+    private void onReloadPuzzleClicked() {
+        chessboardController.renderPuzzle();
     }
 
     private void onPreviousPuzzleClicked() {

@@ -108,6 +108,10 @@ public class Chessboard {
         makeNextMove();
     }
 
+    public boolean isPlayersTurn() {
+        return movesIndex % 2 == 1;
+    }
+
     public boolean isFirstMoveDone() {
         return firstMoveDone;
     }
