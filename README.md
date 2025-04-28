@@ -1,5 +1,4 @@
-[<img src="https://img.shields.io/github/v/release/jazzm0/tactic-master.svg?logo=github" alt="Version" height="40">]
-(https://f-droid.org/packages/com.daemon.ssh/)
+[<img src="https://img.shields.io/github/v/release/jazzm0/tactic-master.svg?logo=github" alt="Version" height="40">](https://f-droid.org/en/packages/com.tacticmaster/)
 
 # Tactic Master
 
@@ -24,7 +23,8 @@ the chess tactics data:
 - **`converter.py`**: Processes the downloaded puzzles, convert the from csv to sqlite format.
 - **`analyzer.py`**: Generates statistics from the processed puzzles, such as the number
   of puzzles per rating distribution.
-- **`validator.py`**: Processes the downloaded puzzles to filter and validate them according to certain rules.
+- **`validator.py`**: Processes the downloaded puzzles to filter and validate them according to
+  certain rules.
 
 ## Icons
 
@@ -34,11 +34,10 @@ I used the piece icons from chess.com
 
 This project is licensed under the GNU GENERAL PUBLIC LICENSE Version 3.
 
-
-#TODO: Add the following badges
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
 alt="Get it on F-Droid"
-height="80">](https://f-droid.org/packages/com.daemon.ssh/)
+height="80">](https://f-droid.org/en/packages/com.tacticmaster/)
+
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
 alt="Get it on Google Play"
-height="80">](https://play.google.com/store/apps/details?id=com.daemon.ssh)
+height="80">](https://play.google.com/store/apps/details?id=com.tacticmaster)

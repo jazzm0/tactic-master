@@ -6,6 +6,7 @@ import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
+import static java.util.Objects.isNull;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -63,10 +64,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.i("DatabaseHelper", "Database does not exist yet, creating one");
         }
-        if (checkDB != null) {
+        if (!isNull(checkDB)) {
             checkDB.close();
         }
-        return checkDB != null;
+        return !isNull(checkDB);
     }
 
     private void copyDatabase() throws IOException {

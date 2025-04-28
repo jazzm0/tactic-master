@@ -73,12 +73,23 @@ public class Chessboard {
         }
     }
 
+    public Character getPieceAt(int row, int col) {
+        if (row < 0 || row >= 8 || col < 0 || col >= 8) {
+            throw new IllegalArgumentException("Invalid board coordinates");
+        }
+        return board[row][col];
+    }
+
     public char[][] getBoard() {
         return board;
     }
 
     public boolean isWhiteToMove() {
         return whiteToMove;
+    }
+
+    public boolean isOwnPiece(Character piece) {
+        return Character.isUpperCase(piece) == whiteToMove;
     }
 
     public boolean isCorrectMove(int fromRow, int fromCol, int toRow, int toCol) {
@@ -99,6 +110,10 @@ public class Chessboard {
 
     public boolean isFirstMoveDone() {
         return firstMoveDone;
+    }
+
+    public int[] getNextMove() {
+        return movesIndex >= 0 && movesIndex < moves.size() ? moves.get(movesIndex) : null;
     }
 
     public void makeNextMove() {
