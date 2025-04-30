@@ -3,7 +3,6 @@ package com.tacticmaster.db;
 import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
-import static com.tacticmaster.db.PuzzleTable.COLUMN_POPULARITY;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
@@ -75,8 +74,7 @@ public class DatabaseAccessor {
             queryBuilder.append(")");
         }
 
-        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING);
-        queryBuilder.append(" ORDER BY ").append(COLUMN_POPULARITY).append(" ASC LIMIT 5");
+        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" LIMIT 5");
 
         return executeQuery(db, queryBuilder.toString());
     }
@@ -88,28 +86,14 @@ public class DatabaseAccessor {
             int fenIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_FEN);
             int movesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_MOVES);
             int ratingIndex = cursor.getColumnIndex(COLUMN_RATING);
-            int ratingDeviationIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_RATING_DEVIATION);
-            int popularityIndex = cursor.getColumnIndex(COLUMN_POPULARITY);
-            int nbPlaysIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_NB_PLAYS);
-            int themesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_THEMES);
-            int gameUrlIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_GAME_URL);
-            int openingTagsIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_OPENING_TAGS);
             while (cursor.moveToNext()) {
-                if (puzzleIdIndex >= 0 && fenIndex >= 0 && movesIndex >= 0 && ratingIndex >= 0 &&
-                        ratingDeviationIndex >= 0 && popularityIndex >= 0 && nbPlaysIndex >= 0 &&
-                        themesIndex >= 0 && gameUrlIndex >= 0 && openingTagsIndex >= 0) {
+                if (puzzleIdIndex >= 0 && fenIndex >= 0 && movesIndex >= 0 && ratingIndex >= 0) {
 
                     puzzles.add(new Puzzle(
                             cursor.getString(puzzleIdIndex),
                             cursor.getString(fenIndex),
                             cursor.getString(movesIndex),
-                            cursor.getInt(ratingIndex),
-                            cursor.getInt(ratingDeviationIndex),
-                            cursor.getInt(popularityIndex),
-                            cursor.getInt(nbPlaysIndex),
-                            cursor.getString(themesIndex),
-                            cursor.getString(gameUrlIndex),
-                            cursor.getString(openingTagsIndex)
+                            cursor.getInt(ratingIndex)
                     ));
                 }
             }

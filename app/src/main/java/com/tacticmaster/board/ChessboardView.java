@@ -73,18 +73,23 @@ public class ChessboardView extends View {
         selectionPaint.setStyle(Paint.Style.STROKE);
         selectionPaint.setStrokeWidth(5);
 
-        whiteKing = BitmapFactory.decodeResource(getResources(), R.drawable.wk);
-        blackKing = BitmapFactory.decodeResource(getResources(), R.drawable.bk);
-        whiteQueen = BitmapFactory.decodeResource(getResources(), R.drawable.wq);
-        blackQueen = BitmapFactory.decodeResource(getResources(), R.drawable.bq);
-        whiteRook = BitmapFactory.decodeResource(getResources(), R.drawable.wr);
-        blackRook = BitmapFactory.decodeResource(getResources(), R.drawable.br);
-        whiteBishop = BitmapFactory.decodeResource(getResources(), R.drawable.wb);
-        blackBishop = BitmapFactory.decodeResource(getResources(), R.drawable.bb);
-        whiteKnight = BitmapFactory.decodeResource(getResources(), R.drawable.wn);
-        blackKnight = BitmapFactory.decodeResource(getResources(), R.drawable.bn);
-        whitePawn = BitmapFactory.decodeResource(getResources(), R.drawable.wp);
-        blackPawn = BitmapFactory.decodeResource(getResources(), R.drawable.bp);
+        whiteKing = loadBitmap(R.drawable.wk, "whiteKing");
+        blackKing = loadBitmap(R.drawable.bk, "blackKing");
+        whiteQueen = loadBitmap(R.drawable.wq, "whiteQueen");
+        blackQueen = loadBitmap(R.drawable.bq, "blackQueen");
+        whiteRook = loadBitmap(R.drawable.wr, "whiteRook");
+        blackRook = loadBitmap(R.drawable.br, "blackRook");
+        whiteBishop = loadBitmap(R.drawable.wb, "whiteBishop");
+        blackBishop = loadBitmap(R.drawable.bb, "blackBishop");
+        whiteKnight = loadBitmap(R.drawable.wn, "whiteKnight");
+        blackKnight = loadBitmap(R.drawable.bn, "blackKnight");
+        whitePawn = loadBitmap(R.drawable.wp, "whitePawn");
+        blackPawn = loadBitmap(R.drawable.bp, "blackPawn");
+    }
+
+    private void post(Runnable runnable, long delay) {
+        handler.removeCallbacksAndMessages(null);
+        handler.postDelayed(runnable, delay);
     }
 
     private void updatePlayerTurnIcon(boolean isWhiteTurn) {
@@ -95,11 +100,60 @@ public class ChessboardView extends View {
         }
     }
 
+    private float getTileSize() {
+        return (float) Math.min(getWidth(), getHeight()) / BOARD_SIZE;
+    }
+
+    private Bitmap loadBitmap(int resId, String pieceName) {
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
+        if (isNull(bitmap)) {
+            throw new IllegalStateException("Failed to load bitmap for " + pieceName + " (resource ID: " + resId + ")");
+        }
+        return bitmap;
+    }
+
+    private Bitmap getPieceBitmap(char piece) {
+        return switch (piece) {
+            case 'K' -> scaledWhiteKing;
+            case 'k' -> scaledBlackKing;
+            case 'Q' -> scaledWhiteQueen;
+            case 'q' -> scaledBlackQueen;
+            case 'R' -> scaledWhiteRook;
+            case 'r' -> scaledBlackRook;
+            case 'B' -> scaledWhiteBishop;
+            case 'b' -> scaledBlackBishop;
+            case 'N' -> scaledWhiteKnight;
+            case 'n' -> scaledBlackKnight;
+            case 'P' -> scaledWhitePawn;
+            case 'p' -> scaledBlackPawn;
+            default -> null;
+        };
+    }
+
+    private void recycleBitmaps() {
+        for (Bitmap bitmap : new Bitmap[]{whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook,
+                whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn,
+                scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook,
+                scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn}) {
+            if (!isNull(bitmap) && !bitmap.isRecycled()) {
+                bitmap.recycle();
+            }
+        }
+        whiteKing = blackKing = whiteQueen = blackQueen
+                = whiteRook = blackRook = whiteBishop
+                = blackBishop = whiteKnight = blackKnight
+                = whitePawn = blackPawn = scaledWhiteKing
+                = scaledBlackKing = scaledWhiteQueen = scaledBlackQueen
+                = scaledWhiteRook = scaledBlackRook = scaledWhiteBishop
+                = scaledBlackBishop = scaledWhiteKnight = scaledBlackKnight
+                = scaledWhitePawn = scaledBlackPawn = null;
+    }
+
     public void setPlayerTurnIcon(ImageView playerTurnIcon) {
         this.playerTurnIcon = playerTurnIcon;
     }
 
-    public void setArrowView(HintPathView hintPathView) {
+    public void setHintPathView(HintPathView hintPathView) {
         this.hintPathView = hintPathView;
     }
 
@@ -111,7 +165,7 @@ public class ChessboardView extends View {
         this.puzzleSolved = false;
 
         invalidate();
-        handler.postDelayed(() -> {
+        post(() -> {
             this.chessboard.makeFirstMove();
             invalidate();
         }, 2000);
@@ -138,8 +192,10 @@ public class ChessboardView extends View {
     }
 
     public void puzzleHintClicked() {
+        if (isNull(hintPathView) || isNull(chessboard)) return;
+
         var move = chessboard.getNextMove();
-        if (!isNull(move)) {
+        if (!isNull(move) && chessboard.isPlayersTurn()) {
             int fromRow = move[0] + 2;
             int fromCol = move[1] + 1;
             int toRow = move[2] + 2;
@@ -148,7 +204,11 @@ public class ChessboardView extends View {
             var halfTileSize = getTileSize() / 2;
 
             hintPathView.setVisibility(VISIBLE);
-            hintPathView.drawAnimatedHintPath((fromCol * tileSize) - halfTileSize, fromRow * tileSize * 1.02f, toCol * tileSize - halfTileSize, toRow * tileSize * 1.02f);
+            hintPathView.drawAnimatedHintPath(
+                    (fromCol * tileSize) - halfTileSize,
+                    fromRow * tileSize * 1.02f,
+                    toCol * tileSize - halfTileSize,
+                    toRow * tileSize * 1.02f);
         }
     }
 
@@ -161,6 +221,10 @@ public class ChessboardView extends View {
 
             int col = (int) (event.getX() / tileSize);
             int row = (int) (event.getY() / tileSize);
+
+            if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+                return true;
+            }
 
             char piece = chessboard.getPieceAt(row, col);
             boolean isWhiteToMove = chessboard.isWhiteToMove();
@@ -181,7 +245,7 @@ public class ChessboardView extends View {
                             selectedRow = -1;
                             selectedCol = -1;
 
-                            handler.postDelayed(() -> {
+                            post(() -> {
                                 chessboard.makeNextMove();
                                 invalidate();
                             }, 1300);
@@ -189,7 +253,7 @@ public class ChessboardView extends View {
                     } else {
                         Toast.makeText(getContext(), "Wrong solution", Toast.LENGTH_SHORT).show();
 
-                        handler.postDelayed(() -> {
+                        post(() -> {
                             puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
                         }, NEXT_PUZZLE_DELAY);
                     }
@@ -288,32 +352,20 @@ public class ChessboardView extends View {
                     }
                 }
             }
-            if (chessboard.solved() && !isNull(puzzleFinishedListener) && !puzzleSolved) {
+            if (!isNull(chessboard) && chessboard.solved() && !isNull(puzzleFinishedListener) && !puzzleSolved) {
                 puzzleSolved = true;
-                handler.postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(this.puzzle), NEXT_PUZZLE_DELAY);
+                post(() -> {
+                    synchronized (ChessboardView.this) {
+                        puzzleFinishedListener.onPuzzleSolved(this.puzzle);
+                    }
+                }, NEXT_PUZZLE_DELAY);
             }
         }
     }
 
-    private float getTileSize() {
-        return (float) Math.min(getWidth(), getHeight()) / BOARD_SIZE;
-    }
-
-    private Bitmap getPieceBitmap(char piece) {
-        return switch (piece) {
-            case 'K' -> scaledWhiteKing;
-            case 'k' -> scaledBlackKing;
-            case 'Q' -> scaledWhiteQueen;
-            case 'q' -> scaledBlackQueen;
-            case 'R' -> scaledWhiteRook;
-            case 'r' -> scaledBlackRook;
-            case 'B' -> scaledWhiteBishop;
-            case 'b' -> scaledBlackBishop;
-            case 'N' -> scaledWhiteKnight;
-            case 'n' -> scaledBlackKnight;
-            case 'P' -> scaledWhitePawn;
-            case 'p' -> scaledBlackPawn;
-            default -> null;
-        };
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        recycleBitmaps();
     }
 }

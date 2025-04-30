@@ -40,6 +40,18 @@ public class AntiAliasedImageView extends AppCompatImageView {
         paint.setFilterBitmap(true);
         paint.setDither(true);
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_white_turn);
+        if (isNull(bitmap)) {
+            throw new IllegalStateException("Failed to load bitmap from R.drawable.ic_white_turn");
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (!isNull(bitmap) && !bitmap.isRecycled()) {
+            bitmap.recycle();
+            bitmap = null;
+        }
     }
 
     @Override

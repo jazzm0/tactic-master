@@ -1,6 +1,7 @@
 package com.tacticmaster.board;
 
 import static java.lang.Math.abs;
+import static java.util.Objects.isNull;
 
 import com.tacticmaster.puzzle.Puzzle;
 
@@ -13,6 +14,7 @@ public class Chessboard {
     private boolean whiteToMove;
     private final List<int[]> moves;
     private int movesIndex = 0;
+    private int[] lastMove;
     private boolean firstMoveDone = false;
     private final List<Character> promotions = new ArrayList<>();
 
@@ -22,7 +24,11 @@ public class Chessboard {
         var movesList = List.of(puzzle.moves().split(" "));
         for (var move : movesList) {
             if (move.length() == 5) {
-                promotions.add(move.charAt(4));
+                char promotion = move.charAt(4);
+                if ("qrbnQRBN".indexOf(promotion) == -1) {
+                    throw new IllegalArgumentException("Invalid promotion piece: " + promotion);
+                }
+                promotions.add(promotion);
             }
         }
         this.moves = convertMovesToCoordinates(movesList);
@@ -31,45 +37,78 @@ public class Chessboard {
     private List<int[]> convertMovesToCoordinates(List<String> moves) {
         List<int[]> coordinates = new ArrayList<>();
         for (String move : moves) {
-            int fromCol = move.charAt(0) - 'a';
-            int fromRow = 8 - (move.charAt(1) - '0');
-            int toCol = move.charAt(2) - 'a';
-            int toRow = 8 - (move.charAt(3) - '0');
-
+            if (move == null || move.length() < 4 || move.length() > 5) {
+                throw new IllegalArgumentException("Invalid move: " + move);
+            }
+            char fromColChar = move.charAt(0);
+            char fromRowChar = move.charAt(1);
+            char toColChar = move.charAt(2);
+            char toRowChar = move.charAt(3);
+            if (fromColChar < 'a' || fromColChar > 'h' || toColChar < 'a' || toColChar > 'h' ||
+                    fromRowChar < '1' || fromRowChar > '8' || toRowChar < '1' || toRowChar > '8') {
+                throw new IllegalArgumentException("Invalid move coordinates: " + move);
+            }
+            int fromCol = fromColChar - 'a';
+            int fromRow = 8 - (fromRowChar - '0');
+            int toCol = toColChar - 'a';
+            int toRow = 8 - (toRowChar - '0');
             if (!whiteToMove) {
                 fromRow = 7 - fromRow;
                 toRow = 7 - toRow;
             }
-
             coordinates.add(new int[]{fromRow, fromCol, toRow, toCol});
         }
         return coordinates;
     }
 
     private void setupBoard(String fen) {
+        if (isNull(fen) || fen.isEmpty()) {
+            throw new IllegalArgumentException("FEN string cannot be null or empty");
+        }
         String[] parts = fen.split(" ");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid FEN: Missing turn indicator");
+        }
         String[] rows = parts[0].split("/");
+        if (rows.length != 8) {
+            throw new IllegalArgumentException("Invalid FEN: Must have 8 rows");
+        }
         for (int i = 0; i < 8; i++) {
             int col = 0;
             for (char c : rows[i].toCharArray()) {
                 if (Character.isDigit(c)) {
                     int emptySquares = Character.getNumericValue(c);
+                    if (col + emptySquares > 8) {
+                        throw new IllegalArgumentException("Invalid FEN: Row " + i + " exceeds 8 columns");
+                    }
                     for (int j = 0; j < emptySquares; j++) {
                         board[i][col++] = ' ';
                     }
-                } else {
+                } else if (isValidPiece(c)) {
                     board[i][col++] = c;
+                } else {
+                    throw new IllegalArgumentException("Invalid FEN: Invalid piece character " + c);
                 }
             }
-        }
-
-        whiteToMove = parts[1].equals("b");//first move is made by opponent
-        if (!whiteToMove) {
-            for (int i = 0; i < 4; i++) {
-                var src = board[i];
-                board[i] = board[7 - i];
-                board[7 - i] = src;
+            if (col != 8) {
+                throw new IllegalArgumentException("Invalid FEN: Row " + i + " does not have 8 columns");
             }
+        }
+        whiteToMove = parts[1].equals("b");
+        if (!whiteToMove) {
+            flipBoard();
+        }
+    }
+
+    private boolean isValidPiece(char c) {
+        return "rnbqkpRNBQKP".indexOf(c) != -1;
+    }
+
+    private void flipBoard() {
+        for (int i = 0; i < 4; i++) {
+            char[] src = board[i];
+            board[i] = board[7 - i];
+            board[7 - i] = src;
         }
     }
 
@@ -108,6 +147,10 @@ public class Chessboard {
         makeNextMove();
     }
 
+    public boolean isPlayersTurn() {
+        return movesIndex % 2 == 1;
+    }
+
     public boolean isFirstMoveDone() {
         return firstMoveDone;
     }
@@ -132,10 +175,15 @@ public class Chessboard {
                 Character.isLowerCase(board[fromRow][fromCol]) && Character.isLowerCase(board[toRow][toCol]) || board[fromRow][fromCol] == ' ') {
             return false;
         }
-        if ((board[fromRow][fromCol] == 'p' || board[fromRow][fromCol] == 'P') && board[toRow][toCol] == ' ' && fromCol != toCol) {
-            if (board[fromRow][fromCol] == 'p' && board[fromRow][toCol] == 'P' ||
-                    board[fromRow][fromCol] == 'P' && board[fromRow][toCol] == 'p') {
-                board[fromRow][toCol] = ' ';
+        if ((board[fromRow][fromCol] == 'p' || board[fromRow][fromCol] == 'P') &&
+                board[toRow][toCol] == ' ' && fromCol != toCol) {
+            if (board[fromRow][toCol] == (board[fromRow][fromCol] == 'p' ? 'P' : 'p')) {
+                if (lastMove != null && lastMove[2] == fromRow && lastMove[3] == toCol &&
+                        Math.abs(lastMove[0] - lastMove[2]) == 2) {
+                    board[fromRow][toCol] = ' ';
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
@@ -168,6 +216,7 @@ public class Chessboard {
             board[toRow][toCol] = promotions.isEmpty() ? 'q' : Character.toLowerCase(promotions.remove(0));
         }
 
+        lastMove = new int[]{fromRow, fromCol, toRow, toCol};
         movesIndex++;
         return true;
     }

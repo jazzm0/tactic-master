@@ -1,6 +1,7 @@
 package com.tacticmaster;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,13 +26,16 @@ public class PuzzleTextViews {
 
     public void setPuzzleRating(int rating) {
         puzzleRatingTextView.setText(context.getString(R.string.rating, rating));
+        puzzleRatingTextView.setTypeface(null, Typeface.BOLD);
     }
 
     public void setPuzzlesSolved(int solvedCount, int totalCount) {
         puzzlesSolvedTextView.setText(context.getString(R.string.puzzles_solved, solvedCount, totalCount));
+        puzzlesSolvedTextView.setTypeface(null, Typeface.BOLD);
     }
 
     public void setPlayerRating(int playerRating) {
         playerRatingTextView.setText(context.getString(R.string.player_rating, playerRating));
+        playerRatingTextView.setTypeface(null, Typeface.BOLD);
     }
 }

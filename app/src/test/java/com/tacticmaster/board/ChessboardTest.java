@@ -23,7 +23,7 @@ public class ChessboardTest {
     public void setUp() {
         String fen = "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29";
         String moves = "f8f7 c2h7 g8h7 g7g8q";
-        Puzzle puzzle = new Puzzle("1", fen, moves, 1049, 80, 85, 208, "opening", "url", "tags");
+        Puzzle puzzle = new Puzzle("1", fen, moves, 1049);
         chessboard = new Chessboard(puzzle);
     }
 
@@ -159,7 +159,7 @@ public class ChessboardTest {
     public void testMultiplePromotionsInOneBoard() {
         String fen = "8/P1P1P1P1/8/5k2/2K5/8/1p1p1p1p/8 w - - 0 1";
         String moves = "a7a8q b2b1q c7c8r d2d1r e7e8b f2f1b g7g8n h2h1n";
-        Puzzle puzzle = new Puzzle("1", fen, moves, 1049, 80, 85, 208, "promotion", "url", "tags");
+        Puzzle puzzle = new Puzzle("1", fen, moves, 1049);
         Chessboard chessboard = new Chessboard(puzzle);
 
         chessboard.makeFirstMove();
@@ -187,7 +187,7 @@ public class ChessboardTest {
     public void testEnPassant() {
         String fen = "4k3/2p5/8/3P4/8/8/8/4K3 w - - 0 1";
         String move = "c7c5 d5c6";
-        Puzzle puzzle = new Puzzle("1", fen, move, 1049, 80, 85, 208, "en passant", "url", "tags");
+        Puzzle puzzle = new Puzzle("1", fen, move, 1049);
         Chessboard chessboard = new Chessboard(puzzle);
         chessboard.makeFirstMove();
         assertEquals('p', chessboard.getBoard()[4][2]);
@@ -195,9 +195,9 @@ public class ChessboardTest {
         assertEquals(' ', chessboard.getBoard()[4][3]);
         assertEquals('P', chessboard.getBoard()[5][2]);
 
-        fen = "1k6/8/8/pP6/8/8/8/1K6 b - - 0 1";
-        move = "b8c8 b5a6";
-        puzzle = new Puzzle("1", fen, move, 1049, 80, 85, 208, "en passant", "url", "tags");
+        fen = "1k6/p7/8/1P6/8/8/8/1K6 b - - 0 1";
+        move = "a7a5 b5a6";
+        puzzle = new Puzzle("1", fen, move, 1049);
         chessboard = new Chessboard(puzzle);
         chessboard.makeFirstMove();
         chessboard.makeNextMove();
@@ -311,7 +311,7 @@ public class ChessboardTest {
             "'r3k1nr/ppp3pp/2n2q2/5b2/1bPp4/1N3N2/PP1BPPPP/R2QKB1R w KQkq - 4 9', 'b3d4 c6d4 f3d4 b4d2 d1d2 e8c8 e2e3 c7c5'"
     })
     public void testCastling(String fen, String moves) {
-        Puzzle puzzle = new Puzzle("1", fen, moves, 1049, 80, 85, 208, "castling", "url", "tags");
+        Puzzle puzzle = new Puzzle("1", fen, moves, 1049);
         Chessboard chessboard = new Chessboard(puzzle);
 
         char[] firstRowBefore = chessboard.getBoard()[0].clone();
