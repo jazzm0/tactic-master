@@ -3,36 +3,29 @@ plugins {
 }
 
 android {
-    namespace 'com.tacticmaster'
-    compileSdk 34
+    namespace = 'com.tacticmaster'
+    compileSdk = 35
 
     defaultConfig {
-        applicationId "com.tacticmaster"
-        minSdk 24
-        targetSdk 34
-        versionCode 7
-        versionName "1.0.6"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        applicationId = "com.tacticmaster"
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 8
+        versionName = "1.0.7"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
-    aaptOptions {
-        cruncherEnabled = false
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    buildFeatures {
-        prefab true
     }
 
     dependenciesInfo {
@@ -62,8 +55,6 @@ dependencies {
     testImplementation libs.junit.platform.launcher
     testImplementation libs.androidx.junit
     testImplementation libs.mockito.core
-    testImplementation libs.mockito.inline
-
 
     androidTestImplementation libs.androidx.core
     androidTestImplementation libs.androidx.junit

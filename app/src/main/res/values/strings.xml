@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">TacticMaster</string>
     <string name="rating">Puzzle Rating: %d</string>
-    <string name="puzzles_solved">Puzzles solved: %d of %d</string>
+    <string name="puzzles_solved">Solved %1$d of %2$d puzzles</string>
     <string name="show_previous_puzzle">Show previous puzzle</string>
     <string name="hint">Hint</string>
     <string name="reload">Reload Puzzle</string>
