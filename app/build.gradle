@@ -55,9 +55,8 @@ dependencies {
     testImplementation libs.junit.platform.launcher
     testImplementation libs.androidx.junit
     testImplementation libs.mockito.core
-\
 
-     androidTestImplementation libs.androidx.core
+    androidTestImplementation libs.androidx.core
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.runner
     androidTestImplementation libs.androidx.espresso.core
