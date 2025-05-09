@@ -47,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
         hint.setOnClickListener(v -> onPuzzleHintClicked());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        chessboardController.renderPuzzle();
+    }
+
     private void onReloadPuzzleClicked() {
         chessboardController.renderPuzzle();
     }
