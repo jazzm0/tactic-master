@@ -62,8 +62,6 @@
         android:id="@+id/hint_path_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -80,6 +78,32 @@
             android:gravity="center"
             android:text="@string/rating"
             android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/puzzle_id_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+            <TextView
+                android:id="@+id/puzzle_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/puzzle_id"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/share_puzzle_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:gravity="center"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/puzzles_count"

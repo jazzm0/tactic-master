@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class PuzzleTextViews {
 
+    private final TextView puzzleIdTextView;
+    private final TextView sharePuzzleIdTextView;
     private final TextView puzzleRatingTextView;
     private final TextView puzzlesSolvedTextView;
     private final TextView playerRatingTextView;
@@ -15,6 +17,8 @@ public class PuzzleTextViews {
 
     public PuzzleTextViews(Context context) {
         this.context = context;
+        this.puzzleIdTextView = findViewById(R.id.puzzle_id);
+        this.sharePuzzleIdTextView = findViewById(R.id.share_puzzle_id);
         this.puzzleRatingTextView = findViewById(R.id.puzzle_rating);
         this.puzzlesSolvedTextView = findViewById(R.id.puzzles_count);
         this.playerRatingTextView = findViewById(R.id.player_rating);
@@ -27,6 +31,12 @@ public class PuzzleTextViews {
     public void setPuzzleRating(int rating) {
         puzzleRatingTextView.setText(context.getString(R.string.rating, rating));
         puzzleRatingTextView.setTypeface(null, Typeface.BOLD);
+    }
+
+    public void setPuzzleId(String puzzleId) {
+        puzzleIdTextView.setTypeface(null, Typeface.BOLD);
+        sharePuzzleIdTextView.setText(puzzleId);
+        sharePuzzleIdTextView.setTypeface(null, Typeface.BOLD);
     }
 
     public void setPuzzlesSolved(int solvedCount, int totalCount) {

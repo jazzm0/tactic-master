@@ -66,6 +66,7 @@ public class ChessboardControllerTest {
         chessboardController.loadNextPuzzle();
 
         verify(chessboardView).setPuzzle(puzzle);
+        verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
         verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
         verify(puzzleTextViews).setPuzzlesSolved(5, 256);
         verify(puzzleTextViews).setPlayerRating(2333);

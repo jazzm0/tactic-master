@@ -3,6 +3,7 @@ package com.tacticmaster;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -40,11 +41,13 @@ public class MainActivity extends AppCompatActivity {
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
         ImageButton hint = findViewById(R.id.puzzle_hint);
+        TextView sharePuzzleId = findViewById(R.id.share_puzzle_id);
 
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());
         nextPuzzle.setOnClickListener(v -> onNextPuzzleClicked());
         hint.setOnClickListener(v -> onPuzzleHintClicked());
+        sharePuzzleId.setOnClickListener(v->onSharePuzzleIdClicked());
     }
 
     private void onReloadPuzzleClicked() {
@@ -62,4 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private void onPuzzleHintClicked() {
         chessboardController.puzzleHintClicked();
     }
+
+    private void onSharePuzzleIdClicked() { chessboardController.sharePuzzleIdClicked(); }
+
 }

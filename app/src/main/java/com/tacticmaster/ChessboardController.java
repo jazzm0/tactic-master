@@ -1,5 +1,7 @@
 package com.tacticmaster;
 
+import android.content.Intent;
+
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.Puzzle;
@@ -19,6 +21,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final PuzzleTextViews puzzleTextViews;
 
     private int currentPuzzleIndex = 0;
+    private String currentPuzzleId = "";
     private final Set<String> loadedPuzzleIds = new HashSet<>();
     private final TreeSet<Puzzle> loadedPuzzles = new TreeSet<>();
     private final List<Puzzle> playedPuzzles = new ArrayList<>();
@@ -54,8 +57,10 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     public void renderPuzzle() {
         Puzzle puzzle = playedPuzzles.get(currentPuzzleIndex);
+        currentPuzzleId = puzzle.puzzleId();
         chessboardView.setPuzzle(puzzle);
 
+        puzzleTextViews.setPuzzleId(puzzle.puzzleId());
         puzzleTextViews.setPuzzleRating(puzzle.rating());
         puzzleTextViews.setPuzzlesSolved(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
@@ -83,6 +88,16 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         renderPuzzle();
     }
 
+    public void sharePuzzleIdClicked() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "https://lichess.org/training/"+currentPuzzleId);
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        chessboardView.getContext().startActivity(shareIntent);
+    }
+    
     public void puzzleHintClicked() {
         chessboardView.puzzleHintClicked();
     }
