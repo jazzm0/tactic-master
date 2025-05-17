@@ -24,6 +24,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final List<Puzzle> playedPuzzles = new ArrayList<>();
     private final Random randomNumberGenerator;
     private int playerRating;
+    private boolean autoplay;
 
     public ChessboardController(
             DatabaseAccessor databaseAccessor,
@@ -35,6 +36,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.randomNumberGenerator = randomNumberGenerator;
         this.chessboardView.setPuzzleSolvedListener(this);
         this.playerRating = databaseAccessor.getPlayerRating();
+        this.autoplay = databaseAccessor.getPlayerAutoplay();
     }
 
     private void updatePlayerRating(int opponentRating, double result) {
@@ -87,16 +89,29 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         chessboardView.puzzleHintClicked();
     }
 
+    public void setAutoplay(boolean isChecked) {
+        this.autoplay = isChecked;
+        databaseAccessor.storePlayerAutoplay(isChecked);
+    }
+
+    public boolean getAutoplay() {
+        return this.autoplay;
+    }
+
     @Override
     public void onPuzzleSolved(Puzzle puzzle) {
         databaseAccessor.setSolved(puzzle.puzzleId());
         updatePlayerRating(puzzle.rating(), 1.0);
-        loadNextPuzzle();
+        if(this.autoplay) {
+            loadNextPuzzle();
+        }
     }
 
     @Override
     public void onPuzzleNotSolved(Puzzle puzzle) {
         updatePlayerRating(puzzle.rating(), 0.0);
-        loadNextPuzzle();
+        if(this.autoplay) {
+            loadNextPuzzle();
+        }
     }
 }

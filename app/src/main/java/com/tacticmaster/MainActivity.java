@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 
+import android.widget.CompoundButton;
+import android.widget.Switch;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tacticmaster.board.ChessboardView;
@@ -40,6 +43,16 @@ public class MainActivity extends AppCompatActivity {
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
         ImageButton hint = findViewById(R.id.puzzle_hint);
+
+
+        Switch autoplay = findViewById(R.id.toggle_autoplay);
+        autoplay.setChecked(chessboardController.getAutoplay());
+        autoplay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                chessboardController.setAutoplay(isChecked);
+            }
+        });
+
 
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());

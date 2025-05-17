@@ -1,5 +1,6 @@
 package com.tacticmaster.db;
 
+import static com.tacticmaster.db.PlayerTable.COLUMN_AUTOPLAY_ENABLED;
 import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_ID;
 import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
@@ -8,6 +9,7 @@ import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static java.util.Objects.isNull;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -21,7 +23,7 @@ import java.io.OutputStream;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "puzzle.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private final Context context;
     private final String databasePath;
 
@@ -32,24 +34,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
-        createPlayerRatingTable(db);
-    }
+    public void onCreate(SQLiteDatabase db) {}
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Handle database upgrade if needed
+        if (oldVersion < 3 && newVersion == 3) {
+            SQLiteDatabase localDb = openDatabase();
+            localDb.execSQL("ALTER TABLE " + PLAYER_TABLE_NAME + " ADD COLUMN " + COLUMN_AUTOPLAY_ENABLED + " INTEGER DEFAULT 1");
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_PLAYER_ID, 1);
+            localDb.update(PLAYER_TABLE_NAME, values,COLUMN_PLAYER_ID + " != 1", null);
+        }
     }
 
-    public void createDatabase() throws IOException {
+    public void createDatabase() throws Error {
         boolean dbExist = checkDatabase();
         if (!dbExist) {
-            this.getReadableDatabase();
             try {
                 copyDatabase();
                 SQLiteDatabase db = openDatabase();
                 db.execSQL("ALTER TABLE " + PUZZLE_TABLE_NAME + " ADD COLUMN " + COLUMN_SOLVED + " INTEGER DEFAULT 0");
                 createPlayerRatingTable(db);
+                createPlayer(db);
                 db.close();
             } catch (IOException e) {
                 throw new Error("Error copying database");
@@ -67,6 +74,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (!isNull(checkDB)) {
             checkDB.close();
         }
+        SQLiteDatabase db = getWritableDatabase(); // open the bundled database once, to trigger onUpdate if needed
+        db.close();
         return !isNull(checkDB);
     }
 
@@ -90,7 +99,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void createPlayerRatingTable(SQLiteDatabase db) {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS " + PLAYER_TABLE_NAME + " (" +
                 COLUMN_PLAYER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_PLAYER_RATING + " INTEGER NOT NULL DEFAULT " + DEFAULT_PLAYER_RATING + ")";
+                COLUMN_PLAYER_RATING + " INTEGER NOT NULL DEFAULT " + DEFAULT_PLAYER_RATING + ", " +
+                COLUMN_AUTOPLAY_ENABLED + " INTEGER NOT NULL DEFAULT 1)";
         db.execSQL(createTableSQL);
+    }
+
+    private void createPlayer(SQLiteDatabase db) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PLAYER_ID, 1);
+        values.put(COLUMN_PLAYER_RATING, DEFAULT_PLAYER_RATING);
+        db.insert(PLAYER_TABLE_NAME, null, values);
     }
 }
