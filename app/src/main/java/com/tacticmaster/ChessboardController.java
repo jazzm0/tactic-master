@@ -1,6 +1,7 @@
 package com.tacticmaster;
 
 import android.content.Intent;
+import android.widget.Toast;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
@@ -55,6 +56,16 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.loadedPuzzles.addAll(nextPuzzles);
     }
 
+    private void shareText(String t) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, t);
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        chessboardView.getContext().startActivity(shareIntent);
+    }
+
     public void renderPuzzle() {
         Puzzle puzzle = playedPuzzles.get(currentPuzzleIndex);
         currentPuzzleId = puzzle.puzzleId();
@@ -88,14 +99,27 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         renderPuzzle();
     }
 
-    public void sharePuzzleIdClicked() {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "https://lichess.org/training/"+currentPuzzleId);
-        sendIntent.setType("text/plain");
+    public void loadPuzzleById(String puzzleId) {
+        try {
+            Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
+            if(!loadedPuzzleIds.contains(puzzleId)) {
+                currentPuzzleIndex += this.playedPuzzles.isEmpty() ? 0 : 1;
+                this.playedPuzzles.add(nextPuzzle);
+                loadedPuzzleIds.add(nextPuzzle.puzzleId());
+            }
+            else {
+                currentPuzzleIndex = this.playedPuzzles.lastIndexOf(nextPuzzle);
+            }
+        }
+        catch (RuntimeException e) {
+            Toast.makeText(chessboardView.getContext(), "Invalid puzzle ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        renderPuzzle();
+    }
 
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        chessboardView.getContext().startActivity(shareIntent);
+    public void puzzleIdLinkClicked() {
+        shareText("https://lichess.org/training/"+currentPuzzleId);
     }
     
     public void puzzleHintClicked() {
