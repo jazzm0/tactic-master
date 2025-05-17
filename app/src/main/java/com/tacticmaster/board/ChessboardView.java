@@ -305,8 +305,6 @@ public class ChessboardView extends View {
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 var colorChoice = (col + row) % 2 == 0;
-                if (!isWhiteToMove)
-                    colorChoice = !colorChoice;
                 Paint paint = colorChoice ? lightBrownPaint : darkBrownPaint;
                 var left = col * tileSize;
                 var top = row * tileSize;
@@ -325,7 +323,7 @@ public class ChessboardView extends View {
         }
 
         for (int col = 0; col < BOARD_SIZE; col++) {
-            String label = String.valueOf((char) ('a' + col));
+            String label = isWhiteToMove ? String.valueOf((char) ('a' + col)) : String.valueOf((char) ('h' - col));
             float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.9f;
             float y = height - 10;
             canvas.drawText(label, x, y, textPaint);
