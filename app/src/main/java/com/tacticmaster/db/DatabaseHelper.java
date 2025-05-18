@@ -11,6 +11,7 @@ import static java.util.Objects.isNull;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -42,9 +43,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 3 && newVersion == 3) {
             SQLiteDatabase localDb = openDatabase();
             localDb.execSQL("ALTER TABLE " + PLAYER_TABLE_NAME + " ADD COLUMN " + COLUMN_AUTOPLAY_ENABLED + " INTEGER DEFAULT 1");
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_PLAYER_ID, 1);
-            localDb.update(PLAYER_TABLE_NAME, values,COLUMN_PLAYER_ID + " != 1", null);
+            try (Cursor cursor = localDb.rawQuery("SELECT * FROM "+PLAYER_TABLE_NAME,null)) {
+                if (cursor.getCount() > 0) {
+                    ContentValues values = new ContentValues();
+                    values.put(COLUMN_PLAYER_ID, 1);
+                    localDb.update(PLAYER_TABLE_NAME, values,COLUMN_PLAYER_ID + " != 1", null);
+                }
+                else {
+                    createPlayer(localDb);
+                }
+            }
         }
     }
 
