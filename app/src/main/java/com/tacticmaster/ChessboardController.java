@@ -103,7 +103,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         try {
             Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
             if(!loadedPuzzleIds.contains(puzzleId)) {
-                currentPuzzleIndex += this.playedPuzzles.isEmpty() ? 0 : 1;
+                currentPuzzleIndex = this.playedPuzzles.size();
                 this.playedPuzzles.add(nextPuzzle);
                 loadedPuzzleIds.add(nextPuzzle.puzzleId());
             }
