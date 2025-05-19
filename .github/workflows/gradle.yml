@@ -45,5 +45,22 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           emulator-options: "-no-window -no-audio"
-          script: ./gradlew connectedAndroidTest --stacktrace
-
+          script: echo "Emulator started"
+      - name: Wait for Emulator to Boot
+        run: |
+          adb wait-for-device
+          echo "Waiting for emulator to fully boot..."
+          for i in {1..10}; do
+            if adb shell getprop sys.boot_completed | grep -m 1 '1'; then
+              echo "Emulator is ready!"
+              exit 0
+            fi
+            echo "Emulator is still booting, waiting..."
+            sleep 10
+          done
+          echo "Emulator failed to boot within the timeout!"
+          exit 1
+      - name: Run Instrumentation Tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ./gradlew connectedAndroidTest --stacktrace
