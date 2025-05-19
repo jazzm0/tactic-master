@@ -9,7 +9,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/*" ]
   pull_request:
     branches: [ "main" ]
 
@@ -28,7 +28,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build with Gradle
+      - name: Run Unit Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build --continue
+          arguments: test --stacktrace --warning-mode=all
