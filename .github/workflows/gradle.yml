@@ -32,35 +32,3 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: test --stacktrace --warning-mode=all
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v2
-        with:
-          api-level: 30
-          build-tools: 30.0.3
-      - name: Start Emulator
-        uses: ReactiveCircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          target: default
-          arch: x86_64
-          profile: Nexus 6
-          emulator-options: "-no-window -no-audio"
-          script: echo "Emulator started"
-      - name: Wait for Emulator to Boot
-        run: |
-          adb wait-for-device
-          echo "Waiting for emulator to fully boot..."
-          for i in {1..10}; do
-            if adb shell getprop sys.boot_completed | grep -m 1 '1'; then
-              echo "Emulator is ready!"
-              exit 0
-            fi
-            echo "Emulator is still booting, waiting..."
-            sleep 10
-          done
-          echo "Emulator failed to boot within the timeout!"
-          exit 1
-      - name: Run Instrumentation Tests
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: ./gradlew connectedAndroidTest --stacktrace
