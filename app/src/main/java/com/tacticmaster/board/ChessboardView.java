@@ -201,14 +201,15 @@ public class ChessboardView extends View {
             int toRow = move[2] + 2;
             int toCol = move[3] + 1;
             var tileSize = getTileSize();
-            var halfTileSize = getTileSize() / 2;
+            var halfTileSize = tileSize / 2;
 
             hintPathView.setVisibility(VISIBLE);
             hintPathView.drawAnimatedHintPath(
                     (fromCol * tileSize) - halfTileSize,
-                    fromRow * tileSize * 1.02f,
-                    toCol * tileSize - halfTileSize,
-                    toRow * tileSize * 1.02f);
+                    ((fromRow * tileSize) + halfTileSize) * 0.975f,
+                    (toCol * tileSize) - halfTileSize,
+                    ((toRow * tileSize) + halfTileSize) * 0.975f
+            );
         }
     }
 
