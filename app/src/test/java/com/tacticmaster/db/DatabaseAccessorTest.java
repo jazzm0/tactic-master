@@ -117,15 +117,13 @@ class DatabaseAccessorTest {
         int rating = 2000;
         databaseAccessor.storePlayerRating(rating);
 
-        verify(mockDatabase).execSQL("DELETE FROM player_table");
-        verify(mockDatabase).insert(eq("player_table"), isNull(), any(ContentValues.class));
+        verify(mockDatabase).update(eq("player_table"), any(ContentValues.class), eq("PlayerId = 1"), isNull());
     }
 
     @Test
     void testGetPlayerRating() {
-        when(mockDatabase.rawQuery("SELECT * FROM player_table", null)).thenReturn(mockCursor);
+        when(mockDatabase.rawQuery("SELECT PlayerRating FROM player_table", null)).thenReturn(mockCursor);
         when(mockCursor.moveToFirst()).thenReturn(true);
-        when(mockCursor.getColumnIndex("player_rating")).thenReturn(0);
         when(mockCursor.getInt(0)).thenReturn(1500);
 
         int rating = databaseAccessor.getPlayerRating();
