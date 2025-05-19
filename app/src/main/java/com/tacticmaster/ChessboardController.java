@@ -102,15 +102,21 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         renderPuzzle();
     }
 
-    public void loadPuzzleById(String puzzleId) throws NoSuchElementException {
-        Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
-        if(!loadedPuzzleIds.contains(puzzleId)) {
-            currentPuzzleIndex = this.playedPuzzles.size();
-            this.playedPuzzles.add(nextPuzzle);
-            loadedPuzzleIds.add(nextPuzzle.puzzleId());
+    public void loadPuzzleById(String puzzleId) {
+        try {
+            Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
+            if(!loadedPuzzleIds.contains(puzzleId)) {
+                currentPuzzleIndex = this.playedPuzzles.size();
+                this.playedPuzzles.add(nextPuzzle);
+                loadedPuzzleIds.add(nextPuzzle.puzzleId());
+            }
+            else {
+                currentPuzzleIndex = this.playedPuzzles.lastIndexOf(nextPuzzle);
+            }
         }
-        else {
-            currentPuzzleIndex = this.playedPuzzles.lastIndexOf(nextPuzzle);
+        catch (NoSuchElementException e) {
+            Toast.makeText(chessboardView.getContext(), R.string.invalid_puzzle_id, Toast.LENGTH_SHORT).show();
+            return;
         }
         renderPuzzle();
     }

@@ -50,31 +50,22 @@ public class MainActivity extends AppCompatActivity {
         EditText puzzleId = findViewById(R.id.puzzle_id);
         TextView puzzleIdLink = findViewById(R.id.puzzle_id_link);
 
-
         SwitchMaterial autoplay = findViewById(R.id.toggle_autoplay);
         autoplay.setChecked(chessboardController.getAutoplay());
         autoplay.setOnCheckedChangeListener((buttonView, isChecked)
                 -> chessboardController.setAutoplay(isChecked));
 
-
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());
         nextPuzzle.setOnClickListener(v -> onNextPuzzleClicked());
         hint.setOnClickListener(v -> onPuzzleHintClicked());
-        puzzleId.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        puzzleId.setOnEditorActionListener((TextView v, int actionId, KeyEvent event) -> {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    try {
-                        chessboardController.loadPuzzleById(puzzleId.getText().toString());
-                    }
-                    catch (NoSuchElementException e) {
-                        Toast.makeText(chessboardView.getContext(), R.string.invalid_puzzle_id, Toast.LENGTH_SHORT).show();
-                    }
+                    chessboardController.loadPuzzleById(puzzleId.getText().toString());
                     return true;
                 }
                 return false;
-            }});
+            });
         puzzleIdLink.setOnClickListener(v->onPuzzleIdLinkClicked());
     }
 

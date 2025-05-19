@@ -81,15 +81,12 @@ public class ChessboardControllerTest {
     @Test
     public void testLoadPuzzleById() {
         when(databaseAccessor.getPuzzleById("1")).thenReturn(puzzle);
-        when(databaseAccessor.getPuzzleById("2")).thenThrow(NoSuchElementException.class);
 
         chessboardController.loadPuzzleById("1");
 
         verify(chessboardView).setPuzzle(puzzle);
         verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
         verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
-
-        assertThrows(NoSuchElementException.class,() -> chessboardController.loadPuzzleById("2"));
     }
 
     @Test
