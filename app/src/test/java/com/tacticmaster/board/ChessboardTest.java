@@ -163,24 +163,24 @@ public class ChessboardTest {
         Chessboard chessboard = new Chessboard(puzzle);
 
         chessboard.makeFirstMove();
-        assertEquals('Q', chessboard.getBoard()[7][0]);
+        assertEquals('Q', chessboard.getBoard()[7][7]);
         chessboard.makeNextMove();
-        assertEquals('q', chessboard.getBoard()[0][1]);
+        assertEquals('q', chessboard.getBoard()[0][6]);
 
         chessboard.makeNextMove();
-        assertEquals('R', chessboard.getBoard()[7][2]);
+        assertEquals('R', chessboard.getBoard()[7][5]);
         chessboard.makeNextMove();
-        assertEquals('r', chessboard.getBoard()[0][3]);
+        assertEquals('r', chessboard.getBoard()[0][4]);
 
         chessboard.makeNextMove();
-        assertEquals('B', chessboard.getBoard()[7][4]);
+        assertEquals('B', chessboard.getBoard()[7][3]);
         chessboard.makeNextMove();
-        assertEquals('b', chessboard.getBoard()[0][5]);
+        assertEquals('b', chessboard.getBoard()[0][2]);
 
         chessboard.makeNextMove();
-        assertEquals('N', chessboard.getBoard()[7][6]);
+        assertEquals('N', chessboard.getBoard()[7][1]);
         chessboard.makeNextMove();
-        assertEquals('n', chessboard.getBoard()[0][7]);
+        assertEquals('n', chessboard.getBoard()[0][0]);
     }
 
     @Test
@@ -190,10 +190,10 @@ public class ChessboardTest {
         Puzzle puzzle = new Puzzle("1", fen, move, 1049);
         Chessboard chessboard = new Chessboard(puzzle);
         chessboard.makeFirstMove();
-        assertEquals('p', chessboard.getBoard()[4][2]);
+        assertEquals('p', chessboard.getBoard()[4][5]);
         chessboard.makeNextMove();
-        assertEquals(' ', chessboard.getBoard()[4][3]);
-        assertEquals('P', chessboard.getBoard()[5][2]);
+        assertEquals(' ', chessboard.getBoard()[4][5]);
+        assertEquals('P', chessboard.getBoard()[5][5]);
 
         fen = "1k6/p7/8/1P6/8/8/8/1K6 b - - 0 1";
         move = "a7a5 b5a6";
