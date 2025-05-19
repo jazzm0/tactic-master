@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
@@ -47,6 +48,13 @@ public class MainActivity extends AppCompatActivity {
         EditText puzzleId = findViewById(R.id.puzzle_id);
         TextView puzzleIdLink = findViewById(R.id.puzzle_id_link);
 
+
+        SwitchMaterial autoplay = findViewById(R.id.toggle_autoplay);
+        autoplay.setChecked(chessboardController.getAutoplay());
+        autoplay.setOnCheckedChangeListener((buttonView, isChecked)
+                -> chessboardController.setAutoplay(isChecked));
+
+
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());
         nextPuzzle.setOnClickListener(v -> onNextPuzzleClicked());
@@ -61,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }});
         puzzleIdLink.setOnClickListener(v->onPuzzleIdLinkClicked());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        chessboardController.renderPuzzle();
     }
 
     private void onReloadPuzzleClicked() {

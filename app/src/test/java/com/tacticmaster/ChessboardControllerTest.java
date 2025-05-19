@@ -1,8 +1,10 @@
 package com.tacticmaster;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +46,7 @@ public class ChessboardControllerTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         when(databaseAccessor.getPlayerRating()).thenReturn(2333);
+        when(databaseAccessor.getPlayerAutoplay()).thenReturn(false);
         String fen = "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29";
         String moves = "f8f7 c2h7 g8h7 g7g8q";
         this.puzzle = new Puzzle("1", fen, moves, 1049);
@@ -103,6 +106,7 @@ public class ChessboardControllerTest {
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet()))
                 .thenReturn(puzzles)
                 .thenReturn(newPuzzles);
+
         chessboardController.loadNextPuzzle();
 
         chessboardController.onPuzzleSolved(puzzle);
@@ -110,6 +114,14 @@ public class ChessboardControllerTest {
         verify(databaseAccessor).setSolved(puzzle.puzzleId());
         verify(databaseAccessor).storePlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
+
+        // check that chessboardController.loadNextPuzzle() was not executed again (because autoplay=false)
+        verify(chessboardView, times(1)).setPuzzle(any());
+
+        chessboardController.setAutoplay(true);
+        chessboardController.onPuzzleSolved(puzzle);
+        // check that chessboardController.loadNextPuzzle() was executed once more (because autoplay=true)
+        verify(chessboardView, times(2)).setPuzzle(any());
     }
 
     @Test
@@ -122,4 +134,5 @@ public class ChessboardControllerTest {
         verify(databaseAccessor).storePlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
     }
+
 }

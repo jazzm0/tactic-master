@@ -1,5 +1,7 @@
 package com.tacticmaster.db;
 
+import static com.tacticmaster.db.PlayerTable.COLUMN_AUTOPLAY_ENABLED;
+import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_ID;
 import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
@@ -15,7 +17,6 @@ import android.util.Log;
 
 import com.tacticmaster.puzzle.Puzzle;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +29,7 @@ public class DatabaseAccessor {
         this.dbHelper = dbHelper;
         try {
             dbHelper.createDatabase();
-        } catch (IOException e) {
+        } catch (Error e) {
             Log.e("The following error occurred: ", e.getMessage());
         }
     }
@@ -114,20 +115,35 @@ public class DatabaseAccessor {
 
     public void storePlayerRating(int rating) {
         SQLiteDatabase db = dbHelper.openDatabase();
-        db.execSQL("DELETE FROM " + PLAYER_TABLE_NAME); // Delete any existing rows
         ContentValues values = new ContentValues();
         values.put(COLUMN_PLAYER_RATING, rating);
-        db.insert(PLAYER_TABLE_NAME, null, values);
+        db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
     }
 
     public int getPlayerRating() {
         SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT * FROM " + PLAYER_TABLE_NAME, null)) {
+        try (Cursor cursor = db.rawQuery("SELECT " + COLUMN_PLAYER_RATING + " FROM " + PLAYER_TABLE_NAME, null)) {
             if (cursor.moveToFirst()) {
-                int ratingIndex = cursor.getColumnIndex(COLUMN_PLAYER_RATING);
-                return cursor.getInt(ratingIndex);
+                return cursor.getInt(0);
             }
         }
         return DEFAULT_PLAYER_RATING;
+    }
+
+    public void storePlayerAutoplay(boolean isChecked) {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_AUTOPLAY_ENABLED, isChecked ? 1 : 0);
+        db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
+    }
+
+    public boolean getPlayerAutoplay() {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        try (Cursor cursor = db.rawQuery("SELECT " + COLUMN_AUTOPLAY_ENABLED + " FROM " + PLAYER_TABLE_NAME, null)) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0) == 1;
+            }
+        }
+        return true;
     }
 }
