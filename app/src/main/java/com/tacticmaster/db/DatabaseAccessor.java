@@ -19,6 +19,7 @@ import com.tacticmaster.puzzle.Puzzle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class DatabaseAccessor {
@@ -80,13 +81,13 @@ public class DatabaseAccessor {
         return executeQuery(db, queryBuilder.toString(), null);
     }
 
-    public Puzzle getPuzzleById(String puzzleId) {
+    public Puzzle getPuzzleById(String puzzleId) throws NoSuchElementException {
         SQLiteDatabase db = dbHelper.openDatabase();
         String query = "SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_PUZZLE_ID + " = ?";
         List<Puzzle> puzzles = executeQuery(db, query, new String[]{puzzleId});
         if(puzzles.isEmpty()){
-            throw new RuntimeException("Puzzle ID  not found");
+            throw new NoSuchElementException("Puzzle ID  not found");
         }
         return puzzles.get(0);
     }

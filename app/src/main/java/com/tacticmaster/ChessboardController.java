@@ -11,6 +11,7 @@ import com.tacticmaster.rating.EloRatingCalculator;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -101,21 +102,15 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         renderPuzzle();
     }
 
-    public void loadPuzzleById(String puzzleId) {
-        try {
-            Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
-            if(!loadedPuzzleIds.contains(puzzleId)) {
-                currentPuzzleIndex = this.playedPuzzles.size();
-                this.playedPuzzles.add(nextPuzzle);
-                loadedPuzzleIds.add(nextPuzzle.puzzleId());
-            }
-            else {
-                currentPuzzleIndex = this.playedPuzzles.lastIndexOf(nextPuzzle);
-            }
+    public void loadPuzzleById(String puzzleId) throws NoSuchElementException {
+        Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
+        if(!loadedPuzzleIds.contains(puzzleId)) {
+            currentPuzzleIndex = this.playedPuzzles.size();
+            this.playedPuzzles.add(nextPuzzle);
+            loadedPuzzleIds.add(nextPuzzle.puzzleId());
         }
-        catch (RuntimeException e) {
-            Toast.makeText(chessboardView.getContext(), "Invalid puzzle ID", Toast.LENGTH_SHORT).show();
-            return;
+        else {
+            currentPuzzleIndex = this.playedPuzzles.lastIndexOf(nextPuzzle);
         }
         renderPuzzle();
     }

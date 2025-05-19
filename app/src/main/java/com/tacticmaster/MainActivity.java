@@ -7,6 +7,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +17,7 @@ import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
 
 import java.security.SecureRandom;
+import java.util.NoSuchElementException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,7 +65,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    chessboardController.loadPuzzleById(puzzleId.getText().toString());
+                    try {
+                        chessboardController.loadPuzzleById(puzzleId.getText().toString());
+                    }
+                    catch (NoSuchElementException e) {
+                        Toast.makeText(chessboardView.getContext(), R.string.invalid_puzzle_id, Toast.LENGTH_SHORT).show();
+                    }
                     return true;
                 }
                 return false;

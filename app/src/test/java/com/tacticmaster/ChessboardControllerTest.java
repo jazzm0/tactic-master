@@ -1,5 +1,6 @@
 package com.tacticmaster;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anySet;
@@ -20,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 public class ChessboardControllerTest {
@@ -73,6 +75,21 @@ public class ChessboardControllerTest {
         verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
         verify(puzzleTextViews).setPuzzlesSolved(5, 256);
         verify(puzzleTextViews).setPlayerRating(2333);
+    }
+
+
+    @Test
+    public void testLoadPuzzleById() {
+        when(databaseAccessor.getPuzzleById("1")).thenReturn(puzzle);
+        when(databaseAccessor.getPuzzleById("2")).thenThrow(NoSuchElementException.class);
+
+        chessboardController.loadPuzzleById("1");
+
+        verify(chessboardView).setPuzzle(puzzle);
+        verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
+        verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
+
+        assertThrows(NoSuchElementException.class,() -> chessboardController.loadPuzzleById("2"));
     }
 
     @Test
