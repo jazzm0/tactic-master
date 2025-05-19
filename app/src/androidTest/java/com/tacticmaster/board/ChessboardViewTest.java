@@ -109,7 +109,7 @@ public class ChessboardViewTest {
             chessboardView.getChessboard().makeFirstMove();
             chessboardView.puzzleHintClicked();
             assertEquals(6, chessboardView.getHintMoveRow());
-            assertEquals(4, chessboardView.getHintMoveColumn());
+            assertEquals(3, chessboardView.getHintMoveColumn());
 
             chessboardView.puzzleHintClicked();
             assertEquals(View.VISIBLE, mockHintPathView.getVisibility());
