@@ -187,6 +187,14 @@ public class ChessboardView extends View {
                 = scaledWhitePawn = scaledBlackPawn = null;
     }
 
+    int getHintMoveRow() {
+        return hintMoveRow;
+    }
+
+    int getHintMoveColumn() {
+        return hintMoveColumn;
+    }
+
     public void setPlayerTurnIcon(ImageView playerTurnIcon) {
         this.playerTurnIcon = playerTurnIcon;
     }
