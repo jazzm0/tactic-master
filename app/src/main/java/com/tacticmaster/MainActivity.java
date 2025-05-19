@@ -6,6 +6,7 @@ import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
@@ -40,6 +41,13 @@ public class MainActivity extends AppCompatActivity {
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
         ImageButton hint = findViewById(R.id.puzzle_hint);
+
+
+        SwitchMaterial autoplay = findViewById(R.id.toggle_autoplay);
+        autoplay.setChecked(chessboardController.getAutoplay());
+        autoplay.setOnCheckedChangeListener((buttonView, isChecked)
+                -> chessboardController.setAutoplay(isChecked));
+
 
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());

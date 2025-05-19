@@ -305,11 +305,8 @@ public class ChessboardView extends View {
                             }, 1300);
                         }
                     } else {
-                        Toast.makeText(getContext(), "Wrong solution", Toast.LENGTH_SHORT).show();
-
-                        post(() -> {
-                            puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
-                        }, NEXT_PUZZLE_DELAY);
+                        Toast.makeText(getContext(), R.string.wrong_solution, Toast.LENGTH_SHORT).show();
+                        puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
                     }
                 }
             }
@@ -411,6 +408,7 @@ public class ChessboardView extends View {
             }
             if (!isNull(chessboard) && chessboard.solved() && !isNull(puzzleFinishedListener) && !puzzleSolved) {
                 puzzleSolved = true;
+                Toast.makeText(getContext(), R.string.correct_solution, Toast.LENGTH_SHORT).show();
                 post(() -> {
                     synchronized (ChessboardView.this) {
                         puzzleFinishedListener.onPuzzleSolved(this.puzzle);

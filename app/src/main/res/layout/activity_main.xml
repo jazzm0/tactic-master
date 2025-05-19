@@ -124,6 +124,15 @@
             android:src="@drawable/ic_right" />
     </LinearLayout>
 
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/toggle_autoplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:thumb="@drawable/autoplay"
+        app:layout_constraintBottom_toTopOf="@id/puzzle_hint"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <ImageButton
         android:id="@+id/puzzle_hint"
         android:layout_width="40dp"
