@@ -110,8 +110,5 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     @Override
     public void onPuzzleNotSolved(Puzzle puzzle) {
         updatePlayerRating(puzzle.rating(), 0.0);
-        if(this.autoplay) {
-            loadNextPuzzle();
-        }
     }
 }

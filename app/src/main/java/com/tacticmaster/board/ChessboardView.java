@@ -253,10 +253,7 @@ public class ChessboardView extends View {
                         }
                     } else {
                         Toast.makeText(getContext(), R.string.wrong_solution, Toast.LENGTH_SHORT).show();
-
-                        post(() -> {
-                            puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
-                        }, NEXT_PUZZLE_DELAY);
+                        puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
                     }
                 }
             }
