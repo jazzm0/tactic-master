@@ -124,7 +124,7 @@
             android:src="@drawable/ic_right" />
     </LinearLayout>
 
-    <Switch
+    <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/toggle_autoplay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

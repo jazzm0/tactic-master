@@ -4,11 +4,9 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 
-import android.widget.CompoundButton;
-import android.widget.Switch;
-
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
@@ -45,13 +43,10 @@ public class MainActivity extends AppCompatActivity {
         ImageButton hint = findViewById(R.id.puzzle_hint);
 
 
-        Switch autoplay = findViewById(R.id.toggle_autoplay);
+        SwitchMaterial autoplay = findViewById(R.id.toggle_autoplay);
         autoplay.setChecked(chessboardController.getAutoplay());
-        autoplay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                chessboardController.setAutoplay(isChecked);
-            }
-        });
+        autoplay.setOnCheckedChangeListener((buttonView, isChecked)
+                -> chessboardController.setAutoplay(isChecked));
 
 
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());

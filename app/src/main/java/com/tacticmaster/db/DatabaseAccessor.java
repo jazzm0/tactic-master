@@ -17,7 +17,6 @@ import android.util.Log;
 
 import com.tacticmaster.puzzle.Puzzle;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -107,7 +106,7 @@ public class DatabaseAccessor {
         SQLiteDatabase db = dbHelper.openDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_PLAYER_RATING, rating);
-        db.update(PLAYER_TABLE_NAME, values,COLUMN_PLAYER_ID + " = 1", null);
+        db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
     }
 
     public int getPlayerRating() {
@@ -124,7 +123,7 @@ public class DatabaseAccessor {
         SQLiteDatabase db = dbHelper.openDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_AUTOPLAY_ENABLED, isChecked ? 1 : 0);
-        db.update(PLAYER_TABLE_NAME, values,COLUMN_PLAYER_ID + " = 1", null);
+        db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
     }
 
     public boolean getPlayerAutoplay() {
