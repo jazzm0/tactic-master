@@ -29,8 +29,8 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class ChessboardViewTest {
 
-    public static class MockView extends ImageView {
-        public MockView(Context context) {
+    public static class MockViewTest extends ImageView {
+        public MockViewTest(Context context) {
             super(context);
         }
     }
@@ -50,7 +50,7 @@ public class ChessboardViewTest {
         activityScenarioRule.getScenario().onActivity(activity -> {
             chessboardView = new ChessboardView(context, null);
             chessboardView.setPuzzle(puzzle);
-            chessboardView.setPlayerTurnIcon(new MockView(context));
+            chessboardView.setPlayerTurnIcon(new MockViewTest(context));
             activity.setContentView(chessboardView);
         });
     }

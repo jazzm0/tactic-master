@@ -44,5 +44,6 @@ jobs:
           target: default
           arch: x86_64
           profile: Nexus 6
+          emulator-options: "-no-window -no-audio"
           script: connectedAndroidTest --stacktrace
 
