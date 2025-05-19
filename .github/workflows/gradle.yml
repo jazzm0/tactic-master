@@ -31,7 +31,7 @@ jobs:
       - name: Run Unit Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ./gradlew test --stacktrace --warning-mode=all
+          arguments: test --stacktrace --warning-mode=all
       - name: Install Android SDK
         uses: android-actions/setup-android@v2
         with:
@@ -44,5 +44,5 @@ jobs:
           target: default
           arch: x86_64
           profile: Nexus 6
-          script: ./gradlew connectedAndroidTest --stacktrace
+          script: connectedAndroidTest --stacktrace
 
