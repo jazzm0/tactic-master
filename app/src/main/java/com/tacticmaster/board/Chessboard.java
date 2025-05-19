@@ -55,6 +55,8 @@ public class Chessboard {
             if (!whiteToMove) {
                 fromRow = 7 - fromRow;
                 toRow = 7 - toRow;
+                fromCol = 7 - fromCol;
+                toCol = 7 - toCol;
             }
             coordinates.add(new int[]{fromRow, fromCol, toRow, toCol});
         }
@@ -106,10 +108,19 @@ public class Chessboard {
 
     private void flipBoard() {
         for (int i = 0; i < 4; i++) {
-            char[] src = board[i];
-            board[i] = board[7 - i];
+            char[] src = flipRow(board[i]);
+            board[i] = flipRow(board[7 - i]);
             board[7 - i] = src;
         }
+    }
+
+    private char[] flipRow(char[] row) {
+        for (int i = 0; i < 4; i++) {
+            char src = row[i];
+            row[i] = row[7 - i];
+            row[7 - i] = src;
+        }
+        return row;
     }
 
     public Character getPieceAt(int row, int col) {
