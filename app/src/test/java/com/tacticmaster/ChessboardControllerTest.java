@@ -69,9 +69,22 @@ public class ChessboardControllerTest {
         chessboardController.loadNextPuzzle();
 
         verify(chessboardView).setPuzzle(puzzle);
+        verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
         verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
         verify(puzzleTextViews).setPuzzlesSolved(5, 256);
         verify(puzzleTextViews).setPlayerRating(2333);
+    }
+
+
+    @Test
+    public void testLoadPuzzleById() {
+        when(databaseAccessor.getPuzzleById("1")).thenReturn(puzzle);
+
+        chessboardController.loadPuzzleById("1");
+
+        verify(chessboardView).setPuzzle(puzzle);
+        verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
+        verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
     }
 
     @Test

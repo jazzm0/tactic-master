@@ -19,6 +19,7 @@ import com.tacticmaster.puzzle.Puzzle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class DatabaseAccessor {
@@ -36,7 +37,7 @@ public class DatabaseAccessor {
 
     public void setSolved(String puzzleId) {
         SQLiteDatabase db = dbHelper.openDatabase();
-        db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET solved = 1 WHERE " + COLUMN_PUZZLE_ID + " = '" + puzzleId + "'");
+        db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET " + COLUMN_SOLVED + " = 1 WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
     }
 
     public int getSolvedPuzzleCount() {
@@ -77,12 +78,23 @@ public class DatabaseAccessor {
 
         queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" LIMIT 5");
 
-        return executeQuery(db, queryBuilder.toString());
+        return executeQuery(db, queryBuilder.toString(), null);
     }
 
-    private List<Puzzle> executeQuery(SQLiteDatabase db, String query) {
+    public Puzzle getPuzzleById(String puzzleId) throws NoSuchElementException {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        String query = "SELECT * FROM " + PUZZLE_TABLE_NAME +
+                " WHERE " + COLUMN_PUZZLE_ID + " = ?";
+        List<Puzzle> puzzles = executeQuery(db, query, new String[]{puzzleId});
+        if (puzzles.isEmpty()) {
+            throw new NoSuchElementException("Puzzle ID  not found");
+        }
+        return puzzles.get(0);
+    }
+
+    private List<Puzzle> executeQuery(SQLiteDatabase db, String query, String[] selectionArgs) {
         List<Puzzle> puzzles = new ArrayList<>();
-        try (Cursor cursor = db.rawQuery(query, null)) {
+        try (Cursor cursor = db.rawQuery(query, selectionArgs)) {
             int puzzleIdIndex = cursor.getColumnIndex(COLUMN_PUZZLE_ID);
             int fenIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_FEN);
             int movesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_MOVES);
