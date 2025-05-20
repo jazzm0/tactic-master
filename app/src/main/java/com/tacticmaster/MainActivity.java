@@ -1,13 +1,16 @@
 package com.tacticmaster;
 
+import static java.util.Objects.isNull;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,7 +20,6 @@ import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
 
 import java.security.SecureRandom;
-import java.util.NoSuchElementException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,13 +62,17 @@ public class MainActivity extends AppCompatActivity {
         nextPuzzle.setOnClickListener(v -> onNextPuzzleClicked());
         hint.setOnClickListener(v -> onPuzzleHintClicked());
         puzzleId.setOnEditorActionListener((TextView v, int actionId, KeyEvent event) -> {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    chessboardController.loadPuzzleById(puzzleId.getText().toString());
-                    return true;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                chessboardController.loadPuzzleById(puzzleId.getText().toString());
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (!isNull(imm)) {
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 }
-                return false;
-            });
-        puzzleIdLink.setOnClickListener(v->onPuzzleIdLinkClicked());
+                return true;
+            }
+            return false;
+        });
+        puzzleIdLink.setOnClickListener(v -> onPuzzleIdLinkClicked());
     }
 
     @Override
@@ -91,5 +97,7 @@ public class MainActivity extends AppCompatActivity {
         chessboardController.puzzleHintClicked();
     }
 
-    private void onPuzzleIdLinkClicked() { chessboardController.puzzleIdLinkClicked(); }
+    private void onPuzzleIdLinkClicked() {
+        chessboardController.puzzleIdLinkClicked();
+    }
 }

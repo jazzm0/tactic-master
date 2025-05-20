@@ -80,6 +80,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
+
             <TextView
                 android:id="@+id/puzzle_id_label"
                 android:layout_width="wrap_content"
@@ -93,9 +94,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
+                android:autofillHints="name"
                 android:gravity="center"
+                android:hint="@string/puzzle_id_hint"
                 android:imeOptions="actionDone"
-                android:inputType="text"
+                android:inputType="textNoSuggestions"
                 android:maxLength="5"
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
@@ -108,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:gravity="center"
-                android:text="↗️"
+                android:text="@string/puzzle_id_sharing"
                 android:textSize="12sp" />
         </LinearLayout>
 

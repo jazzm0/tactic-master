@@ -59,16 +59,6 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.loadedPuzzles.addAll(nextPuzzles);
     }
 
-    private void shareText(String t) {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, t);
-        sendIntent.setType("text/plain");
-
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        chessboardView.getContext().startActivity(shareIntent);
-    }
-
     public void renderPuzzle() {
         Puzzle puzzle = playedPuzzles.get(currentPuzzleIndex);
         currentPuzzleId = puzzle.puzzleId();
@@ -105,16 +95,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void loadPuzzleById(String puzzleId) {
         try {
             Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
-            if(!loadedPuzzleIds.contains(puzzleId)) {
+            if (!loadedPuzzleIds.contains(puzzleId)) {
                 currentPuzzleIndex = this.playedPuzzles.size();
                 this.playedPuzzles.add(nextPuzzle);
                 loadedPuzzleIds.add(nextPuzzle.puzzleId());
-            }
-            else {
+            } else {
                 currentPuzzleIndex = this.playedPuzzles.lastIndexOf(nextPuzzle);
             }
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             Toast.makeText(chessboardView.getContext(), R.string.invalid_puzzle_id, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -122,9 +110,15 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     public void puzzleIdLinkClicked() {
-        shareText("https://lichess.org/training/"+currentPuzzleId);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "https://lichess.org/training/" + currentPuzzleId);
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        chessboardView.getContext().startActivity(shareIntent);
     }
-    
+
     public void puzzleHintClicked() {
         chessboardView.puzzleHintClicked();
     }
@@ -142,7 +136,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void onPuzzleSolved(Puzzle puzzle) {
         databaseAccessor.setSolved(puzzle.puzzleId());
         updatePlayerRating(puzzle.rating(), 1.0);
-        if(this.autoplay) {
+        if (this.autoplay) {
             loadNextPuzzle();
         }
     }

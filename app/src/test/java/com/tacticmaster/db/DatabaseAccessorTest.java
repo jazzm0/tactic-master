@@ -141,9 +141,9 @@ class DatabaseAccessorTest {
 
         when(mockDatabase.rawQuery("SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{"2"})).thenReturn(mockCursor);
-        when(mockCursor.moveToNext()).thenReturn( false); // 0 rows
+        when(mockCursor.moveToNext()).thenReturn(false); // 0 rows
 
-        assertThrows(NoSuchElementException.class,() -> databaseAccessor.getPuzzleById("2"));
+        assertThrows(NoSuchElementException.class, () -> databaseAccessor.getPuzzleById("2"));
     }
 
     @Test

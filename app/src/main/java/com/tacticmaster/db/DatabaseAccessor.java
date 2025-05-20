@@ -86,7 +86,7 @@ public class DatabaseAccessor {
         String query = "SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_PUZZLE_ID + " = ?";
         List<Puzzle> puzzles = executeQuery(db, query, new String[]{puzzleId});
-        if(puzzles.isEmpty()){
+        if (puzzles.isEmpty()) {
             throw new NoSuchElementException("Puzzle ID  not found");
         }
         return puzzles.get(0);
