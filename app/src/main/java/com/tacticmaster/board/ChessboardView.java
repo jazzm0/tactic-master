@@ -35,13 +35,12 @@ public class ChessboardView extends View {
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private Puzzle puzzle;
     private Chessboard chessboard;
+    private final ChessboardBitmapManager bitmapManager;
     private static final int BOARD_SIZE = 8;
     private Paint lightBrownPaint;
     private Paint darkBrownPaint;
     private Paint bitmapPaint;
     private Paint selectionPaint;
-    private Bitmap whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook, whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn;
-    private Bitmap scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook, scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn;
     private ImageView playerTurnIcon;
     private HintPathView hintPathView;
     private int selectedRow = -1;
@@ -57,6 +56,7 @@ public class ChessboardView extends View {
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.bitmapManager = new ChessboardBitmapManager(context);
         init();
     }
 
@@ -79,19 +79,6 @@ public class ChessboardView extends View {
         selectionPaint.setColor(Color.YELLOW);
         selectionPaint.setStyle(Paint.Style.STROKE);
         selectionPaint.setStrokeWidth(5);
-
-        whiteKing = loadBitmap(R.drawable.wk, "whiteKing");
-        blackKing = loadBitmap(R.drawable.bk, "blackKing");
-        whiteQueen = loadBitmap(R.drawable.wq, "whiteQueen");
-        blackQueen = loadBitmap(R.drawable.bq, "blackQueen");
-        whiteRook = loadBitmap(R.drawable.wr, "whiteRook");
-        blackRook = loadBitmap(R.drawable.br, "blackRook");
-        whiteBishop = loadBitmap(R.drawable.wb, "whiteBishop");
-        blackBishop = loadBitmap(R.drawable.bb, "blackBishop");
-        whiteKnight = loadBitmap(R.drawable.wn, "whiteKnight");
-        blackKnight = loadBitmap(R.drawable.bn, "blackKnight");
-        whitePawn = loadBitmap(R.drawable.wp, "whitePawn");
-        blackPawn = loadBitmap(R.drawable.bp, "blackPawn");
     }
 
     public void resetHintFirstClick() {
@@ -148,43 +135,6 @@ public class ChessboardView extends View {
             throw new IllegalStateException("Failed to load bitmap for " + pieceName + " (resource ID: " + resId + ")");
         }
         return bitmap;
-    }
-
-    private Bitmap getPieceBitmap(char piece) {
-        return switch (piece) {
-            case 'K' -> scaledWhiteKing;
-            case 'k' -> scaledBlackKing;
-            case 'Q' -> scaledWhiteQueen;
-            case 'q' -> scaledBlackQueen;
-            case 'R' -> scaledWhiteRook;
-            case 'r' -> scaledBlackRook;
-            case 'B' -> scaledWhiteBishop;
-            case 'b' -> scaledBlackBishop;
-            case 'N' -> scaledWhiteKnight;
-            case 'n' -> scaledBlackKnight;
-            case 'P' -> scaledWhitePawn;
-            case 'p' -> scaledBlackPawn;
-            default -> null;
-        };
-    }
-
-    private void recycleBitmaps() {
-        for (Bitmap bitmap : new Bitmap[]{whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook,
-                whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn,
-                scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook,
-                scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn}) {
-            if (!isNull(bitmap) && !bitmap.isRecycled()) {
-                bitmap.recycle();
-            }
-        }
-        whiteKing = blackKing = whiteQueen = blackQueen
-                = whiteRook = blackRook = whiteBishop
-                = blackBishop = whiteKnight = blackKnight
-                = whitePawn = blackPawn = scaledWhiteKing
-                = scaledBlackKing = scaledWhiteQueen = scaledBlackQueen
-                = scaledWhiteRook = scaledBlackRook = scaledWhiteBishop
-                = scaledBlackBishop = scaledWhiteKnight = scaledBlackKnight
-                = scaledWhitePawn = scaledBlackPawn = null;
     }
 
     int getHintMoveRow() {
@@ -327,19 +277,7 @@ public class ChessboardView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         int tileSize = (int) ((Math.min(w, h) * 0.95f / BOARD_SIZE));
 
-        scaledWhiteKing = Bitmap.createScaledBitmap(whiteKing, tileSize, tileSize, true);
-        scaledBlackKing = Bitmap.createScaledBitmap(blackKing, tileSize, tileSize, true);
-        scaledWhiteQueen = Bitmap.createScaledBitmap(whiteQueen, tileSize, tileSize, true);
-        scaledBlackQueen = Bitmap.createScaledBitmap(blackQueen, tileSize, tileSize, true);
-        scaledWhiteRook = Bitmap.createScaledBitmap(whiteRook, tileSize, tileSize, true);
-        scaledBlackRook = Bitmap.createScaledBitmap(blackRook, tileSize, tileSize, true);
-        scaledWhiteBishop = Bitmap.createScaledBitmap(whiteBishop, tileSize, tileSize, true);
-        scaledBlackBishop = Bitmap.createScaledBitmap(blackBishop, tileSize, tileSize, true);
-        scaledWhiteKnight = Bitmap.createScaledBitmap(whiteKnight, tileSize, tileSize, true);
-        scaledBlackKnight = Bitmap.createScaledBitmap(blackKnight, tileSize, tileSize, true);
-        scaledWhitePawn = Bitmap.createScaledBitmap(whitePawn, tileSize, tileSize, true);
-        scaledBlackPawn = Bitmap.createScaledBitmap(blackPawn, tileSize, tileSize, true);
-
+        bitmapManager.onSizeChanged(tileSize);
         invalidate();
     }
 
@@ -392,7 +330,7 @@ public class ChessboardView extends View {
                 for (int col = 0; col < BOARD_SIZE; col++) {
                     char piece = chessboard.getPieceAt(row, col);
                     if (piece != ' ') {
-                        Bitmap pieceBitmap = getPieceBitmap(piece);
+                        Bitmap pieceBitmap = bitmapManager.getPieceBitmap(piece);
                         if (!isNull(pieceBitmap)) {
                             float left = col * tileSize + 3.5f;
                             float top = row * tileSize;
@@ -421,6 +359,6 @@ public class ChessboardView extends View {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        recycleBitmaps();
+        bitmapManager.recycleBitmaps();
     }
 }
