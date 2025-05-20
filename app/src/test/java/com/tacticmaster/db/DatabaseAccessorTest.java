@@ -5,6 +5,7 @@ import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
@@ -24,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 class DatabaseAccessorTest {
@@ -50,7 +52,7 @@ class DatabaseAccessorTest {
     void testSetSolved() {
         String puzzleId = "12345";
         databaseAccessor.setSolved(puzzleId);
-        verify(mockDatabase).execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET solved = 1 WHERE " + COLUMN_PUZZLE_ID + " = '" + puzzleId + "'");
+        verify(mockDatabase).execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET " + COLUMN_SOLVED + " = 1 WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
     }
 
     @Test
@@ -110,6 +112,38 @@ class DatabaseAccessorTest {
         assertEquals("puzzle1", puzzles.get(0).puzzleId());
         assertEquals("puzzle2", puzzles.get(1).puzzleId());
         assertEquals("puzzle3", puzzles.get(2).puzzleId());
+    }
+
+    @Test
+    void testGetPuzzleById() {
+        String puzzleId = "1";
+        when(mockDatabase.rawQuery("SELECT * FROM " + PUZZLE_TABLE_NAME +
+                " WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId})).thenReturn(mockCursor);
+        when(mockCursor.moveToNext()).thenReturn(true, false); // 1 row
+        when(mockCursor.getColumnIndex(COLUMN_PUZZLE_ID)).thenReturn(0);
+        when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_FEN)).thenReturn(1);
+        when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_MOVES)).thenReturn(2);
+        when(mockCursor.getColumnIndex(COLUMN_RATING)).thenReturn(3);
+        when(mockCursor.getString(0)).thenReturn(puzzleId);
+        when(mockCursor.getString(1)).thenReturn("fen1");
+        when(mockCursor.getString(2)).thenReturn("moves1");
+        when(mockCursor.getInt(3)).thenReturn(1700);
+        when(mockCursor.getInt(4)).thenReturn(50);
+        when(mockCursor.getInt(5)).thenReturn(100);
+        when(mockCursor.getInt(6)).thenReturn(10);
+        when(mockCursor.getString(7)).thenReturn("theme1");
+        when(mockCursor.getString(8)).thenReturn("url1");
+        when(mockCursor.getString(9)).thenReturn("opening1");
+
+        Puzzle puzzle = databaseAccessor.getPuzzleById(puzzleId);
+
+        assertEquals(puzzleId, puzzle.puzzleId());
+
+        when(mockDatabase.rawQuery("SELECT * FROM " + PUZZLE_TABLE_NAME +
+                " WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{"2"})).thenReturn(mockCursor);
+        when(mockCursor.moveToNext()).thenReturn(false); // 0 rows
+
+        assertThrows(NoSuchElementException.class, () -> databaseAccessor.getPuzzleById("2"));
     }
 
     @Test

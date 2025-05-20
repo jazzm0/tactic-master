@@ -1,8 +1,16 @@
 package com.tacticmaster;
 
+import static java.util.Objects.isNull;
+
+import android.content.Context;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -41,18 +49,30 @@ public class MainActivity extends AppCompatActivity {
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
         ImageButton hint = findViewById(R.id.puzzle_hint);
-
+        EditText puzzleId = findViewById(R.id.puzzle_id);
+        TextView puzzleIdLink = findViewById(R.id.puzzle_id_link);
 
         SwitchMaterial autoplay = findViewById(R.id.toggle_autoplay);
         autoplay.setChecked(chessboardController.getAutoplay());
         autoplay.setOnCheckedChangeListener((buttonView, isChecked)
                 -> chessboardController.setAutoplay(isChecked));
 
-
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());
         nextPuzzle.setOnClickListener(v -> onNextPuzzleClicked());
         hint.setOnClickListener(v -> onPuzzleHintClicked());
+        puzzleId.setOnEditorActionListener((TextView v, int actionId, KeyEvent event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                chessboardController.loadPuzzleById(puzzleId.getText().toString());
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (!isNull(imm)) {
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+                return true;
+            }
+            return false;
+        });
+        puzzleIdLink.setOnClickListener(v -> onPuzzleIdLinkClicked());
     }
 
     @Override
@@ -75,5 +95,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void onPuzzleHintClicked() {
         chessboardController.puzzleHintClicked();
+    }
+
+    private void onPuzzleIdLinkClicked() {
+        chessboardController.puzzleIdLinkClicked();
     }
 }

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">TacticMaster</string>
     <string name="rating">Puzzle Rating: %d</string>
+    <string name="puzzle_id">Puzzle ID:</string>
+    <string name="puzzle_id_hint">Enter Puzzle ID</string>
+    <string name="invalid_puzzle_id">Invalid puzzle ID</string>
     <string name="puzzles_solved">Solved %1$d of %2$d puzzles</string>
     <string name="show_previous_puzzle">Show previous puzzle</string>
     <string name="correct_solution">✅ Correct solution!</string>
@@ -10,4 +13,5 @@
     <string name="show_next_puzzle">Show next puzzle</string>
     <string name="player_rating">Player Rating: %d</string>
     <string name="player_turn">move</string>
+    <string name="puzzle_id_sharing">↗️</string>
 </resources>
