@@ -36,7 +36,7 @@ public class ChessboardViewTest {
     }
 
     @Rule
-    public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(MainActivity.class);
+    final public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(MainActivity.class);
 
     private Context context;
     private ChessboardView chessboardView;
