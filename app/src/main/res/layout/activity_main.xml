@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingTop="?attr/actionBarSize"
+        android:paddingTop="16dp"
         android:paddingBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,12 +46,14 @@
 
     <com.tacticmaster.board.HintPathView
         android:id="@+id/hint_path_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constrainedHeight="@+id/chessboard_view"
+        app:layout_constrainedWidth="@+id/chessboard_view"
+        app:layout_constraintBottom_toBottomOf="@id/chessboard_view"
+        app:layout_constraintEnd_toEndOf="@id/chessboard_view"
+        app:layout_constraintStart_toStartOf="@id/chessboard_view"
+        app:layout_constraintTop_toTopOf="@id/chessboard_view" />
 
     <LinearLayout
         android:id="@+id/info_container"
@@ -76,10 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/puzzle_id_label"
@@ -142,7 +141,6 @@
         android:layout_height="wrap_content"
         android:gravity="bottom"
         android:orientation="horizontal"
-        android:paddingBottom="?attr/actionBarSize"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -174,7 +172,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:thumb="@drawable/autoplay"
-        app:layout_constraintBottom_toTopOf="@id/puzzle_hint"
+        app:layout_constraintBottom_toTopOf="@id/puzzle_reload"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
