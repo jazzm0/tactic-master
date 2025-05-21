@@ -208,6 +208,7 @@ public class ChessboardTest {
 
     @ParameterizedTest
     @CsvSource({
+            "'4k2r/8/8/8/8/8/8/4K2R w - - 0 1', 'e1g1'",
             "'3rk2r/p2nb1Rp/2Q3bB/8/1qBP4/8/PP1N1P1P/R3K3 w Qk - 5 18', 'e1c1 b4c3 b2c3 e7a3'",
             "'r3k1r1/p1pb1p2/1pn1q2p/1B2p3/4Pp2/P1P2N1P/2P1QPPK/1R3R2 w q - 0 18', 'b1d1 g8g2 h2g2 e6h3 g2g1 e8c8'",
             "'r3k2r/8/8/8/8/8/8/R3K2R b - - 0 1', 'e8g8 e1c1'",
@@ -342,7 +343,7 @@ public class ChessboardTest {
     }
 
     public boolean validCastling(char[] row) {
-        return (toLowerCase(row[6]) == 'k' && toLowerCase(row[5]) == 'r') || (toLowerCase(row[2]) == 'k' && toLowerCase(row[3]) == 'r');
+        return (toLowerCase(row[6]) == 'k' && toLowerCase(row[5]) == 'r') || (toLowerCase(row[2]) == 'k' && toLowerCase(row[3]) == 'r') || (toLowerCase(row[5]) == 'k' && toLowerCase(row[4]) == 'r') || (toLowerCase(row[1]) == 'k' && toLowerCase(row[2]) == 'r');
     }
 
     public boolean wasCastlingMove(char[] rowBefore, char[] rowAfter) {
