@@ -244,9 +244,9 @@ public class ChessboardView extends View {
         var move = chessboard.getNextMove();
 
         if (!isNull(move) && chessboard.isPlayersTurn()) {
-            var fromRow = move[0] + 2;
+            var fromRow = move[0] + 1;
             var fromCol = move[1] + 1;
-            var toRow = move[2] + 2;
+            var toRow = move[2] + 1;
             var toCol = move[3] + 1;
             var tileSize = getTileSize();
             var halfTileSize = tileSize / 2;
@@ -258,9 +258,9 @@ public class ChessboardView extends View {
                 hintPathView.setVisibility(VISIBLE);
                 hintPathView.drawAnimatedHintPath(
                         (fromCol * tileSize) - halfTileSize,
-                        ((fromRow * tileSize) + halfTileSize) * 0.975f,
+                        ((fromRow * tileSize) - halfTileSize),
                         (toCol * tileSize) - halfTileSize,
-                        ((toRow * tileSize) + halfTileSize) * 0.975f
+                        ((toRow * tileSize) - halfTileSize)
                 );
             }
         }
