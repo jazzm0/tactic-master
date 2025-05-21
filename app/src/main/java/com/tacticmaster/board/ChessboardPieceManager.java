@@ -9,85 +9,80 @@ import android.graphics.BitmapFactory;
 
 import com.tacticmaster.R;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ChessboardPieceManager {
 
-    private Bitmap whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook, whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn;
-    private Bitmap scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook, scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn;
+    private final Map<String, Bitmap> bitmaps = new HashMap<>();
+    private final Map<String, Bitmap> scaledBitmaps = new HashMap<>();
     private final Context context;
 
     public ChessboardPieceManager(Context context) {
         this.context = requireNonNull(context);
-        whiteKing = loadBitmap(R.drawable.wk, "whiteKing");
-        blackKing = loadBitmap(R.drawable.bk, "blackKing");
-        whiteQueen = loadBitmap(R.drawable.wq, "whiteQueen");
-        blackQueen = loadBitmap(R.drawable.bq, "blackQueen");
-        whiteRook = loadBitmap(R.drawable.wr, "whiteRook");
-        blackRook = loadBitmap(R.drawable.br, "blackRook");
-        whiteBishop = loadBitmap(R.drawable.wb, "whiteBishop");
-        blackBishop = loadBitmap(R.drawable.bb, "blackBishop");
-        whiteKnight = loadBitmap(R.drawable.wn, "whiteKnight");
-        blackKnight = loadBitmap(R.drawable.bn, "blackKnight");
-        whitePawn = loadBitmap(R.drawable.wp, "whitePawn");
-        blackPawn = loadBitmap(R.drawable.bp, "blackPawn");
+        loadBitmaps();
     }
 
-    private Bitmap loadBitmap(int resId, String pieceName) {
+    private void loadBitmaps() {
+        bitmaps.put("whiteKing", loadBitmap(R.drawable.wk));
+        bitmaps.put("blackKing", loadBitmap(R.drawable.bk));
+        bitmaps.put("whiteQueen", loadBitmap(R.drawable.wq));
+        bitmaps.put("blackQueen", loadBitmap(R.drawable.bq));
+        bitmaps.put("whiteRook", loadBitmap(R.drawable.wr));
+        bitmaps.put("blackRook", loadBitmap(R.drawable.br));
+        bitmaps.put("whiteBishop", loadBitmap(R.drawable.wb));
+        bitmaps.put("blackBishop", loadBitmap(R.drawable.bb));
+        bitmaps.put("whiteKnight", loadBitmap(R.drawable.wn));
+        bitmaps.put("blackKnight", loadBitmap(R.drawable.bn));
+        bitmaps.put("whitePawn", loadBitmap(R.drawable.wp));
+        bitmaps.put("blackPawn", loadBitmap(R.drawable.bp));
+    }
+
+    private Bitmap loadBitmap(int resId) {
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resId);
         if (isNull(bitmap)) {
-            throw new IllegalStateException("Failed to load bitmap for " + pieceName + " (resource ID: " + resId + ")");
+            throw new IllegalStateException("Failed to load bitmap (resource ID: " + resId + ")");
         }
         return bitmap;
     }
 
     public Bitmap getPieceBitmap(char piece) {
         return switch (piece) {
-            case 'K' -> scaledWhiteKing;
-            case 'k' -> scaledBlackKing;
-            case 'Q' -> scaledWhiteQueen;
-            case 'q' -> scaledBlackQueen;
-            case 'R' -> scaledWhiteRook;
-            case 'r' -> scaledBlackRook;
-            case 'B' -> scaledWhiteBishop;
-            case 'b' -> scaledBlackBishop;
-            case 'N' -> scaledWhiteKnight;
-            case 'n' -> scaledBlackKnight;
-            case 'P' -> scaledWhitePawn;
-            case 'p' -> scaledBlackPawn;
+            case 'K' -> scaledBitmaps.get("whiteKing");
+            case 'k' -> scaledBitmaps.get("blackKing");
+            case 'Q' -> scaledBitmaps.get("whiteQueen");
+            case 'q' -> scaledBitmaps.get("blackQueen");
+            case 'R' -> scaledBitmaps.get("whiteRook");
+            case 'r' -> scaledBitmaps.get("blackRook");
+            case 'B' -> scaledBitmaps.get("whiteBishop");
+            case 'b' -> scaledBitmaps.get("blackBishop");
+            case 'N' -> scaledBitmaps.get("whiteKnight");
+            case 'n' -> scaledBitmaps.get("blackKnight");
+            case 'P' -> scaledBitmaps.get("whitePawn");
+            case 'p' -> scaledBitmaps.get("blackPawn");
             default -> null;
         };
     }
 
     public void onSizeChanged(int tileSize) {
-        scaledWhiteKing = Bitmap.createScaledBitmap(whiteKing, tileSize, tileSize, true);
-        scaledBlackKing = Bitmap.createScaledBitmap(blackKing, tileSize, tileSize, true);
-        scaledWhiteQueen = Bitmap.createScaledBitmap(whiteQueen, tileSize, tileSize, true);
-        scaledBlackQueen = Bitmap.createScaledBitmap(blackQueen, tileSize, tileSize, true);
-        scaledWhiteRook = Bitmap.createScaledBitmap(whiteRook, tileSize, tileSize, true);
-        scaledBlackRook = Bitmap.createScaledBitmap(blackRook, tileSize, tileSize, true);
-        scaledWhiteBishop = Bitmap.createScaledBitmap(whiteBishop, tileSize, tileSize, true);
-        scaledBlackBishop = Bitmap.createScaledBitmap(blackBishop, tileSize, tileSize, true);
-        scaledWhiteKnight = Bitmap.createScaledBitmap(whiteKnight, tileSize, tileSize, true);
-        scaledBlackKnight = Bitmap.createScaledBitmap(blackKnight, tileSize, tileSize, true);
-        scaledWhitePawn = Bitmap.createScaledBitmap(whitePawn, tileSize, tileSize, true);
-        scaledBlackPawn = Bitmap.createScaledBitmap(blackPawn, tileSize, tileSize, true);
+        scaledBitmaps.clear();
+        for (Map.Entry<String, Bitmap> entry : bitmaps.entrySet()) {
+            scaledBitmaps.put(entry.getKey(), Bitmap.createScaledBitmap(entry.getValue(), tileSize, tileSize, true));
+        }
     }
 
     public void recycleBitmaps() {
-        for (Bitmap bitmap : new Bitmap[]{whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook,
-                whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn,
-                scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook,
-                scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn}) {
+        for (Bitmap bitmap : bitmaps.values()) {
             if (!isNull(bitmap) && !bitmap.isRecycled()) {
                 bitmap.recycle();
             }
         }
-        whiteKing = blackKing = whiteQueen = blackQueen
-                = whiteRook = blackRook = whiteBishop
-                = blackBishop = whiteKnight = blackKnight
-                = whitePawn = blackPawn = scaledWhiteKing
-                = scaledBlackKing = scaledWhiteQueen = scaledBlackQueen
-                = scaledWhiteRook = scaledBlackRook = scaledWhiteBishop
-                = scaledBlackBishop = scaledWhiteKnight = scaledBlackKnight
-                = scaledWhitePawn = scaledBlackPawn = null;
+        for (Bitmap bitmap : scaledBitmaps.values()) {
+            if (!isNull(bitmap) && !bitmap.isRecycled()) {
+                bitmap.recycle();
+            }
+        }
+        bitmaps.clear();
+        scaledBitmaps.clear();
     }
 }
