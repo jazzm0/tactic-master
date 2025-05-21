@@ -2,7 +2,6 @@ package com.tacticmaster.board;
 
 import static java.util.Objects.isNull;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,9 +21,12 @@ import androidx.annotation.NonNull;
 import com.tacticmaster.R;
 import com.tacticmaster.puzzle.Puzzle;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+public class ChessboardView extends View implements HintPathView.ViewChangedListener {
 
-public class ChessboardView extends View {
+    @Override
+    public void onViewChanged() {
+        invalidate();
+    }
 
     public interface PuzzleFinishedListener {
         void onPuzzleSolved(Puzzle puzzle);
@@ -35,7 +37,7 @@ public class ChessboardView extends View {
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private Puzzle puzzle;
     private Chessboard chessboard;
-    private final ChessboardBitmapManager bitmapManager;
+    private final ChessboardPieceManager bitmapManager;
     private static final int BOARD_SIZE = 8;
     private Paint lightBrownPaint;
     private Paint darkBrownPaint;
@@ -49,14 +51,11 @@ public class ChessboardView extends View {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private PuzzleFinishedListener puzzleFinishedListener;
     private boolean puzzleSolved = false;
-    private final AtomicBoolean isHintFirstClick = new AtomicBoolean(false);
-    private float shakeOffset = 0;
-    private int hintMoveRow = -1;
-    private int hintMoveColumn = -1;
+
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.bitmapManager = new ChessboardBitmapManager(context);
+        this.bitmapManager = new ChessboardPieceManager(context);
         init();
     }
 
@@ -81,36 +80,6 @@ public class ChessboardView extends View {
         selectionPaint.setStrokeWidth(5);
     }
 
-    public void resetHintFirstClick() {
-        isHintFirstClick.set(false);
-    }
-
-    private void shakePiece(int row, int col) {
-        hintMoveRow = row;
-        hintMoveColumn = col;
-
-        ValueAnimator animator = ValueAnimator.ofFloat(-10, 10);
-        animator.setDuration(100);
-        animator.setRepeatCount(5);
-        animator.setRepeatMode(ValueAnimator.REVERSE);
-
-        animator.addUpdateListener(animation -> {
-            shakeOffset = (float) animation.getAnimatedValue();
-            invalidate();
-        });
-
-        animator.addListener(new android.animation.AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(android.animation.Animator animation) {
-                shakeOffset = 0;
-                hintMoveRow = -1;
-                hintMoveColumn = -1;
-                invalidate();
-            }
-        });
-
-        animator.start();
-    }
 
     private void post(Runnable runnable, long delay) {
         handler.removeCallbacksAndMessages(null);
@@ -137,13 +106,6 @@ public class ChessboardView extends View {
         return bitmap;
     }
 
-    int getHintMoveRow() {
-        return hintMoveRow;
-    }
-
-    int getHintMoveColumn() {
-        return hintMoveColumn;
-    }
 
     public void setPlayerTurnIcon(ImageView playerTurnIcon) {
         this.playerTurnIcon = playerTurnIcon;
@@ -151,6 +113,7 @@ public class ChessboardView extends View {
 
     public void setHintPathView(HintPathView hintPathView) {
         this.hintPathView = hintPathView;
+        hintPathView.setHintPathListener(this);
     }
 
     public void setPuzzle(Puzzle puzzle) {
@@ -159,7 +122,7 @@ public class ChessboardView extends View {
         this.selectedRow = -1;
         this.selectedCol = -1;
         this.puzzleSolved = false;
-        resetHintFirstClick();
+        hintPathView.resetHintFirstClick();
 
         invalidate();
         post(() -> {
@@ -189,31 +152,7 @@ public class ChessboardView extends View {
     }
 
     public void puzzleHintClicked() {
-        if (isNull(hintPathView) || isNull(chessboard)) return;
-
-        var move = chessboard.getNextMove();
-
-        if (!isNull(move) && chessboard.isPlayersTurn()) {
-            var fromRow = move[0] + 1;
-            var fromCol = move[1] + 1;
-            var toRow = move[2] + 1;
-            var toCol = move[3] + 1;
-            var tileSize = getTileSize();
-            var halfTileSize = tileSize / 2;
-
-            if (!isHintFirstClick.get()) {
-                isHintFirstClick.set(true);
-                shakePiece(move[0], move[1]);
-            } else {
-                hintPathView.setVisibility(VISIBLE);
-                hintPathView.drawAnimatedHintPath(
-                        (fromCol * tileSize) - halfTileSize,
-                        ((fromRow * tileSize) - halfTileSize),
-                        (toCol * tileSize) - halfTileSize,
-                        ((toRow * tileSize) - halfTileSize)
-                );
-            }
-        }
+        hintPathView.puzzleHintClicked(chessboard, getTileSize());
     }
 
     @Override
@@ -335,9 +274,7 @@ public class ChessboardView extends View {
                             float left = col * tileSize + 3.5f;
                             float top = row * tileSize;
 
-                            if (row == hintMoveRow && col == hintMoveColumn) {
-                                left += shakeOffset;
-                            }
+                            left += hintPathView.getShakeOffset(row, col);
 
                             canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
                         }

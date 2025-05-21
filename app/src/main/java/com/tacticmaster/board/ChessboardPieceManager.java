@@ -9,13 +9,13 @@ import android.graphics.BitmapFactory;
 
 import com.tacticmaster.R;
 
-public class ChessboardBitmapManager {
+public class ChessboardPieceManager {
 
     private Bitmap whiteKing, blackKing, whiteQueen, blackQueen, whiteRook, blackRook, whiteBishop, blackBishop, whiteKnight, blackKnight, whitePawn, blackPawn;
     private Bitmap scaledWhiteKing, scaledBlackKing, scaledWhiteQueen, scaledBlackQueen, scaledWhiteRook, scaledBlackRook, scaledWhiteBishop, scaledBlackBishop, scaledWhiteKnight, scaledBlackKnight, scaledWhitePawn, scaledBlackPawn;
     private final Context context;
 
-    public ChessboardBitmapManager(Context context) {
+    public ChessboardPieceManager(Context context) {
         this.context = requireNonNull(context);
         whiteKing = loadBitmap(R.drawable.wk, "whiteKing");
         blackKing = loadBitmap(R.drawable.bk, "blackKing");

@@ -27,7 +27,7 @@
             android:text="@string/player_rating"
             android:textSize="14sp" />
 
-        <com.tacticmaster.board.AntiAliasedImageView
+        <ImageView
             android:id="@+id/player_turn_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
