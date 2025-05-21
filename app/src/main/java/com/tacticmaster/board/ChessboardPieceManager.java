@@ -46,6 +46,10 @@ public class ChessboardPieceManager {
         return bitmap;
     }
 
+    Map<String, Bitmap> getBitmaps() {
+        return bitmaps;
+    }
+
     public Bitmap getPieceBitmap(char piece) {
         return switch (piece) {
             case 'K' -> scaledBitmaps.get("whiteKing");

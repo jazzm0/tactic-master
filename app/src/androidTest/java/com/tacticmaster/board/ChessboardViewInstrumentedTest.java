@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 
 
 @RunWith(AndroidJUnit4.class)
-public class ChessboardViewTest {
+public class ChessboardViewInstrumentedTest {
 
     public static class MockViewTest extends ImageView {
         public MockViewTest(Context context) {
