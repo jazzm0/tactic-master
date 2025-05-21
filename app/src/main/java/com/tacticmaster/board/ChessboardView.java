@@ -4,7 +4,6 @@ import static java.util.Objects.isNull;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -21,7 +20,7 @@ import androidx.annotation.NonNull;
 import com.tacticmaster.R;
 import com.tacticmaster.puzzle.Puzzle;
 
-public class ChessboardView extends View implements HintPathView.ViewChangedListener {
+public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener {
 
     @Override
     public void onViewChanged() {
@@ -44,7 +43,7 @@ public class ChessboardView extends View implements HintPathView.ViewChangedList
     private Paint bitmapPaint;
     private Paint selectionPaint;
     private ImageView playerTurnIcon;
-    private HintPathView hintPathView;
+    private PuzzleHintView puzzleHintView;
     private int selectedRow = -1;
     private int selectedCol = -1;
     private Paint textPaint;
@@ -98,22 +97,13 @@ public class ChessboardView extends View implements HintPathView.ViewChangedList
         return (float) Math.min(getWidth(), getHeight()) / BOARD_SIZE;
     }
 
-    private Bitmap loadBitmap(int resId, String pieceName) {
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
-        if (isNull(bitmap)) {
-            throw new IllegalStateException("Failed to load bitmap for " + pieceName + " (resource ID: " + resId + ")");
-        }
-        return bitmap;
-    }
-
-
     public void setPlayerTurnIcon(ImageView playerTurnIcon) {
         this.playerTurnIcon = playerTurnIcon;
     }
 
-    public void setHintPathView(HintPathView hintPathView) {
-        this.hintPathView = hintPathView;
-        hintPathView.setHintPathListener(this);
+    public void setPuzzleHintView(PuzzleHintView puzzleHintView) {
+        this.puzzleHintView = puzzleHintView;
+        puzzleHintView.setHintPathListener(this);
     }
 
     public void setPuzzle(Puzzle puzzle) {
@@ -122,7 +112,7 @@ public class ChessboardView extends View implements HintPathView.ViewChangedList
         this.selectedRow = -1;
         this.selectedCol = -1;
         this.puzzleSolved = false;
-        hintPathView.resetHintFirstClick();
+        puzzleHintView.resetHintFirstClick();
 
         invalidate();
         post(() -> {
@@ -152,7 +142,7 @@ public class ChessboardView extends View implements HintPathView.ViewChangedList
     }
 
     public void puzzleHintClicked() {
-        hintPathView.puzzleHintClicked(chessboard, getTileSize());
+        puzzleHintView.puzzleHintClicked(chessboard, getTileSize());
     }
 
     @Override
@@ -274,7 +264,7 @@ public class ChessboardView extends View implements HintPathView.ViewChangedList
                             float left = col * tileSize + 3.5f;
                             float top = row * tileSize;
 
-                            left += hintPathView.getShakeOffset(row, col);
+                            left += puzzleHintView.getShakeOffset(row, col);
 
                             canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
                         }

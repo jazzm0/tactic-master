@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class HintPathView extends View {
+public class PuzzleHintView extends View {
 
     public interface ViewChangedListener {
         void onViewChanged();
@@ -31,7 +31,7 @@ public class HintPathView extends View {
     private int hintMoveColumn = -1;
     private ViewChangedListener viewChangedListener;
 
-    public HintPathView(Context context, AttributeSet attrs) {
+    public PuzzleHintView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }

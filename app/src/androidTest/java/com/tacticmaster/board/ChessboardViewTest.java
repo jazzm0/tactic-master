@@ -48,9 +48,9 @@ public class ChessboardViewTest {
         puzzle = new Puzzle("1", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "e2e4 e7e5", 1049);
 
         activityScenarioRule.getScenario().onActivity(activity -> {
-            HintPathView mockHintPathView = new HintPathView(context, null);
+            PuzzleHintView mockPuzzleHintView = new PuzzleHintView(context, null);
             chessboardView = new ChessboardView(context, null);
-            chessboardView.setHintPathView(mockHintPathView);
+            chessboardView.setPuzzleHintView(mockPuzzleHintView);
             chessboardView.setPuzzle(puzzle);
             chessboardView.setPlayerTurnIcon(new MockViewTest(context));
             activity.setContentView(chessboardView);
@@ -105,16 +105,16 @@ public class ChessboardViewTest {
     @Test
     public void testHintClickBehavior() {
         activityScenarioRule.getScenario().onActivity(activity -> {
-            HintPathView mockHintPathView = new HintPathView(context, null);
-            chessboardView.setHintPathView(mockHintPathView);
+            PuzzleHintView mockPuzzleHintView = new PuzzleHintView(context, null);
+            chessboardView.setPuzzleHintView(mockPuzzleHintView);
 
             chessboardView.getChessboard().makeFirstMove();
             chessboardView.puzzleHintClicked();
-            assertEquals(6, mockHintPathView.getHintMoveRow());
-            assertEquals(3, mockHintPathView.getHintMoveColumn());
+            assertEquals(6, mockPuzzleHintView.getHintMoveRow());
+            assertEquals(3, mockPuzzleHintView.getHintMoveColumn());
 
             chessboardView.puzzleHintClicked();
-            assertEquals(View.VISIBLE, mockHintPathView.getVisibility());
+            assertEquals(View.VISIBLE, mockPuzzleHintView.getVisibility());
         });
     }
 }
