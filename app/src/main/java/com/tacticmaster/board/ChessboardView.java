@@ -7,8 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,67 +20,126 @@ import com.tacticmaster.puzzle.Puzzle;
 
 public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener {
 
-    @Override
-    public void onViewChanged() {
-        invalidate();
-    }
-
     public interface PuzzleFinishedListener {
         void onPuzzleSolved(Puzzle puzzle);
 
         void onPuzzleNotSolved(Puzzle puzzle);
     }
 
+    private static final int BOARD_SIZE = 8;
     private static final int NEXT_PUZZLE_DELAY = 3000;
+
+    private final ChessboardPieceManager bitmapManager;
+
+    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, textPaint;
     private Puzzle puzzle;
     private Chessboard chessboard;
-    private final ChessboardPieceManager bitmapManager;
-    private static final int BOARD_SIZE = 8;
-    private Paint lightBrownPaint;
-    private Paint darkBrownPaint;
-    private Paint bitmapPaint;
-    private Paint selectionPaint;
-    private ImageView playerTurnIcon;
     private PuzzleHintView puzzleHintView;
-    private int selectedRow = -1;
-    private int selectedCol = -1;
-    private Paint textPaint;
-    private final Handler handler = new Handler(Looper.getMainLooper());
     private PuzzleFinishedListener puzzleFinishedListener;
-    private boolean puzzleSolved = false;
+    private ImageView playerTurnIcon;
 
+    private int selectedRow = -1, selectedColumn = -1;
+    private boolean puzzleSolved = false;
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.bitmapManager = new ChessboardPieceManager(context);
-        init();
+        initPaints();
     }
 
-    private void init() {
-        lightBrownPaint = new Paint();
-        lightBrownPaint.setColor(Color.parseColor("#D2B48C")); // Light brown color
-        darkBrownPaint = new Paint();
-        darkBrownPaint.setColor(Color.parseColor("#8B4513")); // Darker brown color
-        textPaint = new Paint();
-        textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(30);
-        textPaint.setAntiAlias(true);
-
-        bitmapPaint = new Paint();
-        bitmapPaint.setAntiAlias(true);
-        bitmapPaint.setFilterBitmap(true);
-        bitmapPaint.setDither(true);
-
-        selectionPaint = new Paint();
-        selectionPaint.setColor(Color.YELLOW);
-        selectionPaint.setStyle(Paint.Style.STROKE);
-        selectionPaint.setStrokeWidth(5);
+    private void initPaints() {
+        lightBrownPaint = createPaint("#D2B48C");
+        darkBrownPaint = createPaint("#8B4513");
+        bitmapPaint = createBitmapPaint();
+        selectionPaint = createSelectionPaint();
+        textPaint = createTextPaint();
     }
 
+    private Paint createPaint(String color) {
+        Paint paint = new Paint();
+        paint.setColor(Color.parseColor(color));
+        return paint;
+    }
 
-    private void post(Runnable runnable, long delay) {
-        handler.removeCallbacksAndMessages(null);
-        handler.postDelayed(runnable, delay);
+    private Paint createBitmapPaint() {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setFilterBitmap(true);
+        paint.setDither(true);
+        return paint;
+    }
+
+    private Paint createSelectionPaint() {
+        Paint paint = new Paint();
+        paint.setColor(Color.YELLOW);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+        return paint;
+    }
+
+    private Paint createTextPaint() {
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(30);
+        paint.setAntiAlias(true);
+        return paint;
+    }
+
+    private void drawBoard(Canvas canvas) {
+        float tileSize = getTileSize();
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int column = 0; column < BOARD_SIZE; column++) {
+                Paint paint = (row + column) % 2 == 0 ? lightBrownPaint : darkBrownPaint;
+                canvas.drawRect(column * tileSize, row * tileSize, (column + 1) * tileSize, (row + 1) * tileSize, paint);
+            }
+        }
+        if (selectedRow != -1 && selectedColumn != -1) {
+            float left = selectedColumn * tileSize;
+            float top = selectedRow * tileSize;
+            canvas.drawRect(left, top, left + tileSize, top + tileSize, selectionPaint);
+        }
+    }
+
+    private void drawLabels(Canvas canvas) {
+        float tileSize = getTileSize();
+        int height = getHeight();
+        boolean isWhiteToMove = chessboard.isWhiteToMove();
+        for (int index = 0; index < BOARD_SIZE; index++) {
+            String columnLabel = isWhiteToMove ? String.valueOf((char) ('a' + index)) : String.valueOf((char) ('h' - index));
+            String rowLabel = isWhiteToMove ? String.valueOf(BOARD_SIZE - index) : String.valueOf(index + 1);
+
+            canvas.drawText(columnLabel, index * tileSize + (tileSize / 2 - textPaint.measureText(columnLabel) / 2) * 1.9f, height - 10, textPaint);
+            canvas.drawText(rowLabel, 10, index * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .4f, textPaint);
+        }
+    }
+
+    private void drawPieces(Canvas canvas) {
+        float tileSize = getTileSize();
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int column = 0; column < BOARD_SIZE; column++) {
+                char piece = chessboard.getPieceAt(row, column);
+                if (piece != ' ') {
+                    Bitmap pieceBitmap = bitmapManager.getPieceBitmap(piece);
+                    if (!isNull(pieceBitmap)) {
+                        float left = column * tileSize + puzzleHintView.getShakeOffset(row, column);
+                        float top = row * tileSize;
+                        canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkPuzzleSolved() {
+        if (chessboard.solved() && !puzzleSolved && !isNull(puzzleFinishedListener)) {
+            puzzleSolved = true;
+            Toast.makeText(getContext(), R.string.correct_solution, Toast.LENGTH_SHORT).show();
+            postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(puzzle), NEXT_PUZZLE_DELAY);
+        }
+    }
+
+    private float getTileSize() {
+        return Math.min(getWidth(), getHeight()) / (float) BOARD_SIZE;
     }
 
     private void updatePlayerTurnIcon(boolean isWhiteTurn) {
@@ -93,12 +150,76 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         }
     }
 
-    private float getTileSize() {
-        return (float) Math.min(getWidth(), getHeight()) / BOARD_SIZE;
+    private void selectPiece(int row, int column, char piece) {
+        if (piece != ' ' && chessboard.isOwnPiece(piece)) {
+            selectedRow = row;
+            selectedColumn = column;
+        }
     }
 
-    public void setPlayerTurnIcon(ImageView playerTurnIcon) {
-        this.playerTurnIcon = playerTurnIcon;
+    private void handleMove(int row, int column) {
+        if (chessboard.isCorrectMove(selectedRow, selectedColumn, row, column)) {
+
+            if (chessboard.movePiece(selectedRow, selectedColumn, row, column)) {
+                selectedRow = -1;
+                selectedColumn = -1;
+
+                postDelayed(() -> {
+                    chessboard.makeNextMove();
+                    invalidate();
+                }, 1300);
+            }
+        } else {
+            Toast.makeText(getContext(), R.string.wrong_solution, Toast.LENGTH_SHORT).show();
+            puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
+        }
+    }
+
+    private void resetSelection() {
+        selectedRow = -1;
+        selectedColumn = -1;
+        puzzleSolved = false;
+    }
+
+    @Override
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
+        bitmapManager.onSizeChanged((int) getTileSize());
+    }
+
+    @Override
+    protected void onDraw(@NonNull Canvas canvas) {
+        super.onDraw(canvas);
+        drawBoard(canvas);
+        drawLabels(canvas);
+        drawPieces(canvas);
+        checkPuzzleSolved();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        bitmapManager.recycleBitmaps();
+    }
+
+    int getSelectedColumn() {
+        return selectedColumn;
+    }
+
+    int getSelectedRow() {
+        return selectedRow;
+    }
+
+    Puzzle getPuzzle() {
+        return puzzle;
+    }
+
+    Chessboard getChessboard() {
+        return chessboard;
+    }
+
+    public void puzzleHintClicked() {
+        puzzleHintView.puzzleHintClicked(chessboard, getTileSize());
     }
 
     public void setPuzzleHintView(PuzzleHintView puzzleHintView) {
@@ -106,17 +227,19 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         puzzleHintView.setHintPathListener(this);
     }
 
+    public void setPlayerTurnIcon(ImageView playerTurnIcon) {
+        this.playerTurnIcon = playerTurnIcon;
+    }
+
     public void setPuzzle(Puzzle puzzle) {
         this.puzzle = puzzle;
         this.chessboard = new Chessboard(puzzle);
-        this.selectedRow = -1;
-        this.selectedCol = -1;
-        this.puzzleSolved = false;
+        resetSelection();
         puzzleHintView.resetHintFirstClick();
-
+        updatePlayerTurnIcon(chessboard.isWhiteToMove());
         invalidate();
-        post(() -> {
-            this.chessboard.makeFirstMove();
+        postDelayed(() -> {
+            chessboard.makeFirstMove();
             invalidate();
         }, 2000);
     }
@@ -125,167 +248,38 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         this.puzzleFinishedListener = listener;
     }
 
-    public Puzzle getPuzzle() {
-        return puzzle;
-    }
-
-    public Chessboard getChessboard() {
-        return chessboard;
-    }
-
-    public int getSelectedCol() {
-        return selectedCol;
-    }
-
-    public int getSelectedRow() {
-        return selectedRow;
-    }
-
-    public void puzzleHintClicked() {
-        puzzleHintView.puzzleHintClicked(chessboard, getTileSize());
+    @Override
+    public void onViewChanged() {
+        invalidate();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            int width = getWidth();
-            int height = getHeight();
-            int tileSize = Math.min(width, height) / BOARD_SIZE;
+        if (event.getAction() == MotionEvent.ACTION_DOWN && chessboard.isFirstMoveDone()) {
+            int tileSize = (int) getTileSize();
 
-            int col = (int) (event.getX() / tileSize);
+            int column = (int) (event.getX() / tileSize);
             int row = (int) (event.getY() / tileSize);
 
-            if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+            if (row < 0 || row >= BOARD_SIZE || column < 0 || column >= BOARD_SIZE) {
                 return true;
             }
 
-            char piece = chessboard.getPieceAt(row, col);
-            boolean isWhiteToMove = chessboard.isWhiteToMove();
+            char piece = chessboard.getPieceAt(row, column);
 
-            if (selectedRow == -1 && selectedCol == -1) {
-                if (piece != ' ' && ((isWhiteToMove && Character.isUpperCase(piece)) || (!isWhiteToMove && Character.isLowerCase(piece)))) {
-                    selectedRow = row;
-                    selectedCol = col;
-                }
-            } else if (chessboard.isFirstMoveDone()) {
-                if (piece != ' ' && chessboard.isOwnPiece(piece)) {
-                    selectedRow = row;
-                    selectedCol = col;
-                } else {
-                    if (chessboard.isCorrectMove(selectedRow, selectedCol, row, col)) {
-
-                        if (chessboard.movePiece(selectedRow, selectedCol, row, col)) {
-                            selectedRow = -1;
-                            selectedCol = -1;
-
-                            post(() -> {
-                                chessboard.makeNextMove();
-                                invalidate();
-                            }, 1300);
-                        }
-                    } else {
-                        Toast.makeText(getContext(), R.string.wrong_solution, Toast.LENGTH_SHORT).show();
-                        puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
-                    }
-                }
+            if (selectedRow == -1 && selectedColumn == -1 || piece != ' ' && chessboard.isOwnPiece(piece)) {
+                selectPiece(row, column, piece);
+            } else {
+                handleMove(row, column);
             }
-            invalidate();
-            performClick();
-            return true;
         }
-        return super.onTouchEvent(event);
+        invalidate();
+        performClick();
+        return true;
     }
 
     @Override
     public boolean performClick() {
         return super.performClick();
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        int tileSize = (int) ((Math.min(w, h) * 0.95f / BOARD_SIZE));
-
-        bitmapManager.onSizeChanged(tileSize);
-        invalidate();
-    }
-
-    @Override
-    protected void onDraw(@NonNull Canvas canvas) {
-        super.onDraw(canvas);
-
-        int height = getHeight();
-        var tileSize = getTileSize();
-
-        boolean isWhiteToMove = chessboard.isWhiteToMove();
-        updatePlayerTurnIcon(isWhiteToMove);
-
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            for (int col = 0; col < BOARD_SIZE; col++) {
-                var colorChoice = (col + row) % 2 == 0;
-                Paint paint = colorChoice ? lightBrownPaint : darkBrownPaint;
-                var left = col * tileSize;
-                var top = row * tileSize;
-                var right = left + tileSize;
-                var bottom = top + tileSize;
-                canvas.drawRect(left, top, right, bottom, paint);
-            }
-        }
-
-        if (selectedRow != -1 && selectedCol != -1) {
-            var left = selectedCol * tileSize;
-            var top = selectedRow * tileSize;
-            var right = left + tileSize;
-            var bottom = top + tileSize;
-            canvas.drawRect(left, top, right, bottom, selectionPaint);
-        }
-
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            String label = isWhiteToMove ? String.valueOf((char) ('a' + col)) : String.valueOf((char) ('h' - col));
-            float x = col * tileSize + (tileSize / 2 - textPaint.measureText(label) / 2) * 1.9f;
-            float y = height - 10;
-            canvas.drawText(label, x, y, textPaint);
-        }
-
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            String label = isWhiteToMove ? String.valueOf(BOARD_SIZE - row) : String.valueOf(row + 1);
-            float x = 10;
-            float y = row * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .4f;
-            canvas.drawText(label, x, y, textPaint);
-        }
-
-        if (!isNull(chessboard)) {
-            for (int row = 0; row < BOARD_SIZE; row++) {
-                for (int col = 0; col < BOARD_SIZE; col++) {
-                    char piece = chessboard.getPieceAt(row, col);
-                    if (piece != ' ') {
-                        Bitmap pieceBitmap = bitmapManager.getPieceBitmap(piece);
-                        if (!isNull(pieceBitmap)) {
-                            float left = col * tileSize + 3.5f;
-                            float top = row * tileSize;
-
-                            left += puzzleHintView.getShakeOffset(row, col);
-
-                            canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
-                        }
-                    }
-                }
-            }
-            if (!isNull(chessboard) && chessboard.solved() && !isNull(puzzleFinishedListener) && !puzzleSolved) {
-                puzzleSolved = true;
-                Toast.makeText(getContext(), R.string.correct_solution, Toast.LENGTH_SHORT).show();
-                post(() -> {
-                    synchronized (ChessboardView.this) {
-                        puzzleFinishedListener.onPuzzleSolved(this.puzzle);
-                    }
-                }, NEXT_PUZZLE_DELAY);
-            }
-        }
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        bitmapManager.recycleBitmaps();
     }
 }

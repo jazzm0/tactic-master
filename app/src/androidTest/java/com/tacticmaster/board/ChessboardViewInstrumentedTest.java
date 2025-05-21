@@ -51,8 +51,8 @@ public class ChessboardViewInstrumentedTest {
             PuzzleHintView mockPuzzleHintView = new PuzzleHintView(context, null);
             chessboardView = new ChessboardView(context, null);
             chessboardView.setPuzzleHintView(mockPuzzleHintView);
-            chessboardView.setPuzzle(puzzle);
             chessboardView.setPlayerTurnIcon(new MockViewTest(context));
+            chessboardView.setPuzzle(puzzle);
             activity.setContentView(chessboardView);
         });
     }
@@ -73,15 +73,29 @@ public class ChessboardViewInstrumentedTest {
     }
 
     @Test
-    public void testOnTouchEvent() {
+    public void testOnTouchEventFirstMoveMade() {
         activityScenarioRule.getScenario().onActivity(activity -> {
-            assertEquals(-1, chessboardView.getSelectedCol());
+            assertEquals(-1, chessboardView.getSelectedColumn());
+            assertEquals(-1, chessboardView.getSelectedRow());
+            MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 900, 935, 0);
+            chessboardView.getChessboard().makeFirstMove();
+            boolean result = chessboardView.onTouchEvent(event);
+            assertTrue(result);
+            assertEquals(6, chessboardView.getSelectedColumn());
+            assertEquals(6, chessboardView.getSelectedRow());
+        });
+    }
+
+    @Test
+    public void testOnTouchEventFirstMoveNotMade() {
+        activityScenarioRule.getScenario().onActivity(activity -> {
+            assertEquals(-1, chessboardView.getSelectedColumn());
             assertEquals(-1, chessboardView.getSelectedRow());
             MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 900, 935, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(6, chessboardView.getSelectedCol());
-            assertEquals(6, chessboardView.getSelectedRow());
+            assertEquals(-1, chessboardView.getSelectedColumn());
+            assertEquals(-1, chessboardView.getSelectedRow());
         });
     }
 
