@@ -4,9 +4,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import android.content.Context;
+import android.content.Intent;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
@@ -169,5 +173,21 @@ public class ChessboardControllerTest {
         chessboardController.loadPuzzleById("1");
 
         verify(puzzleTextViews).setPuzzleSolved(true);
+    }
+
+    @Test
+    public void testPuzzleIdLinkClicked() {
+        String puzzleId = "12345";
+        when(databaseAccessor.getPuzzleById(puzzleId)).thenReturn(new Puzzle(puzzleId, "fen", "moves", 1000));
+        when(chessboardView.getContext()).thenReturn(mock(Context.class));
+        chessboardController.loadPuzzleById(puzzleId);
+
+        chessboardController.puzzleIdLinkClicked();
+
+        Intent expectedIntent = new Intent(Intent.ACTION_SEND);
+        expectedIntent.putExtra(Intent.EXTRA_TEXT, "https://lichess.org/training/" + puzzleId);
+        expectedIntent.setType("text/plain");
+
+        verify(chessboardView.getContext()).startActivity(Intent.createChooser(expectedIntent, null));
     }
 }
