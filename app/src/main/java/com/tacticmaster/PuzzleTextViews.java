@@ -1,12 +1,16 @@
 package com.tacticmaster;
 
+
+import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 public class PuzzleTextViews {
 
@@ -28,8 +32,8 @@ public class PuzzleTextViews {
         this.playerRatingTextView = findViewById(R.id.player_rating);
     }
 
-    private <T extends android.view.View> T findViewById(int id) {
-        return ((AppCompatActivity) context).findViewById(id);
+    <T extends android.view.View> T findViewById(int id) {
+        return ((Activity) context).findViewById(id);
     }
 
     private void setUnsolved() {
@@ -67,5 +71,38 @@ public class PuzzleTextViews {
     public void setPlayerRating(int playerRating) {
         playerRatingTextView.setText(context.getString(R.string.player_rating, playerRating));
         playerRatingTextView.setTypeface(null, Typeface.BOLD);
+    }
+
+    public void updatePlayerRating(int oldRating, int newRating) {
+        ValueAnimator animator = ValueAnimator.ofInt(oldRating, newRating);
+        animator.setDuration(1400);
+        animator.addUpdateListener(animation -> {
+            int animatedValue = (int) animation.getAnimatedValue();
+            String fullText = context.getString(R.string.player_rating, animatedValue);
+
+            SpannableString spannable = new SpannableString(fullText);
+            int start = fullText.indexOf(String.valueOf(animatedValue));
+            int end = start + String.valueOf(animatedValue).length();
+
+            int color = (newRating > oldRating) ? Color.GREEN : (newRating < oldRating) ? Color.RED : Color.BLACK;
+            spannable.setSpan(new ForegroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            playerRatingTextView.setText(spannable);
+        });
+
+        animator.addListener(new android.animation.AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(android.animation.Animator animation) {
+                String fullText = context.getString(R.string.player_rating, newRating);
+                SpannableString spannable = new SpannableString(fullText);
+                int start = fullText.indexOf(String.valueOf(newRating));
+                int end = start + String.valueOf(newRating).length();
+
+                spannable.setSpan(new ForegroundColorSpan(Color.BLACK), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                playerRatingTextView.setText(spannable);
+            }
+        });
+
+        animator.start();
     }
 }

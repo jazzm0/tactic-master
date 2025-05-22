@@ -47,9 +47,10 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     private void updatePlayerRating(int opponentRating, double result) {
-        playerRating = EloRatingCalculator.calculateNewRating(playerRating, opponentRating, result);
-        databaseAccessor.storePlayerRating(playerRating);
-        puzzleTextViews.setPlayerRating(playerRating);
+        var newRating = EloRatingCalculator.calculateNewRating(playerRating, opponentRating, result);
+        databaseAccessor.storePlayerRating(newRating);
+        puzzleTextViews.updatePlayerRating(playerRating, newRating);
+        this.playerRating = newRating;
     }
 
     private void loadNextPuzzles() {
