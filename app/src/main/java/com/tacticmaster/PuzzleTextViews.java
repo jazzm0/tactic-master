@@ -62,6 +62,7 @@ public class PuzzleTextViews {
     public void setPuzzleSolved(boolean solved) {
         if (solved) {
             puzzleIdEditText.setTextColor(Color.GREEN);
+            puzzleIdEditText.setAlpha(0.7f);
             puzzleIdEditText.setTypeface(null, Typeface.ITALIC);
         } else {
             setUnsolved();
@@ -74,8 +75,9 @@ public class PuzzleTextViews {
     }
 
     public void updatePlayerRating(int oldRating, int newRating) {
+        int duration = 1400;
         ValueAnimator animator = ValueAnimator.ofInt(oldRating, newRating);
-        animator.setDuration(1400);
+        animator.setDuration(duration);
         animator.addUpdateListener(animation -> {
             int animatedValue = (int) animation.getAnimatedValue();
             String fullText = context.getString(R.string.player_rating, animatedValue);
@@ -88,6 +90,13 @@ public class PuzzleTextViews {
             spannable.setSpan(new ForegroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             playerRatingTextView.setText(spannable);
+        });
+
+        ValueAnimator alphaAnimator = ValueAnimator.ofFloat(0.2f, 0.8f);
+        alphaAnimator.setDuration(duration);
+        alphaAnimator.addUpdateListener(animation -> {
+            float alphaValue = (float) animation.getAnimatedValue();
+            playerRatingTextView.setAlpha(alphaValue);
         });
 
         animator.addListener(new android.animation.AnimatorListenerAdapter() {
@@ -104,5 +113,6 @@ public class PuzzleTextViews {
         });
 
         animator.start();
+        alphaAnimator.start();
     }
 }
