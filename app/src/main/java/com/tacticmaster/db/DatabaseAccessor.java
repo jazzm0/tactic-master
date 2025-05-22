@@ -35,6 +35,17 @@ public class DatabaseAccessor {
         }
     }
 
+    public boolean wasNotSolved(String puzzleId) {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        String query = "SELECT " + COLUMN_SOLVED + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_PUZZLE_ID + " = ?";
+        try (Cursor cursor = db.rawQuery(query, new String[]{puzzleId})) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(0) != 1;
+            }
+        }
+        return true;
+    }
+
     public void setSolved(String puzzleId) {
         SQLiteDatabase db = dbHelper.openDatabase();
         db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET " + COLUMN_SOLVED + " = 1 WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
@@ -99,14 +110,15 @@ public class DatabaseAccessor {
             int fenIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_FEN);
             int movesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_MOVES);
             int ratingIndex = cursor.getColumnIndex(COLUMN_RATING);
+            int solvedIndex = cursor.getColumnIndex(COLUMN_SOLVED); // Fetch the solved column index
             while (cursor.moveToNext()) {
-                if (puzzleIdIndex >= 0 && fenIndex >= 0 && movesIndex >= 0 && ratingIndex >= 0) {
-
+                if (puzzleIdIndex >= 0 && fenIndex >= 0 && movesIndex >= 0 && ratingIndex >= 0 && solvedIndex >= 0) {
                     puzzles.add(new Puzzle(
                             cursor.getString(puzzleIdIndex),
                             cursor.getString(fenIndex),
                             cursor.getString(movesIndex),
-                            cursor.getInt(ratingIndex)
+                            cursor.getInt(ratingIndex),
+                            cursor.getInt(solvedIndex) == 1
                     ));
                 }
             }

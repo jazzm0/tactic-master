@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -93,7 +94,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 canvas.drawRect(column * tileSize, row * tileSize, (column + 1) * tileSize, (row + 1) * tileSize, paint);
             }
         }
-        if (selectedRow != -1 && selectedColumn != -1) {
+        if (selectedRow != -1 && selectedColumn != -1 && !puzzleSolved) {
             float left = selectedColumn * tileSize;
             float top = selectedRow * tileSize;
             canvas.drawRect(left, top, left + tileSize, top + tileSize, selectionPaint);
@@ -130,10 +131,16 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         }
     }
 
+    private void makeText(int resourceId) {
+        Toast toast = Toast.makeText(getContext(), resourceId, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 50);
+        toast.show();
+    }
+
     private void checkPuzzleSolved() {
         if (chessboard.solved() && !puzzleSolved && !isNull(puzzleFinishedListener)) {
             puzzleSolved = true;
-            Toast.makeText(getContext(), R.string.correct_solution, Toast.LENGTH_SHORT).show();
+            makeText(R.string.correct_solution);
             postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(puzzle), NEXT_PUZZLE_DELAY);
         }
     }
@@ -151,18 +158,22 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void selectPiece(int row, int column, char piece) {
-        if (piece != ' ' && chessboard.isOwnPiece(piece)) {
+        if (piece != ' ' && chessboard.isOwnPiece(piece) && !chessboard.solved()) {
             selectedRow = row;
             selectedColumn = column;
         }
+    }
+
+    private void unselectPiece() {
+        selectedRow = -1;
+        selectedColumn = -1;
     }
 
     private void handleMove(int row, int column) {
         if (chessboard.isCorrectMove(selectedRow, selectedColumn, row, column)) {
 
             if (chessboard.movePiece(selectedRow, selectedColumn, row, column)) {
-                selectedRow = -1;
-                selectedColumn = -1;
+                unselectPiece();
 
                 postDelayed(() -> {
                     chessboard.makeNextMove();
@@ -176,8 +187,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void resetSelection() {
-        selectedRow = -1;
-        selectedColumn = -1;
+        unselectPiece();
         puzzleSolved = false;
     }
 

@@ -1,6 +1,7 @@
 package com.tacticmaster;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,6 +32,12 @@ public class PuzzleTextViews {
         return ((AppCompatActivity) context).findViewById(id);
     }
 
+    private void setUnsolved() {
+        puzzleIdEditText.clearFocus();
+        puzzleIdEditText.setTextColor(Color.BLACK);
+        puzzleIdEditText.setTypeface(null, Typeface.BOLD);
+    }
+
     public void setPuzzleRating(int rating) {
         puzzleRatingTextView.setText(context.getString(R.string.rating, rating));
         puzzleRatingTextView.setTypeface(null, Typeface.BOLD);
@@ -39,14 +46,22 @@ public class PuzzleTextViews {
     public void setPuzzleId(String puzzleId) {
         puzzleIdLabelTextView.setTypeface(null, Typeface.BOLD);
         puzzleIdEditText.setText(puzzleId);
-        puzzleIdEditText.clearFocus();
-        puzzleIdEditText.setTypeface(null, Typeface.BOLD);
+        setUnsolved();
         puzzleIdLinkTextView.setTypeface(null, Typeface.BOLD);
     }
 
-    public void setPuzzlesSolved(int solvedCount, int totalCount) {
+    public void setPuzzlesSolvedCount(int solvedCount, int totalCount) {
         puzzlesSolvedTextView.setText(context.getString(R.string.puzzles_solved, solvedCount, totalCount));
         puzzlesSolvedTextView.setTypeface(null, Typeface.BOLD);
+    }
+
+    public void setPuzzleSolved(boolean solved) {
+        if (solved) {
+            puzzleIdEditText.setTextColor(Color.GREEN);
+            puzzleIdEditText.setTypeface(null, Typeface.ITALIC);
+        } else {
+            setUnsolved();
+        }
     }
 
     public void setPlayerRating(int playerRating) {

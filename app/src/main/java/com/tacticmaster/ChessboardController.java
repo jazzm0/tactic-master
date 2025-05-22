@@ -1,5 +1,7 @@
 package com.tacticmaster;
 
+import static java.util.Objects.isNull;
+
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -59,6 +61,10 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.loadedPuzzles.addAll(nextPuzzles);
     }
 
+    Puzzle getCurrentPuzzle() {
+        return playedPuzzles.get(currentPuzzleIndex);
+    }
+
     public void renderPuzzle() {
         Puzzle puzzle = playedPuzzles.get(currentPuzzleIndex);
         currentPuzzleId = puzzle.puzzleId();
@@ -66,8 +72,9 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
         puzzleTextViews.setPuzzleId(puzzle.puzzleId());
         puzzleTextViews.setPuzzleRating(puzzle.rating());
-        puzzleTextViews.setPuzzlesSolved(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
+        puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
+        puzzleTextViews.setPuzzleSolved(puzzle.solved());
     }
 
     public void loadPreviousPuzzle() {
@@ -86,8 +93,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             if (loadedPuzzles.isEmpty()) {
                 loadNextPuzzles();
             }
-            var nextPuzzle = randomNumberGenerator.nextDouble() < 0.3 ? loadedPuzzles.pollFirst() : loadedPuzzles.pollLast();
-            this.playedPuzzles.add(nextPuzzle);
+            var nextPuzzle = loadedPuzzles.isEmpty() ? null :
+                    (randomNumberGenerator.nextDouble() < 0.3 ? loadedPuzzles.pollFirst() : loadedPuzzles.pollLast());
+            if (!isNull(nextPuzzle)) {
+                this.playedPuzzles.add(nextPuzzle);
+            } else {
+                Toast.makeText(chessboardView.getContext(), R.string.no_more_puzzles, Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
         renderPuzzle();
     }
@@ -134,8 +147,17 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     @Override
     public void onPuzzleSolved(Puzzle puzzle) {
-        databaseAccessor.setSolved(puzzle.puzzleId());
-        updatePlayerRating(puzzle.rating(), 1.0);
+        if (databaseAccessor.wasNotSolved(puzzle.puzzleId())) {
+            databaseAccessor.setSolved(puzzle.puzzleId());
+            updatePlayerRating(puzzle.rating(), 1.0);
+            var updatedPuzzle = new Puzzle(puzzle.puzzleId(), puzzle.fen(), puzzle.moves(), puzzle.rating(), true);
+            if (playedPuzzles.isEmpty()) {
+                playedPuzzles.add(updatedPuzzle);
+            } else {
+                playedPuzzles.set(currentPuzzleIndex, updatedPuzzle);
+            }
+            puzzleTextViews.setPuzzleSolved(true);
+        }
         if (this.autoplay) {
             loadNextPuzzle();
         }
@@ -143,6 +165,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     @Override
     public void onPuzzleNotSolved(Puzzle puzzle) {
-        updatePlayerRating(puzzle.rating(), 0.0);
+        if (databaseAccessor.wasNotSolved(puzzle.puzzleId())) {
+            updatePlayerRating(puzzle.rating(), 0.0);
+        }
     }
 }
