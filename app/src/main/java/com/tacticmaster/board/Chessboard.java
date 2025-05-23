@@ -200,32 +200,20 @@ public class Chessboard {
             }
         }
 
-        if (board[fromRow][fromCol] == 'K' && abs(fromCol - toCol) == 2 && fromRow == toRow) {
-            if (toCol == 1 && board[toRow][0] == 'R') {
-                board[toRow][2] = 'R';
+        if ((board[fromRow][fromCol] == 'K' || board[fromRow][fromCol] == 'k') &&
+                Math.abs(fromCol - toCol) == 2 && fromRow == toRow) {
+            char rook = (board[fromRow][fromCol] == 'K') ? 'R' : 'r';
+            if (toCol == 1 && board[toRow][0] == rook) {
+                board[toRow][2] = rook;
                 board[toRow][0] = ' ';
-            } else if (toCol == 2 && board[toRow][0] == 'R') {
-                board[toRow][3] = 'R';
+            } else if (toCol == 2 && board[toRow][0] == rook) {
+                board[toRow][3] = rook;
                 board[toRow][0] = ' ';
-            } else if (toCol == 5 && board[toRow][7] == 'R') {
-                board[toRow][4] = 'R';
+            } else if (toCol == 5 && board[toRow][7] == rook) {
+                board[toRow][4] = rook;
                 board[toRow][7] = ' ';
-            } else if (toCol == 6 && board[toRow][7] == 'R') {
-                board[toRow][5] = 'R';
-                board[toRow][7] = ' ';
-            }
-        } else if (board[fromRow][fromCol] == 'k' && abs(fromCol - toCol) == 2 && fromRow == toRow) {
-            if (toCol == 1 && board[toRow][0] == 'r') {
-                board[toRow][2] = 'r';
-                board[toRow][0] = ' ';
-            } else if (toCol == 6 && board[toRow][7] == 'r') {
-                board[toRow][5] = 'r';
-                board[toRow][7] = ' ';
-            } else if (toCol == 2 && board[toRow][0] == 'r') {
-                board[toRow][3] = 'r';
-                board[toRow][0] = ' ';
-            } else if (toCol == 5 && board[toRow][7] == 'r') {
-                board[toRow][4] = 'r';
+            } else if (toCol == 6 && board[toRow][7] == rook) {
+                board[toRow][5] = rook;
                 board[toRow][7] = ' ';
             }
         }

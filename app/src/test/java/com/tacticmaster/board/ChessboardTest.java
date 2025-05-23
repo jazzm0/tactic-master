@@ -320,7 +320,6 @@ public class ChessboardTest {
     public void testCastling(String fen, String moves) {
         Puzzle puzzle = new Puzzle("1", fen, moves, 1049);
         Chessboard chessboard = new Chessboard(puzzle);
-        boolean castlingChecked = false;
 
         char[] firstRowBefore = chessboard.getBoard()[0].clone();
         char[] lastRowBefore = chessboard.getBoard()[7].clone();
@@ -334,6 +333,7 @@ public class ChessboardTest {
             return;
         }
 
+        boolean castlingChecked = false;
         for (int i = 0; i < moves.split(" ").length; i++) {
             firstRowBefore = chessboard.getBoard()[0].clone();
             lastRowBefore = chessboard.getBoard()[7].clone();
