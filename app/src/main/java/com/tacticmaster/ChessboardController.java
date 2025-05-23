@@ -166,5 +166,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         if (databaseAccessor.wasNotSolved(puzzle.puzzleId())) {
             updatePlayerRating(puzzle.rating(), 0.0);
         }
+        if (this.autoplay) {
+            loadNextPuzzle();
+        }
     }
 }
