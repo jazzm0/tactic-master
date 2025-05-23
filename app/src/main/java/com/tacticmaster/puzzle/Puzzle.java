@@ -4,8 +4,16 @@ public record Puzzle(
         String puzzleId,
         String fen,
         String moves,
-        int rating
+        int rating,
+        boolean solved
 ) implements Comparable<Puzzle> {
+
+    public Puzzle(String puzzleId,
+                  String fen,
+                  String moves,
+                  int rating) {
+        this(puzzleId, fen, moves, rating, false);
+    }
 
     @Override
     public int compareTo(Puzzle o) {
