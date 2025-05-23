@@ -79,9 +79,6 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     public void loadPreviousPuzzle() {
-        if (loadedPuzzles.isEmpty()) {
-            loadNextPuzzles();
-        }
         currentPuzzleIndex = (currentPuzzleIndex - 1 + playedPuzzles.size()) % playedPuzzles.size();
         renderPuzzle();
     }
