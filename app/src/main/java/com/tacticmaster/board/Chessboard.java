@@ -190,7 +190,7 @@ public class Chessboard {
                 board[toRow][toCol] == ' ' && fromCol != toCol) {
             if (board[fromRow][toCol] == (board[fromRow][fromCol] == 'p' ? 'P' : 'p')) {
                 if (lastMove != null && lastMove[2] == fromRow && lastMove[3] == toCol &&
-                        Math.abs(lastMove[0] - lastMove[2]) == 2) {
+                        abs(lastMove[0] - lastMove[2]) == 2) {
                     board[fromRow][toCol] = ' ';
                 } else {
                     return false;
@@ -201,7 +201,7 @@ public class Chessboard {
         }
 
         if ((board[fromRow][fromCol] == 'K' || board[fromRow][fromCol] == 'k') &&
-                Math.abs(fromCol - toCol) == 2 && fromRow == toRow) {
+                abs(fromCol - toCol) == 2 && fromRow == toRow) {
             char rook = (board[fromRow][fromCol] == 'K') ? 'R' : 'r';
             if (toCol == 1 && board[toRow][0] == rook) {
                 board[toRow][2] = rook;
