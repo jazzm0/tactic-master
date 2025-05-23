@@ -208,6 +208,11 @@ public class ChessboardTest {
 
     @ParameterizedTest
     @CsvSource({
+            "'Q1b1k2r/p2q1ppp/8/2p5/5n2/P3P3/1P3PPP/R3K2R w KQk - 0 17', 'e3f4 e8g8 e1g1 c8b7 a8a7 d7c6 f2f3 f8a8 a7a8 b7a8'",
+            "'r3k2r/ppp2ppp/5n2/3qn3/3P2b1/2P5/P1P1Q1PP/R1B1KBNR w KQkq - 1 10', 'e2e3 e8c8 d4e5 h8e8 g1f3 g4f3'",
+            "'rn1qr1k1/ppp2ppp/1b6/8/1PbP4/P1N3P1/3QNPBP/R3K2R b KQ - 2 13', 'b6d4 e1c1 c4e2 c3e2'",
+            "'r1bq1r1k/ppp2p2/5p1p/7Q/3pBb1B/8/PPP3PP/R3K2R b KQ - 0 15', 'f8e8 e1g1 e8e4 f1f4 e4f4 h5h6 h8g8 h6f4'",
+            "'r3k2r/ppp1qppp/2b2n2/4P1B1/3P4/2P2N2/P5PP/R2QK2R b KQkq - 0 13', 'e8g8 e1g1 e7e6 e5f6'",
             "'4k2r/8/8/8/8/8/8/4K2R w - - 0 1', 'e1g1'",
             "'3rk2r/p2nb1Rp/2Q3bB/8/1qBP4/8/PP1N1P1P/R3K3 w Qk - 5 18', 'e1c1 b4c3 b2c3 e7a3'",
             "'r3k1r1/p1pb1p2/1pn1q2p/1B2p3/4Pp2/P1P2N1P/2P1QPPK/1R3R2 w q - 0 18', 'b1d1 g8g2 h2g2 e6h3 g2g1 e8c8'",
@@ -315,6 +320,7 @@ public class ChessboardTest {
     public void testCastling(String fen, String moves) {
         Puzzle puzzle = new Puzzle("1", fen, moves, 1049);
         Chessboard chessboard = new Chessboard(puzzle);
+        boolean castlingChecked = false;
 
         char[] firstRowBefore = chessboard.getBoard()[0].clone();
         char[] lastRowBefore = chessboard.getBoard()[7].clone();
@@ -337,9 +343,11 @@ public class ChessboardTest {
 
             if (wasCastlingMove(firstRowBefore, firstRowAfter) || wasCastlingMove(lastRowBefore, lastRowAfter)) {
                 assertTrue(validCastling(firstRowAfter) || validCastling(lastRowAfter));
+                castlingChecked = true;
                 break;
             }
         }
+        assertTrue(castlingChecked);
     }
 
     public boolean validCastling(char[] row) {
