@@ -14,7 +14,7 @@ public class Chessboard {
     private boolean whiteToMove;
     private final String[] moves;
     private int movesIndex = 0;
-    private int[] lastMove;
+    private int[] lastMoveCoordinates;
     private boolean firstMoveDone = false;
     private char promotion = ' ';
 
@@ -127,7 +127,7 @@ public class Chessboard {
         return firstMoveDone;
     }
 
-    public int[] getNextMove() {
+    public int[] getNextMoveCoordinates() {
         return movesIndex >= 0 && movesIndex < moves.length ? convertMoveToCoordinates(moves[movesIndex]) : null;
     }
 
@@ -150,8 +150,8 @@ public class Chessboard {
             return false;
         }
         // en passant is ok
-        if (lastMove != null && lastMove[2] == fromRow && lastMove[3] == toCol &&
-                ((board[fromRow][fromCol] == 'p' && fromRow == 3 && lastMove[0]==1) || (board[fromRow][fromCol] == 'P' && fromRow==4 && lastMove[0]==6)) &&
+        if (lastMoveCoordinates != null && lastMoveCoordinates[2] == fromRow && lastMoveCoordinates[3] == toCol &&
+                ((board[fromRow][fromCol] == 'p' && fromRow == 3 && lastMoveCoordinates[0]==1) || (board[fromRow][fromCol] == 'P' && fromRow==4 && lastMoveCoordinates[0]==6)) &&
                 board[toRow][toCol] == ' ' && abs(fromCol - toCol) == 1 && board[fromRow][toCol] == (board[fromRow][fromCol] == 'p' ? 'P' : 'p')) {
                     return true;
         }
@@ -187,7 +187,7 @@ public class Chessboard {
             board[toRow][toCol] = promotion == ' ' ? 'q' : Character.toLowerCase(promotion);
         }
 
-        lastMove = new int[]{fromRow, fromCol, toRow, toCol};
+        lastMoveCoordinates = new int[]{fromRow, fromCol, toRow, toCol};
         movesIndex++;
     }
 
