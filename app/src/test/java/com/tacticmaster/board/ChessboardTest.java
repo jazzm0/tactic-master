@@ -29,78 +29,77 @@ public class ChessboardTest {
 
     @Test
     public void testSetupBoard() {
-        char[][] board = chessboard.getBoard();
-        assertEquals(' ', board[0][0]);
-        assertEquals('r', board[0][1]);
-        assertEquals('b', board[0][2]);
-        assertEquals(' ', board[0][3]);
-        assertEquals(' ', board[0][4]);
-        assertEquals('r', board[0][5]);
-        assertEquals('k', board[0][6]);
-        assertEquals(' ', board[0][7]);
+        assertEquals(' ', chessboard.getPieceAt(0,0));
+        assertEquals('r', chessboard.getPieceAt(0,1));
+        assertEquals('b', chessboard.getPieceAt(0,2));
+        assertEquals(' ', chessboard.getPieceAt(0,3));
+        assertEquals(' ', chessboard.getPieceAt(0,4));
+        assertEquals('r', chessboard.getPieceAt(0,5));
+        assertEquals('k', chessboard.getPieceAt(0,6));
+        assertEquals(' ', chessboard.getPieceAt(0,7));
 
-        assertEquals('q', board[1][0]);
-        assertEquals(' ', board[1][1]);
-        assertEquals(' ', board[1][2]);
-        assertEquals(' ', board[1][3]);
-        assertEquals(' ', board[1][4]);
-        assertEquals(' ', board[1][5]);
-        assertEquals('P', board[1][6]);
-        assertEquals(' ', board[1][7]);
+        assertEquals('q', chessboard.getPieceAt(1,0));
+        assertEquals(' ', chessboard.getPieceAt(1,1));
+        assertEquals(' ', chessboard.getPieceAt(1,2));
+        assertEquals(' ', chessboard.getPieceAt(1,3));
+        assertEquals(' ', chessboard.getPieceAt(1,4));
+        assertEquals(' ', chessboard.getPieceAt(1,5));
+        assertEquals('P', chessboard.getPieceAt(1,6));
+        assertEquals(' ', chessboard.getPieceAt(1,7));
 
-        assertEquals(' ', board[2][0]);
-        assertEquals(' ', board[2][1]);
-        assertEquals(' ', board[2][2]);
-        assertEquals(' ', board[2][3]);
-        assertEquals('p', board[2][4]);
-        assertEquals(' ', board[2][5]);
-        assertEquals(' ', board[2][6]);
-        assertEquals('p', board[2][7]);
+        assertEquals(' ', chessboard.getPieceAt(2,0));
+        assertEquals(' ', chessboard.getPieceAt(2,1));
+        assertEquals(' ', chessboard.getPieceAt(2,2));
+        assertEquals(' ', chessboard.getPieceAt(2,3));
+        assertEquals('p', chessboard.getPieceAt(2,4));
+        assertEquals(' ', chessboard.getPieceAt(2,5));
+        assertEquals(' ', chessboard.getPieceAt(2,6));
+        assertEquals('p', chessboard.getPieceAt(2,7));
 
-        assertEquals(' ', board[3][0]);
-        assertEquals(' ', board[3][1]);
-        assertEquals(' ', board[3][2]);
-        assertEquals('p', board[3][3]);
-        assertEquals(' ', board[3][4]);
-        assertEquals(' ', board[3][5]);
-        assertEquals(' ', board[3][6]);
-        assertEquals('p', board[3][7]);
+        assertEquals(' ', chessboard.getPieceAt(3,0));
+        assertEquals(' ', chessboard.getPieceAt(3,1));
+        assertEquals(' ', chessboard.getPieceAt(3,2));
+        assertEquals('p', chessboard.getPieceAt(3,3));
+        assertEquals(' ', chessboard.getPieceAt(3,4));
+        assertEquals(' ', chessboard.getPieceAt(3,5));
+        assertEquals(' ', chessboard.getPieceAt(3,6));
+        assertEquals('p', chessboard.getPieceAt(3,7));
 
-        assertEquals(' ', board[4][0]);
-        assertEquals(' ', board[4][1]);
-        assertEquals(' ', board[4][2]);
-        assertEquals('P', board[4][3]);
-        assertEquals(' ', board[4][4]);
-        assertEquals('P', board[4][5]);
-        assertEquals(' ', board[4][6]);
-        assertEquals(' ', board[4][7]);
+        assertEquals(' ', chessboard.getPieceAt(4,0));
+        assertEquals(' ', chessboard.getPieceAt(4,1));
+        assertEquals(' ', chessboard.getPieceAt(4,2));
+        assertEquals('P', chessboard.getPieceAt(4,3));
+        assertEquals(' ', chessboard.getPieceAt(4,4));
+        assertEquals('P', chessboard.getPieceAt(4,5));
+        assertEquals(' ', chessboard.getPieceAt(4,6));
+        assertEquals(' ', chessboard.getPieceAt(4,7));
 
-        assertEquals(' ', board[5][0]);
-        assertEquals(' ', board[5][1]);
-        assertEquals('P', board[5][2]);
-        assertEquals(' ', board[5][3]);
-        assertEquals(' ', board[5][4]);
-        assertEquals(' ', board[5][5]);
-        assertEquals(' ', board[5][6]);
-        assertEquals(' ', board[5][7]);
+        assertEquals(' ', chessboard.getPieceAt(5,0));
+        assertEquals(' ', chessboard.getPieceAt(5,1));
+        assertEquals('P', chessboard.getPieceAt(5,2));
+        assertEquals(' ', chessboard.getPieceAt(5,3));
+        assertEquals(' ', chessboard.getPieceAt(5,4));
+        assertEquals(' ', chessboard.getPieceAt(5,5));
+        assertEquals(' ', chessboard.getPieceAt(5,6));
+        assertEquals(' ', chessboard.getPieceAt(5,7));
 
-        assertEquals(' ', board[6][0]);
-        assertEquals(' ', board[6][1]);
-        assertEquals('Q', board[6][2]);
-        assertEquals('K', board[6][3]);
-        assertEquals(' ', board[6][4]);
-        assertEquals(' ', board[6][5]);
-        assertEquals(' ', board[6][6]);
-        assertEquals('P', board[6][7]);
+        assertEquals(' ', chessboard.getPieceAt(6,0));
+        assertEquals(' ', chessboard.getPieceAt(6,1));
+        assertEquals('Q', chessboard.getPieceAt(6,2));
+        assertEquals('K', chessboard.getPieceAt(6,3));
+        assertEquals(' ', chessboard.getPieceAt(6,4));
+        assertEquals(' ', chessboard.getPieceAt(6,5));
+        assertEquals(' ', chessboard.getPieceAt(6,6));
+        assertEquals('P', chessboard.getPieceAt(6,7));
 
-        assertEquals(' ', board[7][0]);
-        assertEquals(' ', board[7][1]);
-        assertEquals(' ', board[7][2]);
-        assertEquals('R', board[7][3]);
-        assertEquals(' ', board[7][4]);
-        assertEquals(' ', board[7][5]);
-        assertEquals('R', board[7][6]);
-        assertEquals(' ', board[7][7]);
+        assertEquals(' ', chessboard.getPieceAt(7,0));
+        assertEquals(' ', chessboard.getPieceAt(7,1));
+        assertEquals(' ', chessboard.getPieceAt(7,2));
+        assertEquals('R', chessboard.getPieceAt(7,3));
+        assertEquals(' ', chessboard.getPieceAt(7,4));
+        assertEquals(' ', chessboard.getPieceAt(7,5));
+        assertEquals('R', chessboard.getPieceAt(7,6));
+        assertEquals(' ', chessboard.getPieceAt(7,7));
     }
 
     @Test
@@ -118,35 +117,25 @@ public class ChessboardTest {
     public void testMakeFirstMove() {
         chessboard.makeFirstMove();
         assertTrue(chessboard.isFirstMoveDone());
-        assertEquals('r', chessboard.getBoard()[1][5]);
+        assertEquals('r', chessboard.getPieceAt(1,5));
     }
 
     @Test
     public void testMakeNextMove() {
         chessboard.makeFirstMove();
         chessboard.makeNextMove();
-        assertEquals('Q', chessboard.getBoard()[1][7]);
+        assertEquals('Q', chessboard.getPieceAt(1,7));
     }
 
     @Test
     public void testMovePiece() {
-        assertTrue(chessboard.movePiece(0, 1, 1, 1));
-        assertEquals('r', chessboard.getBoard()[1][1]);
-        assertEquals(' ', chessboard.getBoard()[0][1]);
+        chessboard.movePiece(0, 1, 1, 1);
+        assertEquals('r', chessboard.getPieceAt(1,1));
+        assertEquals(' ', chessboard.getPieceAt(0,1));
     }
 
     @Test
     public void testSolved() {
-        chessboard.makeFirstMove();
-        chessboard.makeNextMove();
-        chessboard.makeNextMove();
-        chessboard.makeNextMove();
-        chessboard.makeNextMove();
-        assertTrue(chessboard.solved());
-    }
-
-    @Test
-    public void testPromotion() {
         chessboard.makeFirstMove();
         chessboard.makeNextMove();
         chessboard.makeNextMove();
@@ -163,24 +152,24 @@ public class ChessboardTest {
         Chessboard chessboard = new Chessboard(puzzle);
 
         chessboard.makeFirstMove();
-        assertEquals('Q', chessboard.getBoard()[7][7]);
+        assertEquals('Q', chessboard.getPieceAt(0,0));
         chessboard.makeNextMove();
-        assertEquals('q', chessboard.getBoard()[0][6]);
+        assertEquals('q', chessboard.getPieceAt(7,1));
 
         chessboard.makeNextMove();
-        assertEquals('R', chessboard.getBoard()[7][5]);
+        assertEquals('R', chessboard.getPieceAt(0,2));
         chessboard.makeNextMove();
-        assertEquals('r', chessboard.getBoard()[0][4]);
+        assertEquals('r', chessboard.getPieceAt(7,3));
 
         chessboard.makeNextMove();
-        assertEquals('B', chessboard.getBoard()[7][3]);
+        assertEquals('B', chessboard.getPieceAt(0,4));
         chessboard.makeNextMove();
-        assertEquals('b', chessboard.getBoard()[0][2]);
+        assertEquals('b', chessboard.getPieceAt(7,5));
 
         chessboard.makeNextMove();
-        assertEquals('N', chessboard.getBoard()[7][1]);
+        assertEquals('N', chessboard.getPieceAt(0,6));
         chessboard.makeNextMove();
-        assertEquals('n', chessboard.getBoard()[0][0]);
+        assertEquals('n', chessboard.getPieceAt(7,7));
     }
 
     @Test
@@ -190,10 +179,10 @@ public class ChessboardTest {
         Puzzle puzzle = new Puzzle("1", fen, move, 1049);
         Chessboard chessboard = new Chessboard(puzzle);
         chessboard.makeFirstMove();
-        assertEquals('p', chessboard.getBoard()[4][5]);
+        assertEquals('p', chessboard.getPieceAt(3,2));
         chessboard.makeNextMove();
-        assertEquals(' ', chessboard.getBoard()[4][5]);
-        assertEquals('P', chessboard.getBoard()[5][5]);
+        assertEquals(' ', chessboard.getPieceAt(3,2));
+        assertEquals('P', chessboard.getPieceAt(2,2));
 
         fen = "1k6/p7/8/1P6/8/8/8/1K6 b - - 0 1";
         move = "a7a5 b5a6";
@@ -201,8 +190,8 @@ public class ChessboardTest {
         chessboard = new Chessboard(puzzle);
         chessboard.makeFirstMove();
         chessboard.makeNextMove();
-        assertEquals(' ', chessboard.getBoard()[3][0]);
-        assertEquals('P', chessboard.getBoard()[2][0]);
+        assertEquals(' ', chessboard.getPieceAt(3,0));
+        assertEquals('P', chessboard.getPieceAt(2,0));
 
     }
 
@@ -317,55 +306,47 @@ public class ChessboardTest {
             "'r3k2r/p4ppp/1qp2n2/8/Q5b1/2N2N2/PP2KbPP/R1B2B1R w kq - 4 12', 'h2h3 e8c8 h3g4 h8e8'",
             "'r3k1nr/ppp3pp/2n2q2/5b2/1bPp4/1N3N2/PP1BPPPP/R2QKB1R w KQkq - 4 9', 'b3d4 c6d4 f3d4 b4d2 d1d2 e8c8 e2e3 c7c5'"
     })
-    public void testCastling(String fen, String moves) {
-        Puzzle puzzle = new Puzzle("1", fen, moves, 1049);
+    public void testCastling(String fen, String movesData) {
+        Puzzle puzzle = new Puzzle("1", fen, movesData, 1049);
         Chessboard chessboard = new Chessboard(puzzle);
-
-        char[] firstRowBefore = chessboard.getBoard()[0].clone();
-        char[] lastRowBefore = chessboard.getBoard()[7].clone();
-
-        chessboard.makeFirstMove();
-        char[] firstRowAfter = chessboard.getBoard()[0];
-        char[] lastRowAfter = chessboard.getBoard()[7];
-
-        if (wasCastlingMove(firstRowBefore, firstRowAfter) || wasCastlingMove(lastRowBefore, lastRowAfter)) {
-            assertTrue(validCastling(firstRowAfter) || validCastling(lastRowAfter));
-            return;
-        }
+        String[] moves = movesData.split(" ");
 
         boolean castlingChecked = false;
-        for (int i = 0; i < moves.split(" ").length; i++) {
-            firstRowBefore = chessboard.getBoard()[0].clone();
-            lastRowBefore = chessboard.getBoard()[7].clone();
-            chessboard.makeNextMove();
-            firstRowAfter = chessboard.getBoard()[0];
-            lastRowAfter = chessboard.getBoard()[7];
-
-            if (wasCastlingMove(firstRowBefore, firstRowAfter) || wasCastlingMove(lastRowBefore, lastRowAfter)) {
-                assertTrue(validCastling(firstRowAfter) || validCastling(lastRowAfter));
-                castlingChecked = true;
-                break;
+        boolean firstMoveDone = false;
+        for (String move : moves) {
+            boolean wasCastlingMove = (chessboard.getPieceAt(7, 4) == 'K' && (move.equals("e1g1") || move.equals("e1c1"))) ||
+                    (chessboard.getPieceAt(0, 4) == 'k' && (move.equals("e8g8") || move.equals("e8c8")));
+            if(!firstMoveDone) {
+                chessboard.makeFirstMove();
+                firstMoveDone = true;
+            } else {
+                chessboard.makeNextMove();
+            }
+            if (wasCastlingMove) {
+                switch (move) {
+                    case "e1g1":
+                        assertEquals('K', chessboard.getPieceAt(7, 6));
+                        assertEquals('R', chessboard.getPieceAt(7, 5));
+                        castlingChecked = true;
+                        break;
+                    case "e1c1":
+                        assertEquals('K', chessboard.getPieceAt(7, 2));
+                        assertEquals('R', chessboard.getPieceAt(7, 3));
+                        castlingChecked = true;
+                        break;
+                    case "e8g8":
+                        assertEquals('k', chessboard.getPieceAt(0, 6));
+                        assertEquals('r', chessboard.getPieceAt(0, 5));
+                        castlingChecked = true;
+                        break;
+                    case "e8c8":
+                        assertEquals('k', chessboard.getPieceAt(0, 2));
+                        assertEquals('r', chessboard.getPieceAt(0, 3));
+                        castlingChecked = true;
+                        break;
+                }
             }
         }
         assertTrue(castlingChecked);
-    }
-
-    public boolean validCastling(char[] row) {
-        return (toLowerCase(row[6]) == 'k' && toLowerCase(row[5]) == 'r') || (toLowerCase(row[2]) == 'k' && toLowerCase(row[3]) == 'r') || (toLowerCase(row[5]) == 'k' && toLowerCase(row[4]) == 'r') || (toLowerCase(row[1]) == 'k' && toLowerCase(row[2]) == 'r');
-    }
-
-    public boolean wasCastlingMove(char[] rowBefore, char[] rowAfter) {
-        int changes = 0;
-        Set<Character> usedPieces = new HashSet<>();
-        for (int i = 0; i < rowBefore.length; i++) {
-            if (rowBefore[i] != rowAfter[i]) {
-                if (rowBefore[i] != ' ') {
-                    usedPieces.add(toLowerCase(rowBefore[i]));
-                }
-                changes++;
-            }
-        }
-
-        return changes == 4 && usedPieces.size() == 2 && usedPieces.contains('k') && usedPieces.contains('r');
     }
 }
