@@ -141,7 +141,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         if (chessboard.solved() && !puzzleSolved && !isNull(puzzleFinishedListener)) {
             puzzleSolved = true;
             makeText(R.string.correct_solution);
-            postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(puzzle), NEXT_PUZZLE_DELAY);
+            postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(this.puzzle), NEXT_PUZZLE_DELAY);
         }
     }
 
@@ -182,7 +182,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             }
         } else {
             makeText(R.string.wrong_solution);
-            puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
+            postDelayed(() -> puzzleFinishedListener.onPuzzleNotSolved(this.puzzle), NEXT_PUZZLE_DELAY);
         }
     }
 
