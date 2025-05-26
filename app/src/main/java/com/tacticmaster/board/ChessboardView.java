@@ -8,9 +8,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -129,10 +131,17 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         }
     }
 
-    private void checkPuzzleSolved(Puzzle solvedPuzzle) {
+    private void makeText(int resourceId) {
+        Toast toast = Toast.makeText(getContext(), resourceId, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 50);
+        toast.show();
+    }
+
+    private void checkPuzzleSolved() {
         if (chessboard.solved() && !puzzleSolved && !isNull(puzzleFinishedListener)) {
             puzzleSolved = true;
-            postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(solvedPuzzle), NEXT_PUZZLE_DELAY);
+            makeText(R.string.correct_solution);
+            postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(puzzle), NEXT_PUZZLE_DELAY);
         }
     }
 
@@ -172,6 +181,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 }, 1300);
             }
         } else {
+            Toast.makeText(getContext(), R.string.wrong_solution, Toast.LENGTH_SHORT).show();
             puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
         }
     }
@@ -193,7 +203,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         drawBoard(canvas);
         drawLabels(canvas);
         drawPieces(canvas);
-        checkPuzzleSolved(this.puzzle);
+        checkPuzzleSolved();
     }
 
     @Override
