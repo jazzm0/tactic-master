@@ -63,7 +63,7 @@ public class PuzzleTextViews {
         if (solved) {
             puzzleIdEditText.setTextColor(Color.GREEN);
             puzzleIdEditText.setAlpha(0.7f);
-            puzzleIdEditText.setTypeface(null, Typeface.ITALIC);
+            puzzleIdEditText.setTypeface(null, Typeface.BOLD);
         } else {
             setUnsolved();
         }
