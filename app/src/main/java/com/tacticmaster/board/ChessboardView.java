@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -132,8 +133,15 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     public void makeText(int resourceId) {
-        Toast toast = Toast.makeText(getContext(), resourceId, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 50);
+        Toast toast = new Toast(getContext());
+        View customView = View.inflate(getContext(), R.layout.custom_toast_layout, null);
+
+        TextView textView = customView.findViewById(R.id.toast_text);
+        textView.setText(getContext().getString(resourceId));
+
+        toast.setView(customView);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
         toast.show();
     }
 
