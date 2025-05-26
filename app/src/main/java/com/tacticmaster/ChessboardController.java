@@ -96,7 +96,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             if (!isNull(nextPuzzle)) {
                 this.playedPuzzles.add(nextPuzzle);
             } else {
-                Toast.makeText(chessboardView.getContext(), R.string.no_more_puzzles, Toast.LENGTH_SHORT).show();
+                chessboardView.makeText(R.string.no_more_puzzles);
                 return;
             }
         }
@@ -114,7 +114,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                 currentPuzzleIndex = this.playedPuzzles.lastIndexOf(nextPuzzle);
             }
         } catch (NoSuchElementException e) {
-            Toast.makeText(chessboardView.getContext(), R.string.invalid_puzzle_id, Toast.LENGTH_SHORT).show();
+            chessboardView.makeText(R.string.invalid_puzzle_id);
             return;
         }
         renderPuzzle();

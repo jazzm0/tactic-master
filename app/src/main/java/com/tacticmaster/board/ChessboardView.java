@@ -131,7 +131,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         }
     }
 
-    private void makeText(int resourceId) {
+    public void makeText(int resourceId) {
         Toast toast = Toast.makeText(getContext(), resourceId, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 50);
         toast.show();
@@ -181,7 +181,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 }, 1300);
             }
         } else {
-            Toast.makeText(getContext(), R.string.wrong_solution, Toast.LENGTH_SHORT).show();
+            makeText(R.string.wrong_solution);
             puzzleFinishedListener.onPuzzleNotSolved(this.puzzle);
         }
     }
