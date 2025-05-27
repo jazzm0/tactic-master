@@ -180,18 +180,39 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private void handleMove(int row, int column) {
         if (chessboard.isCorrectMove(selectedRow, selectedColumn, row, column)) {
 
-            if (chessboard.movePiece(selectedRow, selectedColumn, row, column)) {
-                unselectPiece();
-
-                postDelayed(() -> {
-                    chessboard.makeNextMove();
-                    invalidate();
-                }, 1300);
+            if (chessboard.isPromotionMove(selectedRow, selectedColumn, row, column)) {
+                PromotionDialog.show(getContext(), bitmapManager, chessboard.isWhiteToMove(), getTileSize(), piece -> {
+                    if (!chessboard.isCorrectPromotionPiece(piece)) {
+                        onFailedMove();
+                    } else {
+                        invalidate();
+                        onCorrectMove(row, column);
+                    }
+                });
+                return;
             }
+            onCorrectMove(row, column);
         } else {
-            makeText(R.string.wrong_solution);
-            postDelayed(() -> puzzleFinishedListener.onPuzzleNotSolved(this.puzzle), NEXT_PUZZLE_DELAY);
+            onFailedMove();
         }
+    }
+
+    private void onCorrectMove(int row, int column) {
+        if (chessboard.movePiece(selectedRow, selectedColumn, row, column)) {
+            unselectPiece();
+
+            postDelayed(() -> {
+                chessboard.makeNextMove();
+                invalidate();
+            }, 1300);
+        }
+    }
+
+    private void onFailedMove() {
+        makeText(R.string.wrong_solution);
+        postDelayed(() -> puzzleFinishedListener.onPuzzleNotSolved(this.puzzle), NEXT_PUZZLE_DELAY);
+        resetSelection();
+        invalidate();
     }
 
     private void resetSelection() {

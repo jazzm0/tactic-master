@@ -10,8 +10,8 @@ android {
         applicationId = "com.tacticmaster"
         minSdk = 24
         targetSdk = 35
-        versionCode = 14
-        versionName = "1.0.13"
+        versionCode = 15
+        versionName = "1.0.14"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -22,6 +22,10 @@ android {
         }
     }
 
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << '-Xlint:deprecation'
+        options.deprecation = true
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17

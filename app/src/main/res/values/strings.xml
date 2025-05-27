@@ -15,4 +15,8 @@
     <string name="player_turn">move</string>
     <string name="puzzle_id_sharing">↗️</string>
     <string name="no_more_puzzles">N️o more unsolved puzzles available</string>
+    <string name="queen">N️o more unsolved puzzles available</string>
+    <string name="rook">N️o more unsolved puzzles available</string>
+    <string name="bishop">N️o more unsolved puzzles available</string>
+    <string name="knight">N️o more unsolved puzzles available</string>
 </resources>

@@ -123,8 +123,12 @@ public class Chessboard {
         return row;
     }
 
+    private boolean isNotValid(int row, int col) {
+        return row < 0 || row >= 8 || col < 0 || col >= 8;
+    }
+
     public Character getPieceAt(int row, int col) {
-        if (row < 0 || row >= 8 || col < 0 || col >= 8) {
+        if (isNotValid(row, col)) {
             throw new IllegalArgumentException("Invalid board coordinates");
         }
         return board[row][col];
@@ -148,6 +152,22 @@ public class Chessboard {
         }
         int[] move = moves.get(movesIndex);
         return move[0] == fromRow && move[1] == fromCol && move[2] == toRow && move[3] == toCol;
+    }
+
+    public boolean isPromotionMove(int fromRow, int fromCol, int toRow, int toCol) {
+        if (movesIndex >= moves.size() || isNotValid(fromRow, fromCol) || isNotValid(toRow, toCol)) {
+            return false;
+        }
+
+        return (board[fromRow][fromCol] == 'P' && toRow == 0 || board[fromRow][fromCol] == 'P' && toRow == 7) ||
+                (board[fromRow][fromCol] == 'p' && toRow == 0 || board[fromRow][fromCol] == 'p' && toRow == 7);
+
+    }
+
+    public boolean isCorrectPromotionPiece(char piece) {
+        if (promotions.isEmpty())
+            return false;
+        return Character.toLowerCase(promotions.get(0)) == Character.toLowerCase(piece);
     }
 
     public synchronized void makeFirstMove() {
