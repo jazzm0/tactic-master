@@ -167,7 +167,7 @@ public class Chessboard {
     public boolean isCorrectPromotionPiece(char piece) {
         if (promotions.isEmpty())
             return false;
-        return promotions.get(0) == Character.toLowerCase(piece);
+        return Character.toLowerCase(promotions.get(0)) == Character.toLowerCase(piece);
     }
 
     public synchronized void makeFirstMove() {

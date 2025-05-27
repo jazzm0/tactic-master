@@ -208,6 +208,18 @@ public class ChessboardTest {
 
     @ParameterizedTest
     @CsvSource({
+            "'1k6/6P1/8/8/8/8/8/1K6 w - - 0 1', 'g7g8Q', 6, 1, 7, 1, true, 'Q'",
+            "'1k6/6P1/8/8/8/8/6p1/1K6 b - - 0 1', 'g1g1N', 6, 6, 7, 6, true, 'N'",
+    })
+    public void testIsPromotionMove(String fen, String moves, int fromRow, int fromCol, int toRow, int toCol, boolean expected, char promotedPiece) {
+        Puzzle puzzle = new Puzzle("1", fen, moves, 1049);
+        var promotionChessBoard = new Chessboard(puzzle);
+        assertEquals(expected, promotionChessBoard.isPromotionMove(fromRow, fromCol, toRow, toCol));
+        assertTrue(promotionChessBoard.isCorrectPromotionPiece(promotedPiece));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
             "'Q1b1k2r/p2q1ppp/8/2p5/5n2/P3P3/1P3PPP/R3K2R w KQk - 0 17', 'e3f4 e8g8 e1g1 c8b7 a8a7 d7c6 f2f3 f8a8 a7a8 b7a8'",
             "'r3k2r/ppp2ppp/5n2/3qn3/3P2b1/2P5/P1P1Q1PP/R1B1KBNR w KQkq - 1 10', 'e2e3 e8c8 d4e5 h8e8 g1f3 g4f3'",
             "'rn1qr1k1/ppp2ppp/1b6/8/1PbP4/P1N3P1/3QNPBP/R3K2R b KQ - 2 13', 'b6d4 e1c1 c4e2 c3e2'",
