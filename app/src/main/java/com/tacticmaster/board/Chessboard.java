@@ -12,55 +12,41 @@ public class Chessboard {
 
     private final char[][] board;
     private boolean whiteToMove;
-    private final List<int[]> moves;
+    private final String[] moves;
     private int movesIndex = 0;
-    private int[] lastMove;
+    private int[] lastMoveCoordinates;
     private boolean firstMoveDone = false;
-    private final List<Character> promotions = new ArrayList<>();
+    private char promotion = ' ';
 
     public Chessboard(Puzzle puzzle) {
         this.board = new char[8][8];
         setupBoard(puzzle.fen());
-        var movesList = List.of(puzzle.moves().split(" "));
-        for (var move : movesList) {
-            if (move.length() == 5) {
-                char promotion = move.charAt(4);
-                if ("qrbnQRBN".indexOf(promotion) == -1) {
-                    throw new IllegalArgumentException("Invalid promotion piece: " + promotion);
-                }
-                promotions.add(promotion);
-            }
-        }
-        this.moves = convertMovesToCoordinates(movesList);
+        this.moves = puzzle.moves().split(" ");
     }
 
-    private List<int[]> convertMovesToCoordinates(List<String> moves) {
-        List<int[]> coordinates = new ArrayList<>();
-        for (String move : moves) {
-            if (move == null || move.length() < 4 || move.length() > 5) {
-                throw new IllegalArgumentException("Invalid move: " + move);
-            }
-            char fromColChar = move.charAt(0);
-            char fromRowChar = move.charAt(1);
-            char toColChar = move.charAt(2);
-            char toRowChar = move.charAt(3);
-            if (fromColChar < 'a' || fromColChar > 'h' || toColChar < 'a' || toColChar > 'h' ||
-                    fromRowChar < '1' || fromRowChar > '8' || toRowChar < '1' || toRowChar > '8') {
-                throw new IllegalArgumentException("Invalid move coordinates: " + move);
-            }
-            int fromCol = fromColChar - 'a';
-            int fromRow = 8 - (fromRowChar - '0');
-            int toCol = toColChar - 'a';
-            int toRow = 8 - (toRowChar - '0');
-            if (!whiteToMove) {
-                fromRow = 7 - fromRow;
-                toRow = 7 - toRow;
-                fromCol = 7 - fromCol;
-                toCol = 7 - toCol;
-            }
-            coordinates.add(new int[]{fromRow, fromCol, toRow, toCol});
+    private int[] convertMoveToCoordinates(String move) {
+        if (move == null || move.length() < 4 || move.length() > 5) {
+            throw new IllegalArgumentException("Invalid move: " + move);
         }
-        return coordinates;
+        char fromColChar = move.charAt(0);
+        char fromRowChar = move.charAt(1);
+        char toColChar = move.charAt(2);
+        char toRowChar = move.charAt(3);
+        if (fromColChar < 'a' || fromColChar > 'h' || toColChar < 'a' || toColChar > 'h' ||
+                fromRowChar < '1' || fromRowChar > '8' || toRowChar < '1' || toRowChar > '8') {
+            throw new IllegalArgumentException("Invalid move coordinates: " + move);
+        }
+        int fromCol = fromColChar - 'a';
+        int fromRow = 8 - (fromRowChar - '0');
+        int toCol = toColChar - 'a';
+        int toRow = 8 - (toRowChar - '0');
+        if (move.length() == 5) {
+            promotion = move.charAt(4);
+            if ("qrbnQRBN".indexOf(promotion) == -1) {
+                throw new IllegalArgumentException("Invalid promotion piece: " + promotion);
+            }
+        }
+        return new int[]{fromRow, fromCol, toRow, toCol};
     }
 
     private void setupBoard(String fen) {
@@ -97,47 +83,22 @@ public class Chessboard {
             }
         }
         whiteToMove = parts[1].equals("b");
-        if (!whiteToMove) {
-            flipBoard();
-        }
     }
 
-    private boolean isValidPiece(char c) {
+    public boolean isValidPiece(char c) {
         return "rnbqkpRNBQKP".indexOf(c) != -1;
     }
 
-    private void flipBoard() {
-        for (int i = 0; i < 4; i++) {
-            char[] src = flipRow(board[i]);
-            board[i] = flipRow(board[7 - i]);
-            board[7 - i] = src;
-        }
-    }
-
-    private char[] flipRow(char[] row) {
-        for (int i = 0; i < 4; i++) {
-            char src = row[i];
-            row[i] = row[7 - i];
-            row[7 - i] = src;
-        }
-        return row;
-    }
-
-    private boolean isNotValid(int row, int col) {
+    private boolean isInvalidField(int row, int col) {
         return row < 0 || row >= 8 || col < 0 || col >= 8;
     }
 
     public Character getPieceAt(int row, int col) {
-        if (isNotValid(row, col)) {
+        if (isInvalidField(row, col)) {
             throw new IllegalArgumentException("Invalid board coordinates");
         }
         return board[row][col];
     }
-
-    public char[][] getBoard() {
-        return board;
-    }
-
     public boolean isWhiteToMove() {
         return whiteToMove;
     }
@@ -147,27 +108,25 @@ public class Chessboard {
     }
 
     public boolean isCorrectMove(int fromRow, int fromCol, int toRow, int toCol) {
-        if (movesIndex >= moves.size()) {
+        if (movesIndex >= moves.length) {
             return false;
         }
-        int[] move = moves.get(movesIndex);
+        int[] move = convertMoveToCoordinates(moves[movesIndex]);
         return move[0] == fromRow && move[1] == fromCol && move[2] == toRow && move[3] == toCol;
     }
 
     public boolean isPromotionMove(int fromRow, int fromCol, int toRow, int toCol) {
-        if (movesIndex >= moves.size() || isNotValid(fromRow, fromCol) || isNotValid(toRow, toCol)) {
+        if (movesIndex >= moves.length || isInvalidField(fromRow, fromCol) || isInvalidField(toRow, toCol)) {
             return false;
         }
 
-        return (board[fromRow][fromCol] == 'P' && toRow == 0 || board[fromRow][fromCol] == 'P' && toRow == 7) ||
-                (board[fromRow][fromCol] == 'p' && toRow == 0 || board[fromRow][fromCol] == 'p' && toRow == 7);
-
+        return (board[fromRow][fromCol] == 'P' && toRow == 0) || (board[fromRow][fromCol] == 'p' && toRow == 7);
     }
 
     public boolean isCorrectPromotionPiece(char piece) {
-        if (promotions.isEmpty())
+        if (promotion == ' ')
             return false;
-        return Character.toLowerCase(promotions.get(0)) == Character.toLowerCase(piece);
+        return Character.toLowerCase(promotion) == Character.toLowerCase(piece);
     }
 
     public synchronized void makeFirstMove() {
@@ -186,52 +145,50 @@ public class Chessboard {
         return firstMoveDone;
     }
 
-    public int[] getNextMove() {
-        return movesIndex >= 0 && movesIndex < moves.size() ? moves.get(movesIndex) : null;
+    public int[] getNextMoveCoordinates() {
+        return movesIndex >= 0 && movesIndex < moves.length ? convertMoveToCoordinates(moves[movesIndex]) : null;
     }
 
     public void makeNextMove() {
         if (!firstMoveDone) {
             return;
         }
-        if (movesIndex >= moves.size()) {
+        if (movesIndex >= moves.length) {
             return;
         }
-        int[] move = moves.get(movesIndex);
+        int[] move = convertMoveToCoordinates(moves[movesIndex]);
         movePiece(move[0], move[1], move[2], move[3]);
     }
 
-    public boolean movePiece(int fromRow, int fromCol, int toRow, int toCol) {
+    // not used (yet), just parked old code here
+    public boolean isValidMove(int fromRow, int fromCol, int toRow, int toCol) {
+        // no move that ends on a field with own piece
         if (Character.isUpperCase(board[fromRow][fromCol]) && Character.isUpperCase(board[toRow][toCol]) ||
                 Character.isLowerCase(board[fromRow][fromCol]) && Character.isLowerCase(board[toRow][toCol]) || board[fromRow][fromCol] == ' ') {
             return false;
         }
-        if ((board[fromRow][fromCol] == 'p' || board[fromRow][fromCol] == 'P') &&
-                board[toRow][toCol] == ' ' && fromCol != toCol) {
-            if (board[fromRow][toCol] == (board[fromRow][fromCol] == 'p' ? 'P' : 'p')) {
-                if (lastMove != null && lastMove[2] == fromRow && lastMove[3] == toCol &&
-                        abs(lastMove[0] - lastMove[2]) == 2) {
-                    board[fromRow][toCol] = ' ';
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
+        // en passant is ok
+        if (lastMoveCoordinates != null && lastMoveCoordinates[2] == fromRow && lastMoveCoordinates[3] == toCol &&
+                ((board[fromRow][fromCol] == 'p' && fromRow == 3 && lastMoveCoordinates[0]==1) || (board[fromRow][fromCol] == 'P' && fromRow==4 && lastMoveCoordinates[0]==6)) &&
+                board[toRow][toCol] == ' ' && abs(fromCol - toCol) == 1 && board[fromRow][toCol] == (board[fromRow][fromCol] == 'p' ? 'P' : 'p')) {
+                    return true;
         }
+        return true;
+    }
 
-        if ((board[fromRow][fromCol] == 'K' || board[fromRow][fromCol] == 'k') &&
+    public void movePiece(int fromRow, int fromCol, int toRow, int toCol) {
+        // remove captured pawn at en passant
+        if ((board[fromRow][fromCol] == 'p' || board[fromRow][fromCol] == 'P') &&
+                board[toRow][toCol] == ' ' && abs(fromCol - toCol) == 1 && board[fromRow][toCol] == (board[fromRow][fromCol] == 'p' ? 'P' : 'p')) {
+                    board[fromRow][toCol] = ' ';
+        }
+        // move rook at castling
+        else if ((board[fromRow][fromCol] == 'K' || board[fromRow][fromCol] == 'k') &&
                 abs(fromCol - toCol) == 2 && fromRow == toRow) {
             char rook = (board[fromRow][fromCol] == 'K') ? 'R' : 'r';
-            if (toCol == 1 && board[toRow][0] == rook) {
-                board[toRow][2] = rook;
-                board[toRow][0] = ' ';
-            } else if (toCol == 2 && board[toRow][0] == rook) {
+            if (toCol == 2 && board[toRow][0] == rook) {
                 board[toRow][3] = rook;
                 board[toRow][0] = ' ';
-            } else if (toCol == 5 && board[toRow][7] == rook) {
-                board[toRow][4] = rook;
-                board[toRow][7] = ' ';
             } else if (toCol == 6 && board[toRow][7] == rook) {
                 board[toRow][5] = rook;
                 board[toRow][7] = ' ';
@@ -241,18 +198,18 @@ public class Chessboard {
         board[toRow][toCol] = board[fromRow][fromCol];
         board[fromRow][fromCol] = ' ';
 
-        if (board[toRow][toCol] == 'P' && toRow == 0 || board[toRow][toCol] == 'P' && toRow == 7) {
-            board[toRow][toCol] = promotions.isEmpty() ? 'Q' : Character.toUpperCase(promotions.remove(0));
-        } else if (board[toRow][toCol] == 'p' && toRow == 0 || board[toRow][toCol] == 'p' && toRow == 7) {
-            board[toRow][toCol] = promotions.isEmpty() ? 'q' : Character.toLowerCase(promotions.remove(0));
+        // promote pawn
+        if (board[toRow][toCol] == 'P' && toRow == 0) {
+            board[toRow][toCol] = promotion == ' ' ? 'Q' : Character.toUpperCase(promotion);
+        } else if (board[toRow][toCol] == 'p' && toRow == 7) {
+            board[toRow][toCol] = promotion == ' ' ? 'q' : Character.toLowerCase(promotion);
         }
 
-        lastMove = new int[]{fromRow, fromCol, toRow, toCol};
+        lastMoveCoordinates = new int[]{fromRow, fromCol, toRow, toCol};
         movesIndex++;
-        return true;
     }
 
     public boolean solved() {
-        return movesIndex == moves.size();
+        return movesIndex == moves.length;
     }
 }

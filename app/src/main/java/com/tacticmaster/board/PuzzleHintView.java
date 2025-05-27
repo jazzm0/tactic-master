@@ -118,30 +118,24 @@ public class PuzzleHintView extends View {
         isHintFirstClick.set(false);
     }
 
-    public void puzzleHintClicked(Chessboard chessboard, float tileSize) {
-        if (isNull(chessboard)) return;
+    public void showHint(int[] moveCoordinates, float tileSize) {
+        var fromRow = moveCoordinates[0] + 1;
+        var fromCol = moveCoordinates[1] + 1;
+        var toRow = moveCoordinates[2] + 1;
+        var toCol = moveCoordinates[3] + 1;
+        var halfTileSize = tileSize / 2;
 
-        var move = chessboard.getNextMove();
-
-        if (!isNull(move) && chessboard.isPlayersTurn()) {
-            var fromRow = move[0] + 1;
-            var fromCol = move[1] + 1;
-            var toRow = move[2] + 1;
-            var toCol = move[3] + 1;
-            var halfTileSize = tileSize / 2;
-
-            if (!isHintFirstClick.get()) {
-                isHintFirstClick.set(true);
-                shakePiece(move[0], move[1]);
-            } else {
-                this.setVisibility(VISIBLE);
-                this.drawAnimatedHintPath(
-                        (fromCol * tileSize) - halfTileSize,
-                        ((fromRow * tileSize) - halfTileSize),
-                        (toCol * tileSize) - halfTileSize,
-                        ((toRow * tileSize) - halfTileSize)
-                );
-            }
+        if (!isHintFirstClick.get()) {
+            isHintFirstClick.set(true);
+            shakePiece(moveCoordinates[0], moveCoordinates[1]);
+        } else {
+            this.setVisibility(VISIBLE);
+            this.drawAnimatedHintPath(
+                    (fromCol * tileSize) - halfTileSize,
+                    ((fromRow * tileSize) - halfTileSize),
+                    (toCol * tileSize) - halfTileSize,
+                    ((toRow * tileSize) - halfTileSize)
+            );
         }
     }
 
