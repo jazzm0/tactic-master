@@ -1,5 +1,7 @@
 package com.tacticmaster;
 
+import static java.util.Objects.isNull;
+
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -45,9 +47,10 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     private void updatePlayerRating(int opponentRating, double result) {
-        playerRating = EloRatingCalculator.calculateNewRating(playerRating, opponentRating, result);
-        databaseAccessor.storePlayerRating(playerRating);
-        puzzleTextViews.setPlayerRating(playerRating);
+        var newRating = EloRatingCalculator.calculateNewRating(playerRating, opponentRating, result);
+        databaseAccessor.storePlayerRating(newRating);
+        puzzleTextViews.updatePlayerRating(playerRating, newRating);
+        this.playerRating = newRating;
     }
 
     private void loadNextPuzzles() {
@@ -59,6 +62,10 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.loadedPuzzles.addAll(nextPuzzles);
     }
 
+    Puzzle getCurrentPuzzle() {
+        return playedPuzzles.get(currentPuzzleIndex);
+    }
+
     public void renderPuzzle() {
         Puzzle puzzle = playedPuzzles.get(currentPuzzleIndex);
         currentPuzzleId = puzzle.puzzleId();
@@ -66,15 +73,13 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
         puzzleTextViews.setPuzzleId(puzzle.puzzleId());
         puzzleTextViews.setPuzzleRating(puzzle.rating());
-        puzzleTextViews.setPuzzlesSolved(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
+        puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
+        puzzleTextViews.setPuzzleSolved(puzzle.solved());
     }
 
     public void loadPreviousPuzzle() {
-        currentPuzzleIndex -= 1;
-        if (currentPuzzleIndex < 0) {
-            currentPuzzleIndex = playedPuzzles.size() - 1;
-        }
+        currentPuzzleIndex = (currentPuzzleIndex - 1 + playedPuzzles.size()) % playedPuzzles.size();
         renderPuzzle();
     }
 
@@ -86,8 +91,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             if (loadedPuzzles.isEmpty()) {
                 loadNextPuzzles();
             }
-            var nextPuzzle = randomNumberGenerator.nextDouble() < 0.3 ? loadedPuzzles.pollFirst() : loadedPuzzles.pollLast();
-            this.playedPuzzles.add(nextPuzzle);
+            var nextPuzzle = loadedPuzzles.isEmpty() ? null :
+                    (randomNumberGenerator.nextDouble() < 0.3 ? loadedPuzzles.pollFirst() : loadedPuzzles.pollLast());
+            if (!isNull(nextPuzzle)) {
+                this.playedPuzzles.add(nextPuzzle);
+            } else {
+                chessboardView.makeText(R.string.no_more_puzzles);
+                return;
+            }
         }
         renderPuzzle();
     }
@@ -103,7 +114,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                 currentPuzzleIndex = this.playedPuzzles.lastIndexOf(nextPuzzle);
             }
         } catch (NoSuchElementException e) {
-            Toast.makeText(chessboardView.getContext(), R.string.invalid_puzzle_id, Toast.LENGTH_SHORT).show();
+            chessboardView.makeText(R.string.invalid_puzzle_id);
             return;
         }
         renderPuzzle();
@@ -134,8 +145,17 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     @Override
     public void onPuzzleSolved(Puzzle puzzle) {
-        databaseAccessor.setSolved(puzzle.puzzleId());
-        updatePlayerRating(puzzle.rating(), 1.0);
+        if (databaseAccessor.wasNotSolved(puzzle.puzzleId())) {
+            databaseAccessor.setSolved(puzzle.puzzleId());
+            updatePlayerRating(puzzle.rating(), 1.0);
+            var updatedPuzzle = new Puzzle(puzzle.puzzleId(), puzzle.fen(), puzzle.moves(), puzzle.rating(), true);
+            if (playedPuzzles.isEmpty()) {
+                playedPuzzles.add(updatedPuzzle);
+            } else {
+                playedPuzzles.set(currentPuzzleIndex, updatedPuzzle);
+            }
+            puzzleTextViews.setPuzzleSolved(true);
+        }
         if (this.autoplay) {
             loadNextPuzzle();
         }
@@ -143,6 +163,11 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     @Override
     public void onPuzzleNotSolved(Puzzle puzzle) {
-        updatePlayerRating(puzzle.rating(), 0.0);
+        if (databaseAccessor.wasNotSolved(puzzle.puzzleId())) {
+            updatePlayerRating(puzzle.rating(), 0.0);
+        }
+        if (this.autoplay) {
+            loadNextPuzzle();
+        }
     }
 }

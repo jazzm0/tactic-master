@@ -4,14 +4,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import android.content.Context;
+import android.content.Intent;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.Puzzle;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -71,7 +76,7 @@ public class ChessboardControllerTest {
         verify(chessboardView).setPuzzle(puzzle);
         verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
         verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
-        verify(puzzleTextViews).setPuzzlesSolved(5, 256);
+        verify(puzzleTextViews).setPuzzlesSolvedCount(5, 256);
         verify(puzzleTextViews).setPlayerRating(2333);
     }
 
@@ -119,6 +124,8 @@ public class ChessboardControllerTest {
                 .thenReturn(puzzles)
                 .thenReturn(newPuzzles);
 
+        when(databaseAccessor.wasNotSolved(any())).thenReturn(true);
+
         chessboardController.loadNextPuzzle();
 
         chessboardController.onPuzzleSolved(puzzle);
@@ -140,6 +147,7 @@ public class ChessboardControllerTest {
     public void testOnPuzzleNotSolved() {
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzles);
         chessboardController.loadNextPuzzle();
+        when(databaseAccessor.wasNotSolved(any())).thenReturn(true);
 
         chessboardController.onPuzzleNotSolved(puzzle);
 
@@ -147,4 +155,39 @@ public class ChessboardControllerTest {
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
     }
 
+    @Test
+    public void testOnPuzzleSolvedUpdatesSolvedState() {
+        when(databaseAccessor.wasNotSolved(puzzle.puzzleId())).thenReturn(true);
+
+        chessboardController.onPuzzleSolved(puzzle);
+
+        verify(databaseAccessor).setSolved(puzzle.puzzleId());
+        verify(puzzleTextViews).setPuzzleSolved(true);
+        Assertions.assertTrue(chessboardController.getCurrentPuzzle().solved());
+    }
+
+    @Test
+    public void testLoadPuzzleByIdDisplaysSolvedState() {
+        when(databaseAccessor.getPuzzleById("1")).thenReturn(new Puzzle("1", "fen", "moves", 1000, true));
+
+        chessboardController.loadPuzzleById("1");
+
+        verify(puzzleTextViews).setPuzzleSolved(true);
+    }
+
+    @Test
+    public void testPuzzleIdLinkClicked() {
+        String puzzleId = "12345";
+        when(databaseAccessor.getPuzzleById(puzzleId)).thenReturn(new Puzzle(puzzleId, "fen", "moves", 1000));
+        when(chessboardView.getContext()).thenReturn(mock(Context.class));
+        chessboardController.loadPuzzleById(puzzleId);
+
+        chessboardController.puzzleIdLinkClicked();
+
+        Intent expectedIntent = new Intent(Intent.ACTION_SEND);
+        expectedIntent.putExtra(Intent.EXTRA_TEXT, "https://lichess.org/training/" + puzzleId);
+        expectedIntent.setType("text/plain");
+
+        verify(chessboardView.getContext()).startActivity(Intent.createChooser(expectedIntent, null));
+    }
 }

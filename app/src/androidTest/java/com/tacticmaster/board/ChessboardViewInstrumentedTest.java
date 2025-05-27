@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 
 
 @RunWith(AndroidJUnit4.class)
-public class ChessboardViewTest {
+public class ChessboardViewInstrumentedTest {
 
     public static class MockViewTest extends ImageView {
         public MockViewTest(Context context) {
@@ -48,9 +48,11 @@ public class ChessboardViewTest {
         puzzle = new Puzzle("1", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "e2e4 e7e5", 1049);
 
         activityScenarioRule.getScenario().onActivity(activity -> {
+            PuzzleHintView mockPuzzleHintView = new PuzzleHintView(context, null);
             chessboardView = new ChessboardView(context, null);
-            chessboardView.setPuzzle(puzzle);
+            chessboardView.setPuzzleHintView(mockPuzzleHintView);
             chessboardView.setPlayerTurnIcon(new MockViewTest(context));
+            chessboardView.setPuzzle(puzzle);
             activity.setContentView(chessboardView);
         });
     }
@@ -71,15 +73,29 @@ public class ChessboardViewTest {
     }
 
     @Test
-    public void testOnTouchEvent() {
+    public void testOnTouchEventFirstMoveMade() {
         activityScenarioRule.getScenario().onActivity(activity -> {
-            assertEquals(-1, chessboardView.getSelectedCol());
+            assertEquals(-1, chessboardView.getSelectedColumn());
+            assertEquals(-1, chessboardView.getSelectedRow());
+            MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 900, 935, 0);
+            chessboardView.getChessboard().makeFirstMove();
+            boolean result = chessboardView.onTouchEvent(event);
+            assertTrue(result);
+            assertEquals(6, chessboardView.getSelectedColumn());
+            assertEquals(6, chessboardView.getSelectedRow());
+        });
+    }
+
+    @Test
+    public void testOnTouchEventFirstMoveNotMade() {
+        activityScenarioRule.getScenario().onActivity(activity -> {
+            assertEquals(-1, chessboardView.getSelectedColumn());
             assertEquals(-1, chessboardView.getSelectedRow());
             MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 900, 935, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(6, chessboardView.getSelectedCol());
-            assertEquals(6, chessboardView.getSelectedRow());
+            assertEquals(-1, chessboardView.getSelectedColumn());
+            assertEquals(-1, chessboardView.getSelectedRow());
         });
     }
 
@@ -103,16 +119,16 @@ public class ChessboardViewTest {
     @Test
     public void testHintClickBehavior() {
         activityScenarioRule.getScenario().onActivity(activity -> {
-            HintPathView mockHintPathView = new HintPathView(context, null);
-            chessboardView.setHintPathView(mockHintPathView);
+            PuzzleHintView mockPuzzleHintView = new PuzzleHintView(context, null);
+            chessboardView.setPuzzleHintView(mockPuzzleHintView);
 
             chessboardView.getChessboard().makeFirstMove();
             chessboardView.puzzleHintClicked();
-            assertEquals(6, chessboardView.getHintMoveRow());
-            assertEquals(3, chessboardView.getHintMoveColumn());
+            assertEquals(6, mockPuzzleHintView.getHintMoveRow());
+            assertEquals(3, mockPuzzleHintView.getHintMoveColumn());
 
             chessboardView.puzzleHintClicked();
-            assertEquals(View.VISIBLE, mockHintPathView.getVisibility());
+            assertEquals(View.VISIBLE, mockPuzzleHintView.getVisibility());
         });
     }
 }

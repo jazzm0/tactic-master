@@ -1,11 +1,16 @@
 package com.tacticmaster.db;
 
+import static com.tacticmaster.db.PlayerTable.COLUMN_AUTOPLAY_ENABLED;
+import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_ID;
+import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
@@ -162,5 +167,55 @@ class DatabaseAccessorTest {
 
         int rating = databaseAccessor.getPlayerRating();
         assertEquals(1500, rating);
+    }
+
+    @Test
+    void testWasNotSolved() {
+        String puzzleId = "12345";
+
+        when(mockDatabase.rawQuery("SELECT " + COLUMN_SOLVED + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId}))
+                .thenReturn(mockCursor);
+        when(mockCursor.moveToFirst()).thenReturn(true);
+        when(mockCursor.getInt(0)).thenReturn(0);
+
+        boolean result = databaseAccessor.wasNotSolved(puzzleId);
+        assertTrue(result);
+
+        when(mockCursor.getInt(0)).thenReturn(1);
+
+        result = databaseAccessor.wasNotSolved(puzzleId);
+        assertFalse(result);
+
+        when(mockCursor.moveToFirst()).thenReturn(false);
+
+        result = databaseAccessor.wasNotSolved(puzzleId);
+        assertTrue(result);
+    }
+
+    @Test
+    void testStorePlayerAutoplay() {
+        databaseAccessor.storePlayerAutoplay(true);
+
+        verify(mockDatabase).update(eq(PLAYER_TABLE_NAME), any(), eq(COLUMN_PLAYER_ID + " = 1"), isNull());
+    }
+
+    @Test
+    void testGetPlayerAutoplay() {
+        when(mockDatabase.rawQuery("SELECT " + COLUMN_AUTOPLAY_ENABLED + " FROM " + PLAYER_TABLE_NAME, null)).thenReturn(mockCursor);
+        when(mockCursor.moveToFirst()).thenReturn(true);
+        when(mockCursor.getInt(0)).thenReturn(1);
+
+        boolean result = databaseAccessor.getPlayerAutoplay();
+        assertTrue(result);
+
+        when(mockCursor.getInt(0)).thenReturn(0);
+
+        result = databaseAccessor.getPlayerAutoplay();
+        assertFalse(result);
+
+        when(mockCursor.moveToFirst()).thenReturn(false);
+
+        result = databaseAccessor.getPlayerAutoplay();
+        assertTrue(result);
     }
 }

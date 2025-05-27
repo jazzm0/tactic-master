@@ -190,7 +190,7 @@ public class Chessboard {
                 board[toRow][toCol] == ' ' && fromCol != toCol) {
             if (board[fromRow][toCol] == (board[fromRow][fromCol] == 'p' ? 'P' : 'p')) {
                 if (lastMove != null && lastMove[2] == fromRow && lastMove[3] == toCol &&
-                        Math.abs(lastMove[0] - lastMove[2]) == 2) {
+                        abs(lastMove[0] - lastMove[2]) == 2) {
                     board[fromRow][toCol] = ' ';
                 } else {
                     return false;
@@ -200,21 +200,21 @@ public class Chessboard {
             }
         }
 
-        if (board[fromRow][fromCol] == 'K' && abs(fromCol - toCol) == 2 && fromRow == toRow) {
-            if (toCol == 6 && board[toRow][7] == 'R') {
-                board[toRow][5] = 'R';
-                board[toRow][7] = ' ';
-            } else if (toCol == 2 && board[toRow][0] == 'R') {
-                board[toRow][3] = 'R';
+        if ((board[fromRow][fromCol] == 'K' || board[fromRow][fromCol] == 'k') &&
+                abs(fromCol - toCol) == 2 && fromRow == toRow) {
+            char rook = (board[fromRow][fromCol] == 'K') ? 'R' : 'r';
+            if (toCol == 1 && board[toRow][0] == rook) {
+                board[toRow][2] = rook;
                 board[toRow][0] = ' ';
-            }
-        } else if (board[fromRow][fromCol] == 'k' && abs(fromCol - toCol) == 2 && fromRow == toRow) {
-            if (toCol == 6 && board[toRow][7] == 'r') {
-                board[toRow][5] = 'r';
-                board[toRow][7] = ' ';
-            } else if (toCol == 2 && board[toRow][0] == 'r') {
-                board[toRow][3] = 'r';
+            } else if (toCol == 2 && board[toRow][0] == rook) {
+                board[toRow][3] = rook;
                 board[toRow][0] = ' ';
+            } else if (toCol == 5 && board[toRow][7] == rook) {
+                board[toRow][4] = rook;
+                board[toRow][7] = ' ';
+            } else if (toCol == 6 && board[toRow][7] == rook) {
+                board[toRow][5] = rook;
+                board[toRow][7] = ' ';
             }
         }
 
