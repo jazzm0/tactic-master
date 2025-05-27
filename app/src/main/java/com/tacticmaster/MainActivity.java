@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -13,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.tacticmaster.board.ChessboardView;
@@ -31,6 +34,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        View rootView = findViewById(R.id.root_layout);
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+            var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            var cutoutInsets = insets.getInsets(WindowInsetsCompat.Type.displayCutout());
+            int topPadding = Math.max(systemInsets.top, cutoutInsets.top);
+            v.setPadding(systemInsets.left, topPadding, systemInsets.right, systemInsets.bottom);
+            return insets;
+        });
 
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(new DatabaseHelper(this));
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
