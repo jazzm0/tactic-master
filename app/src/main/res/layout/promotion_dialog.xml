@@ -8,32 +8,32 @@
 
     <ImageView
         android:id="@+id/queen"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="@dimen/promotion_piece_size"
+        android:layout_height="@dimen/promotion_piece_size"
         android:layout_margin="8dp"
         android:contentDescription="@string/queen"
         android:scaleType="fitCenter" />
 
     <ImageView
         android:id="@+id/rook"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="@dimen/promotion_piece_size"
+        android:layout_height="@dimen/promotion_piece_size"
         android:layout_margin="8dp"
         android:contentDescription="@string/rook"
         android:scaleType="fitCenter" />
 
     <ImageView
         android:id="@+id/bishop"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="@dimen/promotion_piece_size"
+        android:layout_height="@dimen/promotion_piece_size"
         android:layout_margin="8dp"
         android:contentDescription="@string/bishop"
         android:scaleType="fitCenter" />
 
     <ImageView
         android:id="@+id/knight"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="@dimen/promotion_piece_size"
+        android:layout_height="@dimen/promotion_piece_size"
         android:layout_margin="8dp"
         android:contentDescription="@string/knight"
         android:scaleType="fitCenter" />

@@ -181,7 +181,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         if (chessboard.isCorrectMove(selectedRow, selectedColumn, row, column)) {
 
             if (chessboard.isPromotionMove(selectedRow, selectedColumn, row, column)) {
-                PromotionDialog.show(getContext(), bitmapManager, chessboard.isWhiteToMove(), piece -> {
+                PromotionDialog.show(getContext(), bitmapManager, chessboard.isWhiteToMove(), getTileSize(), piece -> {
                     if (!chessboard.isCorrectPromotionPiece(piece)) {
                         onFailedMove();
                     } else {
