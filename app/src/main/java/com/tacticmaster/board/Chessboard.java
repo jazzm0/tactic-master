@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
+import com.github.bhlangonijr.chesslib.move.Move;
 import com.tacticmaster.puzzle.Puzzle;
 
 import java.util.Set;
@@ -92,7 +93,25 @@ public class Chessboard {
             return false;
         }
         int[] move = convertMoveToCoordinates(moves[movesIndex]);
-        return move[0] == fromRow && move[1] == fromCol && move[2] == toRow && move[3] == toCol;
+        var correctMoveFromPuzzle = move[0] == fromRow && move[1] == fromCol && move[2] == toRow && move[3] == toCol;
+        if (correctMoveFromPuzzle) {
+            return true;
+        }
+
+        var fromSquare = mapToSquare(fromRow, fromCol);
+        var toSquare = mapToSquare(toRow, toCol);
+
+        var possibleMatingMove = fromSquare.value().toLowerCase() + toSquare.value().toLowerCase();
+        board.doMove(new Move(mapToSquare(fromRow, fromCol), mapToSquare(toRow, toCol)), true);
+        var isMate = board.isMated();
+
+        board.undoMove();
+
+        if (isMate) {
+            moves[movesIndex] = possibleMatingMove;
+        }
+
+        return isMate;
     }
 
     public boolean isPromotionMove() {
