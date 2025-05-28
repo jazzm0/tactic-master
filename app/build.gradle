@@ -10,8 +10,8 @@ android {
         applicationId = "com.tacticmaster"
         minSdk = 24
         targetSdk = 35
-        versionCode = 16
-        versionName = "1.0.15"
+        versionCode = 17
+        versionName = "1.0.16"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -33,9 +33,7 @@ android {
     }
 
     dependenciesInfo {
-        // Disables dependency metadata when building APKs.
         includeInApk = false
-        // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
     }
 
@@ -51,6 +49,7 @@ android {
 dependencies {
     implementation libs.appcompat
     implementation libs.material
+    implementation libs.chesslib
 
     testImplementation libs.junit
     testImplementation libs.junit.jupiter.api
@@ -65,4 +64,3 @@ dependencies {
     androidTestImplementation libs.androidx.runner
     androidTestImplementation libs.androidx.espresso.core
 }
-
