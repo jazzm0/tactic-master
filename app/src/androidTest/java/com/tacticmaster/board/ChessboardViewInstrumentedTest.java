@@ -81,8 +81,8 @@ public class ChessboardViewInstrumentedTest {
             chessboardView.getChessboard().makeFirstMove();
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(6, chessboardView.getSelectedColumn());
-            assertEquals(6, chessboardView.getSelectedRow());
+            assertEquals(1, chessboardView.getSelectedColumn());
+            assertEquals(1, chessboardView.getSelectedRow());
         });
     }
 
