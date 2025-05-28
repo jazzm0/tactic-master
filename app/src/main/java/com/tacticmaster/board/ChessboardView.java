@@ -148,11 +148,11 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         toast.show();
     }
 
-    private void checkPuzzleSolved() {
+    private void checkPuzzleSolved(Puzzle puzzle) {
         if (chessboard.solved() && !puzzleFinished && !isNull(puzzleFinishedListener)) {
             puzzleFinished = true;
             makeText(R.string.correct_solution);
-            postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(this.puzzle), NEXT_PUZZLE_DELAY);
+            postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(puzzle), NEXT_PUZZLE_DELAY);
         }
     }
 
@@ -230,7 +230,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         drawBoard(canvas);
         drawLabels(canvas);
         drawPieces(canvas);
-        checkPuzzleSolved();
+        checkPuzzleSolved(this.puzzle);
     }
 
     @Override
