@@ -68,12 +68,10 @@ public class Chessboard {
         if (isInvalidField(row, column)) {
             throw new IllegalArgumentException("Invalid row or column");
         }
-
-        var file = isPlayerWhite ? (char) ('A' + column) : (char) ('H' - column);
-        var rank = isPlayerWhite ? (char) ('8' - row) : (char) (row + '1');
+        var file = (char) ('A' + column);
+        var rank = (char) ('8' - row);
         return Square.fromValue(new String(new char[]{file, rank}));
     }
-
 
     public Character getPieceAt(int row, int column) {
         var symbol = board.getPiece(mapToSquare(row, column)).getFenSymbol();

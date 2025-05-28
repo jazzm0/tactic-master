@@ -290,7 +290,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private char getPieceAt(int row, int column) {
-        return chessboard.getPieceAt(row, column);
+        return chessboard.getPieceAt(transformCoordinate(row), transformCoordinate(column));
     }
 
     private int transformCoordinate(int i) {

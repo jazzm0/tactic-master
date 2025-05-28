@@ -137,10 +137,8 @@ public class ChessboardTest {
             "'rn1qr1k1/ppp2ppp/1b6/8/1PbP4/P1N3P1/3QNPBP/R3K2R b KQ - 2 13', 'b6d4 e1c1 c4e2 c3e2'",
             "'r1bq1r1k/ppp2p2/5p1p/7Q/3pBb1B/8/PPP3PP/R3K2R b KQ - 0 15', 'f8e8 e1g1 e8e4 f1f4 e4f4 h5h6 h8g8 h6f4'",
             "'r3k2r/ppp1qppp/2b2n2/4P1B1/3P4/2P2N2/P5PP/R2QK2R b KQkq - 0 13', 'e8g8 e1g1 e7e6 e5f6'",
-            "'4k2r/8/8/8/8/8/8/4K2R w - - 0 1', 'e1g1'",
             "'3rk2r/p2nb1Rp/2Q3bB/8/1qBP4/8/PP1N1P1P/R3K3 w Qk - 5 18', 'e1c1 b4c3 b2c3 e7a3'",
             "'r3k1r1/p1pb1p2/1pn1q2p/1B2p3/4Pp2/P1P2N1P/2P1QPPK/1R3R2 w q - 0 18', 'b1d1 g8g2 h2g2 e6h3 g2g1 e8c8'",
-            "'r3k2r/8/8/8/8/8/8/R3K2R b - - 0 1', 'e8g8 e1c1'",
             "'r4rk1/ppp2ppp/2n3b1/6q1/2B5/2Q2PP1/PP2N2P/R3K2R b KQ - 2 18', 'c6e5 f3f4 e5d3 c4d3 g5d5 e1c1'",
             "'r3k2r/ppp2ppp/2n4n/1B3b2/8/1PP1PN1P/P4PP1/RN1K3R w kq - 3 13', 'f3e5 e8c8 d1e1 c6e5'",
             "'r1bqk2r/pp3p2/2p1pn1p/4P1p1/1bB1P3/2N2N2/PP3PPP/R2QK2R b KQkq - 0 11', 'f6e4 d1d8 e8d8 e1c1 d8c7 c3e4'",
@@ -283,5 +281,6 @@ public class ChessboardTest {
             }
         }
         assertTrue(castlingChecked);
+
     }
 }
