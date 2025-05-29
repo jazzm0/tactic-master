@@ -32,11 +32,11 @@ public class Chessboard {
     }
 
     public boolean isPromotionMove(Move move) {
-        if (chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN &&
-                move.getTo().getRank().equals(Rank.RANK_8)) {
+        if (chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN && move.getTo().getRank().equals(Rank.RANK_8)) {
             return true;
-        } else return chessboard.getPiece(move.getFrom()) == Piece.BLACK_PAWN &&
-                move.getTo().getRank().equals(Rank.RANK_1);
+        } else {
+            return chessboard.getPiece(move.getFrom()) == Piece.BLACK_PAWN && move.getTo().getRank().equals(Rank.RANK_1);
+        }
     }
 
     public void loadFromFen(String fen) {
@@ -55,15 +55,7 @@ public class Chessboard {
         return chessboard.doMove(move, fullValidation);
     }
 
-    public boolean isMated() {
-        return chessboard.isMated();
-    }
-
     public Side getSideToMove() {
         return chessboard.getSideToMove();
-    }
-
-    public Move undoMove() {
-        return chessboard.undoMove();
     }
 }
