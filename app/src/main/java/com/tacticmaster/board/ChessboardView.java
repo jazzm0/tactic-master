@@ -156,12 +156,6 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         toast.show();
     }
 
-    private void checkPuzzleSolved() {
-        if (puzzle.isSolutionFound() && !puzzleFinished && !isNull(puzzleFinishedListener)) {
-            onPuzzleSolved();
-        }
-    }
-
     private void onPuzzleSolved() {
         puzzleFinished = true;
         makeText(R.string.correct_solution);
@@ -220,7 +214,6 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             chessboard.doMove(proposedMove, false);
             if (chessboard.isMated()) {
                 onPuzzleSolved();
-                invalidate();
                 return;
             }
             chessboard.undoMove();
@@ -230,12 +223,12 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             postDelayed(() -> puzzleFinishedListener.onPuzzleNotSolved(this.puzzle), NEXT_PUZZLE_DELAY);
         } else {
             doNextMove();
-            checkPuzzleSolved();
-            if (!puzzleFinished) {
+            if (puzzle.isSolutionFound()) {
+                onPuzzleSolved();
+            } else {
                 postDelayed(this::doNextMove, 1300);
             }
         }
-        invalidate();
     }
 
     @Override
