@@ -12,12 +12,12 @@ public class Puzzle implements Comparable<Puzzle> {
     private int currentMoveIndex;
 
     public Puzzle(
-        String puzzleId,
-        String fen,
-        String moves,
-        int rating,
-        boolean solved
-    )  {
+            String puzzleId,
+            String fen,
+            String moves,
+            int rating,
+            boolean solved
+    ) {
         this.puzzleId = puzzleId;
         this.fen = fen;
         this.moves = moves.trim().isEmpty() ? new String[0] : requireNonNull(moves.split(" "), "Moves cannot be null");

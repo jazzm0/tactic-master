@@ -130,7 +130,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         float tileSize = getTileSize();
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int column = 0; column < BOARD_SIZE; column++) {
-                Piece currentPiece = chessboard.getPiece(squareAt(row,column));
+                Piece currentPiece = chessboard.getPiece(squareAt(row, column));
                 if (!Piece.NONE.equals(currentPiece)) {
                     Bitmap pieceBitmap = bitmapManager.getPieceBitmap(currentPiece.getFenSymbol().charAt(0));
                     if (!isNull(pieceBitmap)) {
@@ -194,7 +194,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     // unfortunately this little game-logic is required as there is no appropriate method
     // in chesslib and even Board#isPromoRank is not public :(
     private boolean isPromotionMove(Move move) {
-        if(chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN &&
+        if (chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN &&
                 move.getTo().getRank().equals(Rank.RANK_8)) {
             return true;
         } else return chessboard.getPiece(move.getFrom()) == Piece.BLACK_PAWN &&
@@ -202,10 +202,10 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void proposeMove(int row, int column) {
-        Move proposedMove = new Move(squareAt(selectedRow,selectedColumn),squareAt(row,column));
+        Move proposedMove = new Move(squareAt(selectedRow, selectedColumn), squareAt(row, column));
         if (isPromotionMove(proposedMove)) {
             PromotionDialog.show(getContext(), bitmapManager, playerSide == Side.WHITE, getTileSize(), piece -> {
-                Move proposedPromotionMove = new Move(squareAt(selectedRow,selectedColumn),squareAt(row,column),Piece.fromFenSymbol(Character.toString(piece)));
+                Move proposedPromotionMove = new Move(squareAt(selectedRow, selectedColumn), squareAt(row, column), Piece.fromFenSymbol(Character.toString(piece)));
                 handleMove(proposedPromotionMove);
             });
         } else {
@@ -216,9 +216,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private void handleMove(Move proposedMove) {
         unselectPiece();
         boolean isLegalMove = chessboard.legalMoves().contains(proposedMove);
-        if(isLegalMove) {
+        if (isLegalMove) {
             chessboard.doMove(proposedMove, false);
-            if(chessboard.isMated()) {
+            if (chessboard.isMated()) {
                 onPuzzleSolved();
                 invalidate();
                 return;
@@ -231,7 +231,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         } else {
             doNextMove();
             checkPuzzleSolved();
-            if(!puzzleFinished) {
+            if (!puzzleFinished) {
                 postDelayed(this::doNextMove, 1300);
             }
         }
@@ -296,7 +296,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     public void doFirstMove() {
-        if(!puzzle.isStarted() && chessboard.getSideToMove() != playerSide) {
+        if (!puzzle.isStarted() && chessboard.getSideToMove() != playerSide) {
             doNextMove();
         }
     }
@@ -310,7 +310,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         this.puzzleFinishedListener = listener;
     }
 
-    private Square squareAt(int row, int column){
+    private Square squareAt(int row, int column) {
         return Square.squareAt(transformFlippedCoordinate(BOARD_SIZE - row - 1) * BOARD_SIZE + transformFlippedCoordinate(column));
     }
 
@@ -320,7 +320,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private int[] transformMove(String fenMove) {
         Move move = new Move(fenMove, chessboard.getSideToMove());
-        int[] moveCoordinates = new int[]{BOARD_SIZE - move.getFrom().getRank().ordinal() - 1 ,move.getFrom().getFile().ordinal(),BOARD_SIZE - move.getTo().getRank().ordinal() - 1,move.getTo().getFile().ordinal()};
+        int[] moveCoordinates = new int[]{BOARD_SIZE - move.getFrom().getRank().ordinal() - 1, move.getFrom().getFile().ordinal(), BOARD_SIZE - move.getTo().getRank().ordinal() - 1, move.getTo().getFile().ordinal()};
         return boardFlipped ? Arrays.stream(moveCoordinates).map(this::transformFlippedCoordinate).toArray() : moveCoordinates;
     }
 
@@ -343,7 +343,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
             Piece piece = chessboard.getPiece(squareAt(row, column));
 
-            if ((selectedRow == -1 && selectedColumn == -1) || (!Piece.NONE.equals(piece) && piece.getPieceSide()==playerSide)) {
+            if ((selectedRow == -1 && selectedColumn == -1) || (!Piece.NONE.equals(piece) && piece.getPieceSide() == playerSide)) {
                 selectPiece(row, column);
             } else {
                 proposeMove(row, column);
