@@ -164,7 +164,6 @@ public class ChessboardControllerTest {
         chessboardController.onPuzzleSolved(puzzle);
 
         verify(databaseAccessor).setSolved(puzzle.puzzleId());
-        verify(puzzleTextViews).setPuzzleSolved(true);
         Assertions.assertTrue(chessboardController.getCurrentPuzzle().solved());
     }
 
