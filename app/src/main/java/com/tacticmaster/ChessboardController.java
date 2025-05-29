@@ -146,15 +146,9 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     @Override
     public void onPuzzleSolved(Puzzle puzzle) {
         if (databaseAccessor.wasNotSolved(puzzle.puzzleId())) {
+            puzzle.setSolved(true);
             databaseAccessor.setSolved(puzzle.puzzleId());
             updatePlayerRating(puzzle.rating(), 1.0);
-            var updatedPuzzle = new Puzzle(puzzle.puzzleId(), puzzle.fen(), puzzle.moves(), puzzle.rating(), true);
-            if (playedPuzzles.isEmpty()) {
-                playedPuzzles.add(updatedPuzzle);
-            } else {
-                playedPuzzles.set(currentPuzzleIndex, updatedPuzzle);
-            }
-            puzzleTextViews.setPuzzleSolved(true);
         }
         if (this.autoplay) {
             loadNextPuzzle();

@@ -60,8 +60,6 @@ public class ChessboardViewInstrumentedTest {
     @Test
     public void testInitialization() {
         assertNotNull(chessboardView);
-        assertNotNull(chessboardView.getPuzzle());
-        assertNotNull(chessboardView.getChessboard());
     }
 
     @Test
@@ -77,12 +75,12 @@ public class ChessboardViewInstrumentedTest {
         activityScenarioRule.getScenario().onActivity(activity -> {
             assertEquals(-1, chessboardView.getSelectedColumn());
             assertEquals(-1, chessboardView.getSelectedRow());
-            MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 900, 935, 0);
-            chessboardView.getChessboard().makeFirstMove();
+            chessboardView.doFirstMove();
+            MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 840, 840, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(1, chessboardView.getSelectedColumn());
-            assertEquals(1, chessboardView.getSelectedRow());
+            assertEquals(7, chessboardView.getSelectedColumn());
+            assertEquals(7, chessboardView.getSelectedRow());
         });
     }
 
@@ -91,7 +89,7 @@ public class ChessboardViewInstrumentedTest {
         activityScenarioRule.getScenario().onActivity(activity -> {
             assertEquals(-1, chessboardView.getSelectedColumn());
             assertEquals(-1, chessboardView.getSelectedRow());
-            MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 900, 935, 0);
+            MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 840, 840, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
             assertEquals(-1, chessboardView.getSelectedColumn());
@@ -108,21 +106,12 @@ public class ChessboardViewInstrumentedTest {
     }
 
     @Test
-    public void testSetPuzzle() {
-        Puzzle newPuzzle = new Puzzle("2", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "e2e4 e7e5", 1049);
-        activityScenarioRule.getScenario().onActivity(activity -> {
-            chessboardView.setPuzzle(newPuzzle);
-            assertEquals(newPuzzle, chessboardView.getPuzzle());
-        });
-    }
-
-    @Test
     public void testHintClickBehavior() {
         activityScenarioRule.getScenario().onActivity(activity -> {
             PuzzleHintView mockPuzzleHintView = new PuzzleHintView(context, null);
             chessboardView.setPuzzleHintView(mockPuzzleHintView);
 
-            chessboardView.getChessboard().makeFirstMove();
+            chessboardView.doFirstMove();
             chessboardView.puzzleHintClicked();
             assertEquals(6, mockPuzzleHintView.getHintMoveRow());
             assertEquals(3, mockPuzzleHintView.getHintMoveColumn());

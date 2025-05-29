@@ -157,6 +157,8 @@ public class ChessboardControllerTest {
 
     @Test
     public void testOnPuzzleSolvedUpdatesSolvedState() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzles);
+        chessboardController.loadNextPuzzle();
         when(databaseAccessor.wasNotSolved(puzzle.puzzleId())).thenReturn(true);
 
         chessboardController.onPuzzleSolved(puzzle);
