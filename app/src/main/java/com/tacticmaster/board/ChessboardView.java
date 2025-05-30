@@ -17,14 +17,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
-import com.github.bhlangonijr.chesslib.move.Move;
 import com.tacticmaster.R;
 import com.tacticmaster.puzzle.PuzzleGame;
-
-import java.util.Arrays;
 
 public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener {
 
@@ -34,7 +28,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         void onPuzzleNotSolved(PuzzleGame puzzle);
     }
 
-    private static final int BOARD_SIZE = 8;
+    public static final int BOARD_SIZE = 8;
     private static final int NEXT_PUZZLE_DELAY = 3000;
 
     private final ChessboardPieceManager bitmapManager;
@@ -42,21 +36,17 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, textPaint;
 
     private PuzzleGame puzzleGame;
-    private final Chessboard chessboard;
+    private Chessboard chessboard;
     private PuzzleHintView puzzleHintView;
     private PuzzleFinishedListener puzzleFinishedListener;
     private ImageView playerTurnIcon;
 
-    private boolean boardFlipped = false;
-
-    private Side playerSide;
     private int selectedRow = -1, selectedColumn = -1;
     private boolean puzzleFinished = false;
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.bitmapManager = new ChessboardPieceManager(context);
-        this.chessboard = new Chessboard();
         initPaints();
     }
 
@@ -117,8 +107,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         float tileSize = getTileSize();
         int height = getHeight();
         for (int index = 0; index < BOARD_SIZE; index++) {
-            String columnLabel = boardFlipped ? String.valueOf((char) ('h' - index)) : String.valueOf((char) ('a' + index));
-            String rowLabel = boardFlipped ? String.valueOf(index + 1) : String.valueOf(BOARD_SIZE - index);
+            String columnLabel = !chessboard.isPlayerWhite() ? String.valueOf((char) ('h' - index)) : String.valueOf((char) ('a' + index));
+            String rowLabel = !chessboard.isPlayerWhite() ? String.valueOf(index + 1) : String.valueOf(BOARD_SIZE - index);
 
             canvas.drawText(columnLabel, index * tileSize + (tileSize / 2 - textPaint.measureText(columnLabel) / 2) * 1.9f, height - 10, textPaint);
             canvas.drawText(rowLabel, 10, index * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .4f, textPaint);
@@ -129,9 +119,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         float tileSize = getTileSize();
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int column = 0; column < BOARD_SIZE; column++) {
-                Piece currentPiece = chessboard.getPiece(squareAt(row, column));
-                if (!Piece.NONE.equals(currentPiece)) {
-                    Bitmap pieceBitmap = bitmapManager.getPieceBitmap(currentPiece.getFenSymbol().charAt(0));
+                var currentPiece = chessboard.getPiece(row, column);
+                if (Chessboard.NONE_PIECE != currentPiece) {
+                    Bitmap pieceBitmap = bitmapManager.getPieceBitmap(currentPiece);
                     if (!isNull(pieceBitmap)) {
                         float left = column * tileSize + puzzleHintView.getShakeOffset(row, column);
                         float top = row * tileSize;
@@ -166,7 +156,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void updatePlayerTurnIcon() {
-        if (playerSide == Side.WHITE) {
+        if (chessboard.isPlayerWhite()) {
             playerTurnIcon.setImageResource(R.drawable.ic_white_turn);
         } else {
             playerTurnIcon.setImageResource(R.drawable.ic_black_turn);
@@ -184,10 +174,10 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void proposeMove(int row, int column) {
-        Move proposedMove = new Move(squareAt(selectedRow, selectedColumn), squareAt(row, column));
-        if (chessboard.isPromotionMove(proposedMove)) {
-            PromotionDialog.show(getContext(), bitmapManager, playerSide == Side.WHITE, getTileSize(), piece -> {
-                Move proposedPromotionMove = new Move(squareAt(selectedRow, selectedColumn), squareAt(row, column), Piece.fromFenSymbol(Character.toString(piece)));
+        var proposedMove = chessboard.getProposedMove(selectedRow, selectedColumn, row, column);
+        if (chessboard.isPromotionMove(selectedRow, selectedColumn, row, column)) {
+            PromotionDialog.show(getContext(), bitmapManager, chessboard.isPlayerWhite(), getTileSize(), piece -> {
+                var proposedPromotionMove = chessboard.getPromotionMove(selectedRow, selectedColumn, row, column, piece);
                 handleMove(proposedPromotionMove);
             });
         } else {
@@ -195,9 +185,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         }
     }
 
-    private void handleMove(Move proposedMove) {
+    private void handleMove(String move) {
         unselectPiece();
-        if (!chessboard.isMoveLeadingToMate(proposedMove) && !puzzleGame.isCorrectNextMove(proposedMove.toString())) {
+        if (!chessboard.isMoveLeadingToMate(move) && !puzzleGame.isCorrectNextMove(move)) {
             makeText(R.string.wrong_solution);
             postDelayed(() -> puzzleFinishedListener.onPuzzleNotSolved(puzzleGame), NEXT_PUZZLE_DELAY);
         } else {
@@ -211,23 +201,10 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void doNextMove() {
-        chessboard.doMove(new Move(puzzleGame.getNextMove(), chessboard.getSideToMove()));
+        chessboard.doMove(puzzleGame.getNextMove());
         invalidate();
     }
 
-    private Square squareAt(int row, int column) {
-        return Square.squareAt(transformFlippedCoordinate(BOARD_SIZE - row - 1) * BOARD_SIZE + transformFlippedCoordinate(column));
-    }
-
-    private int transformFlippedCoordinate(int i) {
-        return boardFlipped ? 7 - i : i;
-    }
-
-    private int[] transformMove(String fenMove) {
-        Move move = new Move(fenMove, chessboard.getSideToMove());
-        int[] moveCoordinates = new int[]{BOARD_SIZE - move.getFrom().getRank().ordinal() - 1, move.getFrom().getFile().ordinal(), BOARD_SIZE - move.getTo().getRank().ordinal() - 1, move.getTo().getFile().ordinal()};
-        return boardFlipped ? Arrays.stream(moveCoordinates).map(this::transformFlippedCoordinate).toArray() : moveCoordinates;
-    }
 
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
@@ -258,14 +235,14 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     void doFirstMove() {
-        if (!puzzleGame.isStarted() && chessboard.getSideToMove() != playerSide) {
+        if (!puzzleGame.isStarted() && !chessboard.isPlayersTurn()) {
             doNextMove();
         }
     }
 
     public void puzzleHintClicked() {
-        if (!isNull(chessboard) && chessboard.getSideToMove() == playerSide) {
-            puzzleHintView.showHint(transformMove(puzzleGame.getNextMove(false)), getTileSize());
+        if (!isNull(chessboard) && chessboard.isPlayersTurn()) {
+            puzzleHintView.showHint(chessboard.getHintMove(puzzleGame.getNextMove(false)), getTileSize());
         }
     }
 
@@ -282,9 +259,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         puzzleFinished = false;
         this.puzzleGame = puzzle;
         puzzleGame.reset();
-        chessboard.loadFromFen(puzzleGame.fen());
-        playerSide = chessboard.getSideToMove() == Side.WHITE ? Side.BLACK : Side.WHITE;
-        boardFlipped = playerSide == Side.BLACK;
+        this.chessboard = new Chessboard(puzzleGame.fen());
         updatePlayerTurnIcon();
         unselectPiece();
         puzzleHintView.resetHintFirstClick();
@@ -314,9 +289,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 return true;
             }
 
-            Piece piece = chessboard.getPiece(squareAt(row, column));
+            var piece = chessboard.getPiece(row, column);
 
-            if (!Piece.NONE.equals(piece) && piece.getPieceSide() == playerSide) {
+            if (Chessboard.NONE_PIECE != piece && chessboard.isOwnPiece(piece)) {
                 selectPiece(row, column);
             } else if (selectedRow != -1 && selectedColumn != -1) {
                 proposeMove(row, column);

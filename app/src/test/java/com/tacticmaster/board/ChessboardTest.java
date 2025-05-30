@@ -1,14 +1,12 @@
 package com.tacticmaster.board;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
-import com.github.bhlangonijr.chesslib.move.Move;
-import com.tacticmaster.puzzle.Puzzle;
 import com.tacticmaster.puzzle.PuzzleGame;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,17 +21,18 @@ public class ChessboardTest {
     @BeforeEach
     public void setUp() {
         String fen = "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29";
-        String moves = "f8f7 c2h7 g8h7 g7g8q";
-        Puzzle puzzle = new Puzzle("1", fen, moves, 1049);
-        chessboard = new Chessboard();
-        chessboard.loadFromFen(puzzle.fen());
+        chessboard = new Chessboard(fen);
+    }
+
+    private char convertPieceToChar(Piece piece) {
+        return piece.getFenSymbol().charAt(0);
     }
 
     @Test
     public void testSetupBoard() {
-        assertEquals(Piece.NONE, chessboard.getPiece(Square.A8));
-        assertEquals(Piece.BLACK_ROOK, chessboard.getPiece(Square.B8));
-        assertEquals(Piece.BLACK_BISHOP, chessboard.getPiece(Square.C8));
+        assertEquals(convertPieceToChar(Piece.NONE), chessboard.getPiece(0, 0));
+        assertEquals(convertPieceToChar(Piece.BLACK_ROOK), chessboard.getPiece(0, 1));
+        assertEquals(convertPieceToChar(Piece.BLACK_BISHOP), chessboard.getPiece(0, 2));
     }
 
     @Test
@@ -46,61 +45,60 @@ public class ChessboardTest {
         String fen = "8/P1P1P1P1/1k6/8/8/6K1/1p1p1p1p/8 w - - 0 1";
         String moves = "a7a8q b2b1q c7c8r d2d1r e7e8b f2f1b g7g8n h2h1n a1a2";
         PuzzleGame puzzle = new PuzzleGame("1", fen, moves, 1049);
-        Chessboard chessboard = new Chessboard();
-        chessboard.loadFromFen(puzzle.fen());
+        Chessboard chessboard = new Chessboard(fen);
 
-        assertTrue(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.WHITE_QUEEN, chessboard.getPiece(Square.A8));
-        assertTrue(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.BLACK_QUEEN, chessboard.getPiece(Square.B1));
+        assertTrue(chessboard.isPromotionMove(6, 7, 7, 7));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.WHITE_QUEEN), chessboard.getPiece(7, 7));
+        assertTrue(chessboard.isPromotionMove(1, 6, 0, 6));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.BLACK_QUEEN), chessboard.getPiece(0, 6));
 
-        assertTrue(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.WHITE_ROOK, chessboard.getPiece(Square.C8));
-        assertTrue(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.BLACK_ROOK, chessboard.getPiece(Square.D1));
+        assertTrue(chessboard.isPromotionMove(6, 5, 7, 5));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.WHITE_ROOK), chessboard.getPiece(7, 5));
+        assertTrue(chessboard.isPromotionMove(1, 4, 0, 4));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.BLACK_ROOK), chessboard.getPiece(0, 4));
 
-        assertTrue(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.WHITE_BISHOP, chessboard.getPiece(Square.E8));
-        assertTrue(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.BLACK_BISHOP, chessboard.getPiece(Square.F1));
+        assertTrue(chessboard.isPromotionMove(6, 3, 7, 3));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.WHITE_BISHOP), chessboard.getPiece(7, 3));
+        assertTrue(chessboard.isPromotionMove(1, 2, 0, 2));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.BLACK_BISHOP), chessboard.getPiece(0, 2));
 
-        assertTrue(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.WHITE_KNIGHT, chessboard.getPiece(Square.G8));
-        assertTrue(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.BLACK_KNIGHT, chessboard.getPiece(Square.H1));
+        assertTrue(chessboard.isPromotionMove(6, 1, 7, 1));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.WHITE_KNIGHT), chessboard.getPiece(7, 1));
+        assertTrue(chessboard.isPromotionMove(1, 0, 0, 0));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.BLACK_KNIGHT), chessboard.getPiece(0, 0));
 
-        assertFalse(chessboard.isPromotionMove(new Move(puzzle.getNextMove(false), chessboard.getSideToMove())));
+        assertFalse(chessboard.isPromotionMove(0, 7, 1, 7));
     }
 
     @Test
     public void testEnPassant() {
-        String fen = "4k3/2p5/8/3P4/8/8/8/4K3 w - - 0 1";
+        String fen = "4k3/2p5/8/3P4/8/8/8/4K3 b - - 0 1";
         String move = "c7c5 d5c6";
         PuzzleGame puzzle = new PuzzleGame("1", fen, move, 1049);
-        Chessboard chessboard = new Chessboard();
-        chessboard.loadFromFen(puzzle.fen());
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.BLACK_PAWN, chessboard.getPiece(Square.C5));
+        Chessboard chessboard = new Chessboard(fen);
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.BLACK_PAWN), chessboard.getPiece(3, 2));
+        chessboard.doMove(puzzle.getNextMove());
+        assertEquals(convertPieceToChar(Piece.NONE), chessboard.getPiece(3, 2));
+        assertEquals(convertPieceToChar(Piece.WHITE_PAWN), chessboard.getPiece(2, 2));
     }
 
     @ParameterizedTest
     @CsvSource({
-            "'1k6/6P1/8/8/8/8/8/1K6 w - - 0 1', 'g7g8q', 1, 6, 0, 6, true, 'Q'",
-            "'1k6/6P1/8/8/8/8/6p1/1K6 b - - 0 1', 'g2g1n', 6, 6, 7, 6, true, 'N'",
+            "'1k6/6P1/8/8/8/8/8/1K6 w - - 0 1', 6, 1, 7, 1, true, 'Q'",
+            "'1k6/6P1/8/8/8/8/6p1/1K6 b - - 0 1', 6, 6, 7, 6, true, 'N'",
     })
-    public void testIsPromotionMove(String fen, String moves, int fromRow, int fromCol, int toRow, int toCol, boolean expected, char promotedPiece) {
-        PuzzleGame puzzle = new PuzzleGame("1", fen, moves, 1049);
-        var promotionChessBoard = new Chessboard();
-        promotionChessBoard.loadFromFen(puzzle.fen());
-        assertEquals(expected, promotionChessBoard.isPromotionMove(new Move(moves, chessboard.getSideToMove())));
+    public void testIsPromotionMove(String fen, int fromRow, int fromCol, int toRow, int toCol, boolean expected, char promotedPiece) {
+        var promotionChessBoard = new Chessboard(fen);
+        assertEquals(expected, promotionChessBoard.isPromotionMove(fromRow, fromCol, toRow, toCol));
     }
 
     @ParameterizedTest
@@ -213,8 +211,7 @@ public class ChessboardTest {
             "'r3k1nr/ppp3pp/2n2q2/5b2/1bPp4/1N3N2/PP1BPPPP/R2QKB1R w KQkq - 4 9', 'b3d4 c6d4 f3d4 b4d2 d1d2 e8c8 e2e3 c7c5'"
     })
     public void testCastling(String fen, String movesData) {
-        Chessboard chessboard = new Chessboard();
-        chessboard.loadFromFen(fen);
+        Chessboard chessboard = new Chessboard(fen);
         String[] moves = movesData.split(" ");
 
         boolean castlingChecked = false;
@@ -222,7 +219,7 @@ public class ChessboardTest {
             boolean wasCastlingMove = (chessboard.getPiece(Square.E1) == Piece.WHITE_KING && (move.equals("e1g1") || move.equals("e1c1"))) ||
                     (chessboard.getPiece(Square.E8) == Piece.BLACK_KING && (move.equals("e8g8") || move.equals("e8c8")));
 
-            chessboard.doMove(new Move(move, chessboard.getSideToMove()));
+            chessboard.doMove(move);
             if (wasCastlingMove) {
                 switch (move) {
                     case "e1g1":

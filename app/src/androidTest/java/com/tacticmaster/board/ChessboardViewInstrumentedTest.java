@@ -79,8 +79,8 @@ public class ChessboardViewInstrumentedTest {
             MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 840, 840, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(7, chessboardView.getSelectedColumn());
-            assertEquals(7, chessboardView.getSelectedRow());
+            assertEquals(6, chessboardView.getSelectedColumn());
+            assertEquals(6, chessboardView.getSelectedRow());
         });
     }
 
