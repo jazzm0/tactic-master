@@ -27,8 +27,8 @@ public class PuzzleHintView extends View {
     private boolean isHintPathVisible = false;
     private final AtomicBoolean isHintFirstClick = new AtomicBoolean(false);
     private float shakeOffset = 0;
-    private int hintMoveRow = -1;
-    private int hintMoveColumn = -1;
+    private int hintMoveRank = -1;
+    private int hintMoveFile = -1;
     private ViewChangedListener viewChangedListener;
 
     public PuzzleHintView(Context context, AttributeSet attrs) {
@@ -52,9 +52,9 @@ public class PuzzleHintView extends View {
         }
     }
 
-    private void shakePiece(int row, int col) {
-        hintMoveRow = row;
-        hintMoveColumn = col;
+    private void shakePiece(int rank, int file) {
+        hintMoveRank = rank;
+        hintMoveFile = file;
 
         ValueAnimator animator = ValueAnimator.ofFloat(-10, 10);
         animator.setDuration(100);
@@ -70,8 +70,8 @@ public class PuzzleHintView extends View {
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
                 shakeOffset = 0;
-                hintMoveRow = -1;
-                hintMoveColumn = -1;
+                hintMoveRank = -1;
+                hintMoveFile = -1;
                 notifyChildInvalidated();
             }
         });
@@ -95,16 +95,16 @@ public class PuzzleHintView extends View {
         }
     }
 
-    int getHintMoveRow() {
-        return hintMoveRow;
+    int getHintMoveRank() {
+        return hintMoveRank;
     }
 
-    int getHintMoveColumn() {
-        return hintMoveColumn;
+    int getHintMoveFile() {
+        return hintMoveFile;
     }
 
-    public float getShakeOffset(int row, int col) {
-        if (row == hintMoveRow && col == hintMoveColumn) {
+    public float getShakeOffset(int rank, int file) {
+        if (rank == hintMoveRank && file == hintMoveFile) {
             return shakeOffset;
         }
         return 0;
@@ -119,10 +119,10 @@ public class PuzzleHintView extends View {
     }
 
     public void showHint(int[] moveCoordinates, float tileSize) {
-        var fromRow = moveCoordinates[0] + 1;
-        var fromCol = moveCoordinates[1] + 1;
-        var toRow = moveCoordinates[2] + 1;
-        var toCol = moveCoordinates[3] + 1;
+        var fromRank = moveCoordinates[0] + 1;
+        var fromFile = moveCoordinates[1] + 1;
+        var toRank = moveCoordinates[2] + 1;
+        var toFile = moveCoordinates[3] + 1;
         var halfTileSize = tileSize / 2;
 
         if (!isHintFirstClick.get()) {
@@ -131,10 +131,10 @@ public class PuzzleHintView extends View {
         } else {
             this.setVisibility(VISIBLE);
             this.drawAnimatedHintPath(
-                    (fromCol * tileSize) - halfTileSize,
-                    ((fromRow * tileSize) - halfTileSize),
-                    (toCol * tileSize) - halfTileSize,
-                    ((toRow * tileSize) - halfTileSize)
+                    (fromFile * tileSize) - halfTileSize,
+                    ((fromRank * tileSize) - halfTileSize),
+                    (toFile * tileSize) - halfTileSize,
+                    ((toRank * tileSize) - halfTileSize)
             );
         }
     }

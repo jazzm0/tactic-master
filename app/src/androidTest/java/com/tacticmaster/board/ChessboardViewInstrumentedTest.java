@@ -73,27 +73,27 @@ public class ChessboardViewInstrumentedTest {
     @Test
     public void testOnTouchEventFirstMoveMade() {
         activityScenarioRule.getScenario().onActivity(activity -> {
-            assertEquals(-1, chessboardView.getSelectedColumn());
-            assertEquals(-1, chessboardView.getSelectedRow());
+            assertEquals(-1, chessboardView.getSelectedFile());
+            assertEquals(-1, chessboardView.getSelectedRank());
             chessboardView.doFirstMove();
             MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 840, 840, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(6, chessboardView.getSelectedColumn());
-            assertEquals(6, chessboardView.getSelectedRow());
+            assertEquals(6, chessboardView.getSelectedFile());
+            assertEquals(6, chessboardView.getSelectedRank());
         });
     }
 
     @Test
     public void testOnTouchEventFirstMoveNotMade() {
         activityScenarioRule.getScenario().onActivity(activity -> {
-            assertEquals(-1, chessboardView.getSelectedColumn());
-            assertEquals(-1, chessboardView.getSelectedRow());
+            assertEquals(-1, chessboardView.getSelectedFile());
+            assertEquals(-1, chessboardView.getSelectedRank());
             MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 840, 840, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(-1, chessboardView.getSelectedColumn());
-            assertEquals(-1, chessboardView.getSelectedRow());
+            assertEquals(-1, chessboardView.getSelectedFile());
+            assertEquals(-1, chessboardView.getSelectedRank());
         });
     }
 
@@ -113,8 +113,8 @@ public class ChessboardViewInstrumentedTest {
 
             chessboardView.doFirstMove();
             chessboardView.puzzleHintClicked();
-            assertEquals(6, mockPuzzleHintView.getHintMoveRow());
-            assertEquals(3, mockPuzzleHintView.getHintMoveColumn());
+            assertEquals(6, mockPuzzleHintView.getHintMoveRank());
+            assertEquals(3, mockPuzzleHintView.getHintMoveFile());
 
             chessboardView.puzzleHintClicked();
             assertEquals(View.VISIBLE, mockPuzzleHintView.getVisibility());

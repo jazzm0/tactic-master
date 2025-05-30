@@ -19,13 +19,16 @@ public class Chessboard {
     private final boolean isPlayerWhite;
 
     public Chessboard(String fen) {
+        if (fen == null || fen.trim().isEmpty()) {
+            throw new IllegalArgumentException("FEN string cannot be null or empty");
+        }
         this.chessboard = new Board();
         this.chessboard.loadFromFen(fen);
         this.isPlayerWhite = chessboard.getSideToMove() == Side.BLACK;
     }
 
-    private Square squareAt(int row, int column) {
-        return Square.squareAt(transformFlippedCoordinate(BOARD_SIZE - row - 1) * BOARD_SIZE + transformFlippedCoordinate(column));
+    private Square squareAt(int rank, int file) {
+        return Square.squareAt(transformFlippedCoordinate(BOARD_SIZE - rank - 1) * BOARD_SIZE + transformFlippedCoordinate(file));
     }
 
     private int transformFlippedCoordinate(int i) {
@@ -33,6 +36,9 @@ public class Chessboard {
     }
 
     private int[] transformMove(String fenMove) {
+        if (fenMove == null || fenMove.length() < 4 || fenMove.length() > 5) {
+            throw new IllegalArgumentException("Invalid move: " + fenMove);
+        }
         Move move = new Move(fenMove, chessboard.getSideToMove());
         int[] moveCoordinates = new int[]{BOARD_SIZE - move.getFrom().getRank().ordinal() - 1, move.getFrom().getFile().ordinal(), BOARD_SIZE - move.getTo().getRank().ordinal() - 1, move.getTo().getFile().ordinal()};
         return !isPlayerWhite ? Arrays.stream(moveCoordinates).map(this::transformFlippedCoordinate).toArray() : moveCoordinates;
@@ -74,7 +80,9 @@ public class Chessboard {
     }
 
     public String getPromotionMove(int fromRank, int fromFile, int toRank, int toFile, char piece) {
-        return new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile), Piece.fromFenSymbol(Character.toString(piece))).toString().toLowerCase();
+        return new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile), Piece.fromFenSymbol(Character.toString(piece)))
+                .toString()
+                .toLowerCase();
     }
 
     public boolean isPlayerWhite() {
@@ -95,8 +103,8 @@ public class Chessboard {
         return (isPlayerWhite && Character.isUpperCase(piece) || (!isPlayerWhite && Character.isLowerCase(piece)));
     }
 
-    public char getPiece(int row, int column) {
-        return chessboard.getPiece(squareAt(row, column)).getFenSymbol().charAt(0);
+    public char getPiece(int rank, int file) {
+        return chessboard.getPiece(squareAt(rank, file)).getFenSymbol().charAt(0);
     }
 
     public void doMove(String nextMove) {
