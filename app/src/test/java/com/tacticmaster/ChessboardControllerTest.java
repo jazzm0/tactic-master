@@ -15,6 +15,7 @@ import android.content.Intent;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.Puzzle;
+import com.tacticmaster.puzzle.PuzzleGame;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,8 +45,10 @@ public class ChessboardControllerTest {
     @InjectMocks
     private ChessboardController chessboardController;
 
-    private Puzzle puzzle;
-    private List<Puzzle> puzzles;
+    private PuzzleGame puzzleGame;
+    private Puzzle puzzleRecord;
+    private List<PuzzleGame> puzzleGames;
+    private List<Puzzle> puzzleRecords;
 
     @BeforeEach
     public void setUp() {
@@ -54,28 +57,34 @@ public class ChessboardControllerTest {
         when(databaseAccessor.getPlayerAutoplay()).thenReturn(false);
         String fen = "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29";
         String moves = "f8f7 c2h7 g8h7 g7g8q";
-        this.puzzle = new Puzzle("1", fen, moves, 1049);
-        this.puzzles = new ArrayList<>();
-        this.puzzles.add(puzzle);
-        this.puzzles.add(new Puzzle("1", "fen1", "moves1", 1500));
-        this.puzzles.add(new Puzzle("2", "fen2", "moves2", 1600));
-        this.puzzles.add(new Puzzle("3", "fen3", "moves3", 1400));
+        this.puzzleGame = new PuzzleGame("1", fen, moves, 1049);
+        this.puzzleRecord = new Puzzle("1", fen, moves, 1049);
+        this.puzzleGames = new ArrayList<>();
+        this.puzzleRecords = new ArrayList<>();
+        this.puzzleRecords.add(new Puzzle("1", fen, moves, 1049));
+        this.puzzleGames.add(new PuzzleGame("1", fen, moves, 1049));
+        this.puzzleRecords.add(new Puzzle("1", "fen1", "moves1", 1500));
+        this.puzzleGames.add(new PuzzleGame("1", "fen1", "moves1", 1500));
+        this.puzzleRecords.add(new Puzzle("2", "fen2", "moves2", 1600));
+        this.puzzleGames.add(new PuzzleGame("2", "fen2", "moves2", 1600));
+        this.puzzleRecords.add(new Puzzle("3", "fen3", "moves3", 1400));
+        this.puzzleGames.add(new PuzzleGame("3", "fen3", "moves3", 1400));
         chessboardController = new ChessboardController(databaseAccessor, chessboardView, puzzleTextViews, randomNumberGenerator);
 
     }
 
     @Test
     public void testLoadNextPuzzles() {
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzles);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzleRecords);
         when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
         when(databaseAccessor.getPlayerRating()).thenReturn(2333);
 
         chessboardController.loadNextPuzzle();
 
-        verify(chessboardView).setPuzzle(puzzle);
-        verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
-        verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
+        verify(chessboardView).setPuzzle(puzzleGame);
+        verify(puzzleTextViews).setPuzzleId(puzzleGame.getPuzzleId());
+        verify(puzzleTextViews).setPuzzleRating(puzzleGame.rating());
         verify(puzzleTextViews).setPuzzlesSolvedCount(5, 256);
         verify(puzzleTextViews).setPlayerRating(2333);
     }
@@ -83,35 +92,35 @@ public class ChessboardControllerTest {
 
     @Test
     public void testLoadPuzzleById() {
-        when(databaseAccessor.getPuzzleById("1")).thenReturn(puzzle);
+        when(databaseAccessor.getPuzzleById("1")).thenReturn(puzzleRecord);
 
         chessboardController.loadPuzzleById("1");
 
-        verify(chessboardView).setPuzzle(puzzle);
-        verify(puzzleTextViews).setPuzzleId(puzzle.puzzleId());
-        verify(puzzleTextViews).setPuzzleRating(puzzle.rating());
+        verify(chessboardView).setPuzzle(puzzleGame);
+        verify(puzzleTextViews).setPuzzleId(puzzleGame.getPuzzleId());
+        verify(puzzleTextViews).setPuzzleRating(puzzleGame.rating());
     }
 
     @Test
     public void testLoadPreviousPuzzle() {
         // Mock the database to return a list of puzzles
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzles);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzleRecords);
 
         // Load the first puzzle
         chessboardController.loadNextPuzzle();
-        verify(chessboardView).setPuzzle(puzzles.get(0));
+        verify(chessboardView).setPuzzle(puzzleGames.get(0));
 
         // Load the second puzzle
         chessboardController.loadNextPuzzle();
-        verify(chessboardView).setPuzzle(puzzles.get(3));
+        verify(chessboardView).setPuzzle(puzzleGames.get(3));
 
         // Go back to the previous puzzle
         chessboardController.loadPreviousPuzzle();
-        verify(chessboardView, atLeastOnce()).setPuzzle(puzzles.get(0));
+        verify(chessboardView, atLeastOnce()).setPuzzle(puzzleGames.get(0));
 
         // Wrap around to the last puzzle when going back from the first puzzle
         chessboardController.loadPreviousPuzzle();
-        verify(chessboardView, atLeastOnce()).setPuzzle(puzzles.get(puzzles.size() - 1));
+        verify(chessboardView, atLeastOnce()).setPuzzle(puzzleGames.get(puzzleGames.size() - 1));
     }
 
     @Test
@@ -121,16 +130,16 @@ public class ChessboardControllerTest {
         newPuzzles.add(new Puzzle("3", "fen", "moves", 1000));
 
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet()))
-                .thenReturn(puzzles)
+                .thenReturn(puzzleRecords)
                 .thenReturn(newPuzzles);
 
         when(databaseAccessor.wasNotSolved(any())).thenReturn(true);
 
         chessboardController.loadNextPuzzle();
 
-        chessboardController.onPuzzleSolved(puzzle);
+        chessboardController.onPuzzleSolved(puzzleGame);
 
-        verify(databaseAccessor).setSolved(puzzle.puzzleId());
+        verify(databaseAccessor).setSolved(puzzleGame.getPuzzleId());
         verify(databaseAccessor).storePlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
 
@@ -138,18 +147,18 @@ public class ChessboardControllerTest {
         verify(chessboardView, times(1)).setPuzzle(any());
 
         chessboardController.setAutoplay(true);
-        chessboardController.onPuzzleSolved(puzzle);
+        chessboardController.onPuzzleSolved(puzzleGame);
         // check that chessboardController.loadNextPuzzle() was executed once more (because autoplay=true)
         verify(chessboardView, times(2)).setPuzzle(any());
     }
 
     @Test
     public void testOnPuzzleNotSolved() {
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzles);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzleRecords);
         chessboardController.loadNextPuzzle();
         when(databaseAccessor.wasNotSolved(any())).thenReturn(true);
 
-        chessboardController.onPuzzleNotSolved(puzzle);
+        chessboardController.onPuzzleNotSolved(puzzleGame);
 
         verify(databaseAccessor).storePlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
@@ -157,12 +166,13 @@ public class ChessboardControllerTest {
 
     @Test
     public void testOnPuzzleSolvedUpdatesSolvedState() {
-        when(databaseAccessor.wasNotSolved(puzzle.puzzleId())).thenReturn(true);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzleRecords);
+        chessboardController.loadNextPuzzle();
+        when(databaseAccessor.wasNotSolved(puzzleGame.getPuzzleId())).thenReturn(true);
 
-        chessboardController.onPuzzleSolved(puzzle);
+        chessboardController.onPuzzleSolved(puzzleGame);
 
-        verify(databaseAccessor).setSolved(puzzle.puzzleId());
-        verify(puzzleTextViews).setPuzzleSolved(true);
+        verify(databaseAccessor).setSolved(puzzleGame.getPuzzleId());
         Assertions.assertTrue(chessboardController.getCurrentPuzzle().solved());
     }
 

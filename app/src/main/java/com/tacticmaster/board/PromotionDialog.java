@@ -38,19 +38,19 @@ public class PromotionDialog {
         knight.setImageBitmap(chessboardPieceManager.getPieceBitmap(isWhite ? 'N' : 'n'));
 
         queen.setOnClickListener(v -> {
-            listener.onPieceSelected('q');
+            listener.onPieceSelected(isWhite ? 'Q' : 'q');
             dialog.dismiss();
         });
         rook.setOnClickListener(v -> {
-            listener.onPieceSelected('r');
+            listener.onPieceSelected(isWhite ? 'R' : 'r');
             dialog.dismiss();
         });
         bishop.setOnClickListener(v -> {
-            listener.onPieceSelected('b');
+            listener.onPieceSelected(isWhite ? 'B' : 'b');
             dialog.dismiss();
         });
         knight.setOnClickListener(v -> {
-            listener.onPieceSelected('n');
+            listener.onPieceSelected(isWhite ? 'N' : 'n');
             dialog.dismiss();
         });
 
