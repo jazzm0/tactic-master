@@ -22,7 +22,6 @@ import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.tacticmaster.R;
-import com.tacticmaster.puzzle.Puzzle;
 import com.tacticmaster.puzzle.PuzzleGame;
 
 import java.util.Arrays;
@@ -30,9 +29,9 @@ import java.util.Arrays;
 public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener {
 
     public interface PuzzleFinishedListener {
-        void onPuzzleSolved(Puzzle puzzle);
+        void onPuzzleSolved(PuzzleGame puzzle);
 
-        void onPuzzleNotSolved(Puzzle puzzle);
+        void onPuzzleNotSolved(PuzzleGame puzzle);
     }
 
     private static final int BOARD_SIZE = 8;
@@ -42,7 +41,6 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, textPaint;
 
-    private Puzzle puzzle;
     private PuzzleGame puzzleGame;
     private final Chessboard chessboard;
     private PuzzleHintView puzzleHintView;
@@ -157,11 +155,10 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         toast.show();
     }
 
-    private void onPuzzleSolved() {
+    private void onPuzzleSolved(PuzzleGame puzzle) {
         puzzleFinished = true;
         makeText(R.string.correct_solution);
-        Puzzle currentPuzzle = puzzle;
-        postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(currentPuzzle), NEXT_PUZZLE_DELAY);
+        postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(puzzle), NEXT_PUZZLE_DELAY);
     }
 
     private float getTileSize() {
@@ -202,15 +199,34 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         unselectPiece();
         if (!chessboard.isMoveLeadingToMate(proposedMove) && !puzzleGame.isCorrectNextMove(proposedMove.toString())) {
             makeText(R.string.wrong_solution);
-            postDelayed(() -> puzzleFinishedListener.onPuzzleNotSolved(this.puzzle), NEXT_PUZZLE_DELAY);
+            postDelayed(() -> puzzleFinishedListener.onPuzzleNotSolved(puzzleGame), NEXT_PUZZLE_DELAY);
         } else {
             doNextMove();
             if (puzzleGame.isSolutionFound()) {
-                onPuzzleSolved();
+                onPuzzleSolved(puzzleGame);
             } else {
                 postDelayed(this::doNextMove, 1300);
             }
         }
+    }
+
+    private void doNextMove() {
+        chessboard.doMove(new Move(puzzleGame.getNextMove(), chessboard.getSideToMove()));
+        invalidate();
+    }
+
+    private Square squareAt(int row, int column) {
+        return Square.squareAt(transformFlippedCoordinate(BOARD_SIZE - row - 1) * BOARD_SIZE + transformFlippedCoordinate(column));
+    }
+
+    private int transformFlippedCoordinate(int i) {
+        return boardFlipped ? 7 - i : i;
+    }
+
+    private int[] transformMove(String fenMove) {
+        Move move = new Move(fenMove, chessboard.getSideToMove());
+        int[] moveCoordinates = new int[]{BOARD_SIZE - move.getFrom().getRank().ordinal() - 1, move.getFrom().getFile().ordinal(), BOARD_SIZE - move.getTo().getRank().ordinal() - 1, move.getTo().getFile().ordinal()};
+        return boardFlipped ? Arrays.stream(moveCoordinates).map(this::transformFlippedCoordinate).toArray() : moveCoordinates;
     }
 
     @Override
@@ -241,6 +257,12 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         return selectedRow;
     }
 
+    void doFirstMove() {
+        if (!puzzleGame.isStarted() && chessboard.getSideToMove() != playerSide) {
+            doNextMove();
+        }
+    }
+
     public void puzzleHintClicked() {
         if (!isNull(chessboard) && chessboard.getSideToMove() == playerSide) {
             puzzleHintView.showHint(transformMove(puzzleGame.getNextMove(false)), getTileSize());
@@ -256,10 +278,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         this.playerTurnIcon = playerTurnIcon;
     }
 
-    public void setPuzzle(Puzzle puzzle) {
+    public void setPuzzle(PuzzleGame puzzle) {
         puzzleFinished = false;
-        this.puzzle = puzzle;
-        this.puzzleGame = new PuzzleGame(puzzle);
+        this.puzzleGame = puzzle;
         puzzleGame.reset();
         chessboard.loadFromFen(puzzleGame.fen());
         playerSide = chessboard.getSideToMove() == Side.WHITE ? Side.BLACK : Side.WHITE;
@@ -271,34 +292,10 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         postDelayed(this::doFirstMove, 2000);
     }
 
-    public void doFirstMove() {
-        if (!puzzleGame.isStarted() && chessboard.getSideToMove() != playerSide) {
-            doNextMove();
-        }
-    }
-
-    public void doNextMove() {
-        chessboard.doMove(new Move(puzzleGame.getNextMove(), chessboard.getSideToMove()));
-        invalidate();
-    }
-
     public void setPuzzleSolvedListener(PuzzleFinishedListener listener) {
         this.puzzleFinishedListener = listener;
     }
 
-    private Square squareAt(int row, int column) {
-        return Square.squareAt(transformFlippedCoordinate(BOARD_SIZE - row - 1) * BOARD_SIZE + transformFlippedCoordinate(column));
-    }
-
-    private int transformFlippedCoordinate(int i) {
-        return boardFlipped ? 7 - i : i;
-    }
-
-    private int[] transformMove(String fenMove) {
-        Move move = new Move(fenMove, chessboard.getSideToMove());
-        int[] moveCoordinates = new int[]{BOARD_SIZE - move.getFrom().getRank().ordinal() - 1, move.getFrom().getFile().ordinal(), BOARD_SIZE - move.getTo().getRank().ordinal() - 1, move.getTo().getFile().ordinal()};
-        return boardFlipped ? Arrays.stream(moveCoordinates).map(this::transformFlippedCoordinate).toArray() : moveCoordinates;
-    }
 
     @Override
     public void onViewChanged() {

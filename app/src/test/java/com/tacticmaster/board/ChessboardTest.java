@@ -2,9 +2,7 @@ package com.tacticmaster.board;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static java.lang.Character.toLowerCase;
 
 import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.Side;
@@ -17,9 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class ChessboardTest {
 
@@ -39,75 +34,6 @@ public class ChessboardTest {
         assertEquals(Piece.NONE, chessboard.getPiece(Square.A8));
         assertEquals(Piece.BLACK_ROOK, chessboard.getPiece(Square.B8));
         assertEquals(Piece.BLACK_BISHOP, chessboard.getPiece(Square.C8));
-        /*
-        assertEquals(Piece.NONE, chessboard.getPiece(0,3));
-        assertEquals(Piece.NONE, chessboard.getPiece(0,4));
-        assertEquals(Piece.BLACK_ROOK, chessboard.getPiece(0,5));
-        assertEquals(Piece.BLACK_KING, chessboard.getPiece(0,6));
-        assertEquals(Piece.NONE, chessboard.getPiece(0,7));
-
-        assertEquals(Piece.BLACK_QUEEN, chessboard.getPiece(1,0));
-        assertEquals(Piece.NONE, chessboard.getPiece(1,1));
-        assertEquals(Piece.NONE, chessboard.getPiece(1,2));
-        assertEquals(Piece.NONE, chessboard.getPiece(1,3));
-        assertEquals(Piece.NONE, chessboard.getPiece(1,4));
-        assertEquals(Piece.NONE, chessboard.getPiece(1,5));
-        assertEquals(Piece.WHITE_PAWN, chessboard.getPiece(1,6));
-        assertEquals(Piece.NONE, chessboard.getPiece(1,7));
-
-        assertEquals(Piece.NONE, chessboard.getPiece(2,0));
-        assertEquals(Piece.NONE, chessboard.getPiece(2,1));
-        assertEquals(Piece.NONE, chessboard.getPiece(2,2));
-        assertEquals(Piece.NONE, chessboard.getPiece(2,3));
-        assertEquals(Piece.BLACK_PAWN, chessboard.getPiece(2,4));
-        assertEquals(Piece.NONE, chessboard.getPiece(2,5));
-        assertEquals(Piece.NONE, chessboard.getPiece(2,6));
-        assertEquals(Piece.BLACK_PAWN, chessboard.getPiece(2,7));
-
-        assertEquals(Piece.NONE, chessboard.getPiece(3,0));
-        assertEquals(Piece.NONE, chessboard.getPiece(3,1));
-        assertEquals(Piece.NONE, chessboard.getPiece(3,2));
-        assertEquals(Piece.BLACK_PAWN, chessboard.getPiece(3,3));
-        assertEquals(Piece.NONE, chessboard.getPiece(3,4));
-        assertEquals(Piece.NONE, chessboard.getPiece(3,5));
-        assertEquals(Piece.NONE, chessboard.getPiece(3,6));
-        assertEquals(Piece.BLACK_PAWN, chessboard.getPiece(3,7));
-
-        assertEquals(Piece.NONE, chessboard.getPiece(4,0));
-        assertEquals(Piece.NONE, chessboard.getPiece(4,1));
-        assertEquals(Piece.NONE, chessboard.getPiece(4,2));
-        assertEquals(Piece.WHITE_PAWN, chessboard.getPiece(4,3));
-        assertEquals(Piece.NONE, chessboard.getPiece(4,4));
-        assertEquals(Piece.WHITE_PAWN, chessboard.getPiece(4,5));
-        assertEquals(Piece.NONE, chessboard.getPiece(4,6));
-        assertEquals(Piece.NONE, chessboard.getPiece(4,7));
-
-        assertEquals(Piece.NONE, chessboard.getPiece(5,0));
-        assertEquals(Piece.NONE, chessboard.getPiece(5,1));
-        assertEquals(Piece.WHITE_PAWN, chessboard.getPiece(5,2));
-        assertEquals(Piece.NONE, chessboard.getPiece(5,3));
-        assertEquals(Piece.NONE, chessboard.getPiece(5,4));
-        assertEquals(Piece.NONE, chessboard.getPiece(5,5));
-        assertEquals(Piece.NONE, chessboard.getPiece(5,6));
-        assertEquals(Piece.NONE, chessboard.getPiece(5,7));
-
-        assertEquals(Piece.NONE, chessboard.getPiece(6,0));
-        assertEquals(Piece.NONE, chessboard.getPiece(6,1));
-        assertEquals(Piece.WHITE_QUEEN, chessboard.getPiece(6,2));
-        assertEquals(Piece.WHITE_KING, chessboard.getPiece(6,3));
-        assertEquals(Piece.NONE, chessboard.getPiece(6,4));
-        assertEquals(Piece.NONE, chessboard.getPiece(6,5));
-        assertEquals(Piece.NONE, chessboard.getPiece(6,6));
-        assertEquals(Piece.WHITE_PAWN, chessboard.getPiece(6,7));
-
-        assertEquals(Piece.NONE, chessboard.getPiece(7,0));
-        assertEquals(Piece.NONE, chessboard.getPiece(7,1));
-        assertEquals(Piece.NONE, chessboard.getPiece(7,2));
-        assertEquals(Piece.WHITE_ROOK, chessboard.getPiece(7,3));
-        assertEquals(Piece.NONE, chessboard.getPiece(7,4));
-        assertEquals(Piece.NONE, chessboard.getPiece(7,5));
-        assertEquals(Piece.WHITE_ROOK, chessboard.getPiece(7,6));
-        assertEquals(Piece.NONE, chessboard.getPiece(7,7));*/
     }
 
     @Test
@@ -163,20 +89,6 @@ public class ChessboardTest {
         chessboard.loadFromFen(puzzle.fen());
         chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
         assertEquals(Piece.BLACK_PAWN, chessboard.getPiece(Square.C5));
-        /*
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.NONE, chessboard.getPiece(3,2));
-        assertEquals(Piece.WHITE_PAWN, chessboard.getPiece(2,2));
-
-        fen = "1k6/p7/8/1P6/8/8/8/1K6 b - - 0 1";
-        move = "a7a5 b5a6";
-        puzzle = new PuzzleGame("1", fen, move, 1049);
-        chessboard.loadFromFen(puzzle.fen());
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        chessboard.doMove(new Move(puzzle.getNextMove(), chessboard.getSideToMove()));
-        assertEquals(Piece.NONE, chessboard.getPiece(3,0));
-        assertEquals(Piece.WHITE_PAWN, chessboard.getPiece(2,0));*/
-
     }
 
     @ParameterizedTest

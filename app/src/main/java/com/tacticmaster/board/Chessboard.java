@@ -7,9 +7,6 @@ import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 
-import java.util.List;
-
-// Adapter for chesslib-Board
 public class Chessboard {
     private final Board chessboard;
 

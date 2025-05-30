@@ -18,7 +18,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.tacticmaster.MainActivity;
 import com.tacticmaster.R;
-import com.tacticmaster.puzzle.Puzzle;
+import com.tacticmaster.puzzle.PuzzleGame;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,12 +40,12 @@ public class ChessboardViewInstrumentedTest {
 
     private Context context;
     private ChessboardView chessboardView;
-    private Puzzle puzzle;
+    private PuzzleGame puzzle;
 
     @Before
     public void setUp() {
         context = ApplicationProvider.getApplicationContext();
-        puzzle = new Puzzle("1", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "e2e4 e7e5", 1049);
+        puzzle = new PuzzleGame("1", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "e2e4 e7e5", 1049);
 
         activityScenarioRule.getScenario().onActivity(activity -> {
             PuzzleHintView mockPuzzleHintView = new PuzzleHintView(context, null);

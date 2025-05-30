@@ -2,12 +2,16 @@ package com.tacticmaster.puzzle;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class PuzzleGame implements Comparable<PuzzleGame> {
+
     private final String puzzleId;
     private final String fen;
     private final String[] moves;
     private final int rating;
-    private boolean solved;
+    private final boolean solved;
 
     private int currentMoveIndex;
 
@@ -22,8 +26,8 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
         this.fen = fen;
         this.moves = moves.trim().isEmpty() ? new String[0] : requireNonNull(moves.split(" "), "Moves cannot be null");
         this.rating = rating;
-        this.solved = solved;
         this.currentMoveIndex = 0;
+        this.solved = solved;
     }
 
     public PuzzleGame(Puzzle puzzleRecord) {
@@ -37,16 +41,8 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
         this(puzzleId, fen, moves, rating, false);
     }
 
-    public String puzzleId() {
-        return this.puzzleId;
-    }
-
     public String fen() {
         return this.fen;
-    }
-
-    public String moves() {
-        return String.join(" ", this.moves);
     }
 
     public boolean isCorrectNextMove(String move) {
@@ -57,13 +53,21 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
         return getNextMove(true);
     }
 
-    public String getNextMove(boolean inc) {
+    public String getNextMove(boolean withIncrement) {
         if (currentMoveIndex >= this.moves.length) {
             return "";
         }
         String move = this.moves[currentMoveIndex];
-        currentMoveIndex += inc ? 1 : 0;
+        currentMoveIndex += withIncrement ? 1 : 0;
         return move;
+    }
+
+    public String getMoves() {
+        return String.join(" ", moves);
+    }
+
+    public String getPuzzleId() {
+        return puzzleId;
     }
 
     public int rating() {
@@ -72,10 +76,6 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
 
     public boolean solved() {
         return this.solved;
-    }
-
-    public void setSolved(boolean isSolved) {
-        this.solved = isSolved;
     }
 
     public void reset() {
@@ -88,6 +88,18 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
 
     public boolean isStarted() {
         return currentMoveIndex > 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        PuzzleGame that = (PuzzleGame) o;
+        return rating == that.rating && solved == that.solved && currentMoveIndex == that.currentMoveIndex && Objects.equals(puzzleId, that.puzzleId) && Objects.equals(fen, that.fen) && Objects.deepEquals(moves, that.moves);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(puzzleId, fen, Arrays.hashCode(moves), rating, solved, currentMoveIndex);
     }
 
     @Override
