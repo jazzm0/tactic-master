@@ -35,15 +35,6 @@ public class Chessboard {
         return !isPlayerWhite ? 7 - i : i;
     }
 
-    private int[] transformMove(String fenMove) {
-        if (fenMove == null || fenMove.length() < 4 || fenMove.length() > 5) {
-            throw new IllegalArgumentException("Invalid move: " + fenMove);
-        }
-        Move move = new Move(fenMove, chessboard.getSideToMove());
-        int[] moveCoordinates = new int[]{BOARD_SIZE - move.getFrom().getRank().ordinal() - 1, move.getFrom().getFile().ordinal(), BOARD_SIZE - move.getTo().getRank().ordinal() - 1, move.getTo().getFile().ordinal()};
-        return !isPlayerWhite ? Arrays.stream(moveCoordinates).map(this::transformFlippedCoordinate).toArray() : moveCoordinates;
-    }
-
     Piece getPiece(Square square) {
         return chessboard.getPiece(square);
     }
@@ -52,8 +43,13 @@ public class Chessboard {
         return chessboard.getSideToMove();
     }
 
-    public int[] getHintMove(String fenMove) {
-        return transformMove(fenMove);
+    public int[] transformFenMove(String fenMove) {
+        if (fenMove == null || fenMove.length() < 4 || fenMove.length() > 5) {
+            throw new IllegalArgumentException("Invalid move: " + fenMove);
+        }
+        Move move = new Move(fenMove, chessboard.getSideToMove());
+        int[] moveCoordinates = new int[]{BOARD_SIZE - move.getFrom().getRank().ordinal() - 1, move.getFrom().getFile().ordinal(), BOARD_SIZE - move.getTo().getRank().ordinal() - 1, move.getTo().getFile().ordinal()};
+        return !isPlayerWhite ? Arrays.stream(moveCoordinates).map(this::transformFlippedCoordinate).toArray() : moveCoordinates;
     }
 
     public boolean isPlayersTurn() {

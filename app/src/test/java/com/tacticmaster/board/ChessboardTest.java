@@ -9,6 +9,7 @@ import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.tacticmaster.puzzle.PuzzleGame;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,10 +30,46 @@ public class ChessboardTest {
     }
 
     @Test
+    void constructorShouldThrowExceptionForInvalidFen() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new Chessboard(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new Chessboard(""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new Chessboard("invalid fen"));
+    }
+
+    @Test
+    void testTransformFenMove() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> chessboard.transformFenMove(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> chessboard.transformFenMove("nil"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> chessboard.transformFenMove("tooLong"));
+
+        int[] expected = {0, 5, 1, 5};
+        Assertions.assertArrayEquals(expected, chessboard.transformFenMove("f8f7"));
+        int[] nextExpected = {6, 2, 1, 7};
+        Assertions.assertArrayEquals(nextExpected, chessboard.transformFenMove("c2h7"));
+    }
+
+    @Test
     public void testSetupBoard() {
         assertEquals(convertPieceToChar(Piece.NONE), chessboard.getPiece(0, 0));
         assertEquals(convertPieceToChar(Piece.BLACK_ROOK), chessboard.getPiece(0, 1));
         assertEquals(convertPieceToChar(Piece.BLACK_BISHOP), chessboard.getPiece(0, 2));
+    }
+
+    @Test
+    void testGetPromotionMove() {
+        assertEquals("g7f8q", chessboard.getPromotionMove(1, 6, 0, 5, 'Q'));
+    }
+
+    @Test
+    void isOwnPiece() {
+        assertTrue(chessboard.isOwnPiece('P'));
+        Assertions.assertFalse(chessboard.isOwnPiece('p'));
+    }
+
+    @Test
+    void testLeadingToMate() {
+        chessboard = new Chessboard("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1");
+        assertTrue(chessboard.isMoveLeadingToMate("h5f7"));
     }
 
     @Test

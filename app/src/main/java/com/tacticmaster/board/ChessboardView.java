@@ -242,7 +242,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     public void puzzleHintClicked() {
         if (!isNull(chessboard) && chessboard.isPlayersTurn()) {
-            puzzleHintView.showHint(chessboard.getHintMove(puzzleGame.getNextMove(false)), getTileSize());
+            puzzleHintView.showHint(chessboard.transformFenMove(puzzleGame.getNextMove(false)), getTileSize());
         }
     }
 
