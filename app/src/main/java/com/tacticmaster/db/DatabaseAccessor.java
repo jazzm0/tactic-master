@@ -87,7 +87,7 @@ public class DatabaseAccessor {
             queryBuilder.append(")");
         }
 
-        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY ").append(COLUMN_PUZZLE_ID).append(" LIMIT 5");
+        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY RANDOM() LIMIT 5");
 
         return executeQuery(db, queryBuilder.toString(), null);
     }

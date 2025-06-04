@@ -89,7 +89,7 @@ class DatabaseAccessorTest {
                 " WHERE " + COLUMN_RATING + " >= 1600 AND "
                 + COLUMN_RATING + " <= 1800 AND "
                 + COLUMN_SOLVED + " = 0 AND "
-                + COLUMN_PUZZLE_ID + " NOT IN ('123','456') GROUP BY " + COLUMN_RATING + " ORDER BY " + COLUMN_PUZZLE_ID + " LIMIT 5";
+                + COLUMN_PUZZLE_ID + " NOT IN ('123','456') GROUP BY " + COLUMN_RATING + " ORDER BY RANDOM() LIMIT 5";
 
         when(mockDatabase.rawQuery(expectedQuery, null)).thenReturn(mockCursor);
 
