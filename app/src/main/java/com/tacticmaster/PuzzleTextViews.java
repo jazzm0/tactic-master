@@ -92,23 +92,17 @@ public class PuzzleTextViews {
             playerRatingTextView.setText(spannable);
         });
 
-        ValueAnimator alphaAnimator = ValueAnimator.ofFloat(0.2f, 0.8f);
-        alphaAnimator.setDuration(duration);
+        ValueAnimator alphaAnimator = ValueAnimator.ofFloat(0.4f, 0.9f);
+        alphaAnimator.setDuration(duration * 3);
         alphaAnimator.addUpdateListener(animation -> {
             float alphaValue = (float) animation.getAnimatedValue();
             playerRatingTextView.setAlpha(alphaValue);
         });
 
-        animator.addListener(new android.animation.AnimatorListenerAdapter() {
+        alphaAnimator.addListener(new android.animation.AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
-                String fullText = context.getString(R.string.player_rating, newRating);
-                SpannableString spannable = new SpannableString(fullText);
-                int start = fullText.indexOf(String.valueOf(newRating));
-                int end = start + String.valueOf(newRating).length();
-
-                spannable.setSpan(new ForegroundColorSpan(Color.BLACK), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                playerRatingTextView.setText(spannable);
+                setPlayerRating(newRating);
             }
         });
 

@@ -28,10 +28,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 class DatabaseAccessorTest {
 
@@ -82,7 +81,7 @@ class DatabaseAccessorTest {
 
     @Test
     void testGetPuzzlesWithinRange() {
-        Set<String> excludedIds = new HashSet<>();
+        List<String> excludedIds = new ArrayList<>();
         excludedIds.add("123");
         excludedIds.add("456");
 
@@ -90,7 +89,7 @@ class DatabaseAccessorTest {
                 " WHERE " + COLUMN_RATING + " >= 1600 AND "
                 + COLUMN_RATING + " <= 1800 AND "
                 + COLUMN_SOLVED + " = 0 AND "
-                + COLUMN_PUZZLE_ID + " NOT IN ('123','456') GROUP BY " + COLUMN_RATING + " LIMIT 5";
+                + COLUMN_PUZZLE_ID + " NOT IN ('123','456') GROUP BY " + COLUMN_RATING + " ORDER BY " + COLUMN_PUZZLE_ID + " LIMIT 5";
 
         when(mockDatabase.rawQuery(expectedQuery, null)).thenReturn(mockCursor);
 

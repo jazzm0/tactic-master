@@ -71,7 +71,7 @@ public class DatabaseAccessor {
         return 0;
     }
 
-    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, Set<String> excludedPuzzleIds) {
+    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, List<String> excludedPuzzleIds) {
         SQLiteDatabase db = dbHelper.openDatabase();
         StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_RATING + " >= " + lowestRating +
@@ -87,7 +87,7 @@ public class DatabaseAccessor {
             queryBuilder.append(")");
         }
 
-        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" LIMIT 5");
+        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY ").append(COLUMN_PUZZLE_ID).append(" LIMIT 5");
 
         return executeQuery(db, queryBuilder.toString(), null);
     }

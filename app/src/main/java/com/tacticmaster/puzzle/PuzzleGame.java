@@ -11,7 +11,7 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
     private final String fen;
     private final String[] moves;
     private final int rating;
-    private final boolean solved;
+    private boolean solved;
 
     private int currentMoveIndex;
 
@@ -76,6 +76,10 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
 
     public boolean solved() {
         return this.solved;
+    }
+
+    public void setSolved(boolean isSolved) {
+        this.solved = isSolved;
     }
 
     public void reset() {

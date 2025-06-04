@@ -26,6 +26,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         void onPuzzleSolved(PuzzleGame puzzle);
 
         void onPuzzleNotSolved(PuzzleGame puzzle);
+
+        void onAfterPuzzleFinished(PuzzleGame puzzle);
     }
 
     public static final int BOARD_SIZE = 8;
@@ -148,7 +150,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private void onPuzzleSolved(PuzzleGame solvedPuzzle) {
         puzzleFinished = true;
         makeText(R.string.correct_solution);
-        postDelayed(() -> puzzleFinishedListener.onPuzzleSolved(solvedPuzzle), NEXT_PUZZLE_DELAY);
+        puzzleFinishedListener.onPuzzleSolved(solvedPuzzle);
+        postDelayed(() -> puzzleFinishedListener.onAfterPuzzleFinished(solvedPuzzle), NEXT_PUZZLE_DELAY);
     }
 
     private float getTileSize() {
@@ -189,7 +192,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         unselectPiece();
         if (!chessboard.isMoveLeadingToMate(move) && !puzzleGame.isCorrectNextMove(move)) {
             makeText(R.string.wrong_solution);
-            postDelayed(() -> puzzleFinishedListener.onPuzzleNotSolved(puzzleGame), NEXT_PUZZLE_DELAY);
+            puzzleFinishedListener.onPuzzleNotSolved(puzzleGame);
+            postDelayed(() -> puzzleFinishedListener.onAfterPuzzleFinished(puzzleGame), NEXT_PUZZLE_DELAY);
         } else {
             doNextMove();
             if (puzzleGame.isSolutionFound()) {
