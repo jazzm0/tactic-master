@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,13 +76,14 @@ public class ChessboardControllerTest {
 
     @Test
     public void testLoadNextPuzzles() {
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList())).thenReturn(puzzleRecords);
         when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
         when(databaseAccessor.getPlayerRating()).thenReturn(2333);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList())).thenReturn(new ArrayList<>()).thenReturn(new ArrayList<>()).thenReturn(puzzleRecords);
 
         chessboardController.loadNextPuzzle();
 
+        verify(databaseAccessor, times(3)).getPuzzlesWithinRange(anyInt(), anyInt(), anyList());
         verify(chessboardView).setPuzzle(puzzleGame);
         verify(puzzleTextViews).setPuzzleId(puzzleGame.getPuzzleId());
         verify(puzzleTextViews).setPuzzleRating(puzzleGame.rating());
@@ -89,6 +91,19 @@ public class ChessboardControllerTest {
         verify(puzzleTextViews).setPlayerRating(2333);
     }
 
+    @Test
+    public void testLoadNextPuzzlesNoUnsolvedLeft() {
+        when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
+        when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
+        when(databaseAccessor.getPlayerRating()).thenReturn(2333);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList())).thenReturn(new ArrayList<>());
+
+        chessboardController.loadNextPuzzle();
+
+        // verify(databaseAccessor, atLeast(10)).getPuzzlesWithinRange(anyInt(), anyInt(), anyList());
+        verify(chessboardView, never()).setPuzzle(any());
+        verify(puzzleTextViews, never()).setPuzzleId(any());
+    }
 
     @Test
     public void testLoadPuzzleById() {

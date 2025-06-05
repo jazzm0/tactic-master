@@ -46,10 +46,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     private void loadNextPuzzles() throws NoSuchElementException {
-        var nextPuzzles = databaseAccessor
-                .getPuzzlesWithinRange(
-                        this.playerRating - 50,
-                        this.playerRating + 200, loadedPuzzleIds);
+        int lowestRating = playerRating - 50;
+        int highestRating = playerRating + 50;
+        List<Puzzle> nextPuzzles = new ArrayList<>();
+        while (nextPuzzles.isEmpty() && lowestRating > 0) {
+            nextPuzzles = databaseAccessor.getPuzzlesWithinRange(lowestRating, highestRating, loadedPuzzleIds);
+            lowestRating -= 50;
+            highestRating += 50;
+        }
         if (nextPuzzles.isEmpty()) {
             throw new NoSuchElementException("No more unsolved puzzles available");
         }
