@@ -22,8 +22,6 @@ import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
 
-import java.security.SecureRandom;
-
 public class MainActivity extends AppCompatActivity {
 
     private ChessboardController chessboardController;
@@ -53,8 +51,7 @@ public class MainActivity extends AppCompatActivity {
         chessboardController = new ChessboardController(
                 databaseAccessor,
                 chessboardView,
-                new PuzzleTextViews(this),
-                new SecureRandom());
+                new PuzzleTextViews(this));
 
         chessboardController.loadNextPuzzle();
 
