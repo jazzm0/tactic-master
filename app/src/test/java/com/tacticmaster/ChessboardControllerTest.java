@@ -1,7 +1,7 @@
 package com.tacticmaster;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -70,7 +70,7 @@ public class ChessboardControllerTest {
         this.puzzleGames.add(new PuzzleGame("3", "fen2", "moves2", 1600));
         this.puzzleRecords.add(new Puzzle("4", "fen3", "moves3", 1400));
         this.puzzleGames.add(new PuzzleGame("4", "fen3", "moves3", 1400));
-        chessboardController = new ChessboardController(databaseAccessor, chessboardView, puzzleTextViews, randomNumberGenerator);
+        chessboardController = new ChessboardController(databaseAccessor, chessboardView, puzzleTextViews);
 
     }
 
@@ -79,11 +79,11 @@ public class ChessboardControllerTest {
         when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
         when(databaseAccessor.getPlayerRating()).thenReturn(2333);
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList())).thenReturn(new ArrayList<>()).thenReturn(new ArrayList<>()).thenReturn(puzzleRecords);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(new ArrayList<>()).thenReturn(new ArrayList<>()).thenReturn(puzzleRecords);
 
         chessboardController.loadNextPuzzle();
 
-        verify(databaseAccessor, times(3)).getPuzzlesWithinRange(anyInt(), anyInt(), anyList());
+        verify(databaseAccessor, times(3)).getPuzzlesWithinRange(anyInt(), anyInt(), anySet());
         verify(chessboardView).setPuzzle(puzzleGame);
         verify(puzzleTextViews).setPuzzleId(puzzleGame.getPuzzleId());
         verify(puzzleTextViews).setPuzzleRating(puzzleGame.rating());
@@ -96,7 +96,7 @@ public class ChessboardControllerTest {
         when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
         when(databaseAccessor.getPlayerRating()).thenReturn(2333);
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList())).thenReturn(new ArrayList<>());
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(new ArrayList<>());
 
         chessboardController.loadNextPuzzle();
 
@@ -128,7 +128,7 @@ public class ChessboardControllerTest {
     @Test
     public void testLoadPreviousPuzzle() {
         // Mock the database to return a list of puzzles
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList())).thenReturn(puzzleRecords);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzleRecords);
 
         // Load the first puzzle
         chessboardController.loadNextPuzzle();
@@ -153,7 +153,7 @@ public class ChessboardControllerTest {
         newPuzzles.add(new Puzzle("2", "fen", "moves", 1000));
         newPuzzles.add(new Puzzle("3", "fen", "moves", 1000));
 
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList()))
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet()))
                 .thenReturn(puzzleRecords)
                 .thenReturn(newPuzzles);
 
@@ -181,7 +181,7 @@ public class ChessboardControllerTest {
 
     @Test
     public void testOnPuzzleNotSolved() {
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList())).thenReturn(puzzleRecords);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzleRecords);
         chessboardController.loadNextPuzzle();
         when(databaseAccessor.wasNotSolved(any())).thenReturn(true);
 
@@ -193,7 +193,7 @@ public class ChessboardControllerTest {
 
     @Test
     public void testOnPuzzleSolvedUpdatesSolvedState() {
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anyList())).thenReturn(puzzleRecords);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet())).thenReturn(puzzleRecords);
         chessboardController.loadNextPuzzle();
         Assertions.assertFalse(puzzleGame.solved());
         when(databaseAccessor.wasNotSolved(puzzleGame.getPuzzleId())).thenReturn(true);

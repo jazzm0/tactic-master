@@ -9,10 +9,10 @@ import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.rating.EloRatingCalculator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 public class ChessboardController implements ChessboardView.PuzzleFinishedListener {
 
@@ -21,15 +21,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final PuzzleTextViews puzzleTextViews;
 
     private int currentPuzzleIndex = -1;
-    private final List<String> loadedPuzzleIds = new ArrayList<>();
-    private final HashMap<String, PuzzleGame> loadedPuzzles = new HashMap<>();
+    private final Map<String, PuzzleGame> loadedPuzzles = new LinkedHashMap<>();
     private int playerRating;
     private boolean autoplay;
 
     public ChessboardController(
             DatabaseAccessor databaseAccessor,
             ChessboardView chessboardView,
-            PuzzleTextViews puzzleTextViews, Random randomNumberGenerator) {
+            PuzzleTextViews puzzleTextViews) {
         this.databaseAccessor = databaseAccessor;
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
@@ -50,21 +49,18 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         int highestRating = playerRating + 50;
         List<Puzzle> nextPuzzles = new ArrayList<>();
         while (nextPuzzles.isEmpty() && lowestRating > 0) {
-            nextPuzzles = databaseAccessor.getPuzzlesWithinRange(lowestRating, highestRating, loadedPuzzleIds);
+            nextPuzzles = databaseAccessor.getPuzzlesWithinRange(lowestRating, highestRating, loadedPuzzles.keySet());
             lowestRating -= 50;
             highestRating += 50;
         }
         if (nextPuzzles.isEmpty()) {
             throw new NoSuchElementException("No more unsolved puzzles available");
         }
-        nextPuzzles.forEach(puzzle -> {
-            loadedPuzzleIds.add(puzzle.puzzleId());
-            loadedPuzzles.put(puzzle.puzzleId(), new PuzzleGame(puzzle));
-        });
+        nextPuzzles.forEach(puzzle -> loadedPuzzles.put(puzzle.puzzleId(), new PuzzleGame(puzzle)));
     }
 
     private PuzzleGame getCurrentPuzzle() {
-        return loadedPuzzles.get(loadedPuzzleIds.get(currentPuzzleIndex));
+        return loadedPuzzles.get(new ArrayList<>(loadedPuzzles.keySet()).get(currentPuzzleIndex));
     }
 
     public void renderPuzzle() {
@@ -79,13 +75,13 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     public void loadPreviousPuzzle() {
-        currentPuzzleIndex = (currentPuzzleIndex - 1 + loadedPuzzleIds.size()) % loadedPuzzleIds.size();
+        currentPuzzleIndex = (currentPuzzleIndex - 1 + loadedPuzzles.size()) % loadedPuzzles.size();
         renderPuzzle();
     }
 
     public void loadNextPuzzle() {
         currentPuzzleIndex++;
-        if (currentPuzzleIndex >= loadedPuzzleIds.size()) {
+        if (currentPuzzleIndex >= loadedPuzzles.size()) {
             try {
                 loadNextPuzzles();
             } catch (NoSuchElementException e) {
@@ -94,7 +90,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                 return;
             }
         }
-        if (currentPuzzleIndex < loadedPuzzleIds.size()) {
+        if (currentPuzzleIndex < loadedPuzzles.size()) {
             renderPuzzle();
         }
     }
@@ -102,12 +98,11 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void loadPuzzleById(String puzzleId) {
         try {
             Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
-            if (!loadedPuzzleIds.contains(puzzleId)) {
-                currentPuzzleIndex = loadedPuzzleIds.size();
+            if (!loadedPuzzles.containsKey(puzzleId)) {
+                currentPuzzleIndex = loadedPuzzles.size();
                 loadedPuzzles.put(nextPuzzle.puzzleId(), new PuzzleGame(nextPuzzle));
-                loadedPuzzleIds.add(nextPuzzle.puzzleId());
             } else {
-                currentPuzzleIndex = loadedPuzzleIds.lastIndexOf(nextPuzzle.puzzleId());
+                currentPuzzleIndex = new ArrayList<>(loadedPuzzles.keySet()).lastIndexOf(nextPuzzle.puzzleId());
             }
             renderPuzzle();
         } catch (NoSuchElementException e) {

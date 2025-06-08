@@ -28,9 +28,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 class DatabaseAccessorTest {
 
@@ -81,7 +82,7 @@ class DatabaseAccessorTest {
 
     @Test
     void testGetPuzzlesWithinRange() {
-        List<String> excludedIds = new ArrayList<>();
+        Set<String> excludedIds = new HashSet<>();
         excludedIds.add("123");
         excludedIds.add("456");
 

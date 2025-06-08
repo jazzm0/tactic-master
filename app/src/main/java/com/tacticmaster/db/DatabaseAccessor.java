@@ -71,7 +71,7 @@ public class DatabaseAccessor {
         return 0;
     }
 
-    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, List<String> excludedPuzzleIds) {
+    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, Set<String> excludedPuzzleIds) {
         SQLiteDatabase db = dbHelper.openDatabase();
         StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_RATING + " >= " + lowestRating +
