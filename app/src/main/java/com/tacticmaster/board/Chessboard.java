@@ -71,6 +71,14 @@ public class Chessboard {
         return isMated;
     }
 
+    public boolean isMoveLegal(String fenMove) {
+        if (fenMove == null || fenMove.length() < 4 || fenMove.length() > 5) {
+            throw new IllegalArgumentException("Invalid move: " + fenMove);
+        }
+        Move move = new Move(fenMove, chessboard.getSideToMove());
+        return chessboard.legalMoves().contains(move);
+    }
+
     public String getProposedMove(int fromRank, int fromFile, int toRank, int toFile) {
         return new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile)).toString().toLowerCase();
     }
@@ -87,7 +95,9 @@ public class Chessboard {
 
     public boolean isPromotionMove(int fromRank, int fromFile, int toRank, int toFile) {
         Move move = new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile));
-
+        if (!chessboard.isMoveLegal(move, true)) {
+            return false;
+        }
         if (chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN && move.getTo().getRank().equals(Rank.RANK_8)) {
             return true;
         } else {

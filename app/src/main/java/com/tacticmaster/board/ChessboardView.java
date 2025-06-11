@@ -189,6 +189,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void handleMove(String move) {
+        if (!chessboard.isMoveLegal(move)) {
+            return;
+        }
         unselectPiece();
         if (!chessboard.isMoveLeadingToMate(move) && !puzzleGame.isCorrectNextMove(move)) {
             makeText(R.string.wrong_solution);
