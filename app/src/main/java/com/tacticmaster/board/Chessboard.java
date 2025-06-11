@@ -94,8 +94,12 @@ public class Chessboard {
     }
 
     public boolean isPromotionMove(int fromRank, int fromFile, int toRank, int toFile) {
+        return isPromotionMove(fromRank, fromFile, toRank, toFile, false);
+    }
+
+    public boolean isPromotionMove(int fromRank, int fromFile, int toRank, int toFile, boolean fullValidation) {
         Move move = new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile));
-        if (!chessboard.isMoveLegal(move, true)) {
+        if (fullValidation && !chessboard.isMoveLegal(move, true)) {
             return false;
         }
         if (chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN && move.getTo().getRank().equals(Rank.RANK_8)) {

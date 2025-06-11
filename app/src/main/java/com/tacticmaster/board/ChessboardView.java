@@ -178,7 +178,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private void proposeMove(int rank, int file) {
         var proposedMove = chessboard.getProposedMove(selectedRank, selectedFile, rank, file);
-        if (chessboard.isPromotionMove(selectedRank, selectedFile, rank, file)) {
+        if (chessboard.isPromotionMove(selectedRank, selectedFile, rank, file, true)) {
             PromotionDialog.show(getContext(), bitmapManager, chessboard.isPlayerWhite(), getTileSize(), piece -> {
                 var proposedPromotionMove = chessboard.getPromotionMove(selectedRank, selectedFile, rank, file, piece);
                 handleMove(proposedPromotionMove);
