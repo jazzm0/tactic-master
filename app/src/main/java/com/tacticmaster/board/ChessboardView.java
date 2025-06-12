@@ -35,7 +35,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private final ChessboardPieceManager bitmapManager;
 
-    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, textPaint;
+    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, opponentSelectionPaint, textPaint;
 
     private PuzzleGame puzzleGame;
     private Chessboard chessboard;
@@ -44,6 +44,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private ImageView playerTurnIcon;
 
     private int selectedFromRank = -1, selectedFromFile = -1, selectedToRank = -1, selectedToFile = -1;
+    private int opponentFromRank = -1, opponentFromFile = -1, opponentToRank = -1, opponentToFile = -1;
     private boolean puzzleFinished = false;
 
     public ChessboardView(Context context, AttributeSet attrs) {
@@ -56,7 +57,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         lightBrownPaint = createPaint("#D2B48C");
         darkBrownPaint = createPaint("#8B4513");
         bitmapPaint = createBitmapPaint();
-        selectionPaint = createSelectionPaint();
+        selectionPaint = createSelectionPaint(false);
+        opponentSelectionPaint = createSelectionPaint(true);
         textPaint = createTextPaint();
     }
 
@@ -74,9 +76,13 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         return paint;
     }
 
-    private Paint createSelectionPaint() {
+    private Paint createSelectionPaint(boolean isOpponent) {
         Paint paint = new Paint();
-        paint.setColor(Color.YELLOW);
+        if (isOpponent) {
+            paint.setColor(Color.WHITE);
+        } else {
+            paint.setColor(Color.YELLOW);
+        }
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
         return paint;
@@ -107,6 +113,18 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 left = selectedToFile * tileSize;
                 top = selectedToRank * tileSize;
                 canvas.drawRect(left, top, left + tileSize, top + tileSize, selectionPaint);
+            }
+        }
+
+        if (opponentFromRank != -1 && opponentFromFile != -1 && !puzzleFinished) {
+            float left = opponentFromFile * tileSize;
+            float top = opponentFromRank * tileSize;
+            canvas.drawRect(left, top, left + tileSize, top + tileSize, opponentSelectionPaint);
+
+            if (opponentToRank != -1 && opponentToFile != -1) {
+                left = opponentToFile * tileSize;
+                top = opponentToRank * tileSize;
+                canvas.drawRect(left, top, left + tileSize, top + tileSize, opponentSelectionPaint);
             }
         }
     }
@@ -185,12 +203,17 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private void removeSelection() {
         selectedFromRank = -1;
         selectedFromFile = -1;
+        opponentFromRank = -1;
+        opponentFromFile = -1;
+        opponentToRank = -1;
+        opponentToFile = -1;
         removeTargetSelection();
     }
 
     private void removeTargetSelection() {
         selectedToRank = -1;
         selectedToFile = -1;
+        invalidate();
     }
 
     private void proposeMove(int rank, int file) {
@@ -229,7 +252,15 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void doNextMove() {
-        chessboard.doMove(puzzleGame.getNextMove());
+        var nextMove = puzzleGame.getNextMove();
+        chessboard.doMove(nextMove);
+        if (chessboard.isPlayersTurn()) {
+            var moveCoordinates = chessboard.transformFenMove(nextMove);
+            opponentFromRank = moveCoordinates[0];
+            opponentFromFile = moveCoordinates[1];
+            opponentToRank = moveCoordinates[2];
+            opponentToFile = moveCoordinates[3];
+        }
         invalidate();
     }
 
