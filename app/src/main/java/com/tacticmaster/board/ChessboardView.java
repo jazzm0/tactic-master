@@ -43,7 +43,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private PuzzleFinishedListener puzzleFinishedListener;
     private ImageView playerTurnIcon;
 
-    private int selectedRank = -1, selectedFile = -1;
+    private int selectedFromRank = -1, selectedFromFile = -1, selectedToRank = -1, selectedToFile = -1;
     private boolean puzzleFinished = false;
 
     public ChessboardView(Context context, AttributeSet attrs) {
@@ -98,10 +98,16 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 canvas.drawRect(file * tileSize, rank * tileSize, (file + 1) * tileSize, (rank + 1) * tileSize, paint);
             }
         }
-        if (selectedRank != -1 && selectedFile != -1 && !puzzleFinished) {
-            float left = selectedFile * tileSize;
-            float top = selectedRank * tileSize;
+        if (selectedFromRank != -1 && selectedFromFile != -1 && !puzzleFinished) {
+            float left = selectedFromFile * tileSize;
+            float top = selectedFromRank * tileSize;
             canvas.drawRect(left, top, left + tileSize, top + tileSize, selectionPaint);
+
+            if (selectedToRank != -1 && selectedToFile != -1) {
+                left = selectedToFile * tileSize;
+                top = selectedToRank * tileSize;
+                canvas.drawRect(left, top, left + tileSize, top + tileSize, selectionPaint);
+            }
         }
     }
 
@@ -167,20 +173,32 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void selectPiece(int rank, int file) {
-        selectedRank = rank;
-        selectedFile = file;
+        selectedFromRank = rank;
+        selectedFromFile = file;
     }
 
-    private void unselectPiece() {
-        selectedRank = -1;
-        selectedFile = -1;
+    private void selectTargetSquare(int rank, int file) {
+        selectedToRank = rank;
+        selectedToFile = file;
+    }
+
+    private void removeSelection() {
+        selectedFromRank = -1;
+        selectedFromFile = -1;
+        removeTargetSelection();
+    }
+
+    private void removeTargetSelection() {
+        selectedToRank = -1;
+        selectedToFile = -1;
     }
 
     private void proposeMove(int rank, int file) {
-        var proposedMove = chessboard.getProposedMove(selectedRank, selectedFile, rank, file);
-        if (chessboard.isPromotionMove(selectedRank, selectedFile, rank, file, true)) {
+        var proposedMove = chessboard.getProposedMove(selectedFromRank, selectedFromFile, rank, file);
+        selectTargetSquare(rank, file);
+        if (chessboard.isPromotionMove(selectedFromRank, selectedFromFile, rank, file, true)) {
             PromotionDialog.show(getContext(), bitmapManager, chessboard.isPlayerWhite(), getTileSize(), piece -> {
-                var proposedPromotionMove = chessboard.getPromotionMove(selectedRank, selectedFile, rank, file, piece);
+                var proposedPromotionMove = chessboard.getPromotionMove(selectedFromRank, selectedFromFile, rank, file, piece);
                 handleMove(proposedPromotionMove);
             });
         } else {
@@ -190,9 +208,12 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private void handleMove(String move) {
         if (!chessboard.isMoveLegal(move)) {
+            removeTargetSelection();
             return;
         }
-        unselectPiece();
+
+        postDelayed(this::removeSelection, 1300);
+
         if (!chessboard.isMoveLeadingToMate(move) && !puzzleGame.isCorrectNextMove(move)) {
             makeText(R.string.wrong_solution);
             puzzleFinishedListener.onPuzzleNotSolved(puzzleGame);
@@ -233,12 +254,12 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         bitmapManager.recycleBitmaps();
     }
 
-    int getSelectedFile() {
-        return selectedFile;
+    int getSelectedFromFile() {
+        return selectedFromFile;
     }
 
-    int getSelectedRank() {
-        return selectedRank;
+    int getSelectedFromRank() {
+        return selectedFromRank;
     }
 
     void doFirstMove() {
@@ -268,7 +289,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         puzzleGame.reset();
         this.chessboard = new Chessboard(puzzleGame.fen());
         updatePlayerTurnIcon();
-        unselectPiece();
+        removeSelection();
         puzzleHintView.resetHintFirstClick();
         invalidate();
         postDelayed(this::doFirstMove, 2000);
@@ -300,7 +321,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
             if (Chessboard.NONE_PIECE != piece && chessboard.isOwnPiece(piece)) {
                 selectPiece(rank, file);
-            } else if (selectedRank != -1 && selectedFile != -1) {
+            } else if (selectedFromRank != -1 && selectedFromFile != -1) {
                 proposeMove(rank, file);
             }
         }

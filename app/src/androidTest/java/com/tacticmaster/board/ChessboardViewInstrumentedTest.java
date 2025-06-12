@@ -73,27 +73,27 @@ public class ChessboardViewInstrumentedTest {
     @Test
     public void testOnTouchEventFirstMoveMade() {
         activityScenarioRule.getScenario().onActivity(activity -> {
-            assertEquals(-1, chessboardView.getSelectedFile());
-            assertEquals(-1, chessboardView.getSelectedRank());
+            assertEquals(-1, chessboardView.getSelectedFromFile());
+            assertEquals(-1, chessboardView.getSelectedFromRank());
             chessboardView.doFirstMove();
             MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 840, 840, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(6, chessboardView.getSelectedFile());
-            assertEquals(6, chessboardView.getSelectedRank());
+            assertEquals(6, chessboardView.getSelectedFromFile());
+            assertEquals(6, chessboardView.getSelectedFromRank());
         });
     }
 
     @Test
     public void testOnTouchEventFirstMoveNotMade() {
         activityScenarioRule.getScenario().onActivity(activity -> {
-            assertEquals(-1, chessboardView.getSelectedFile());
-            assertEquals(-1, chessboardView.getSelectedRank());
+            assertEquals(-1, chessboardView.getSelectedFromFile());
+            assertEquals(-1, chessboardView.getSelectedFromRank());
             MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 840, 840, 0);
             boolean result = chessboardView.onTouchEvent(event);
             assertTrue(result);
-            assertEquals(-1, chessboardView.getSelectedFile());
-            assertEquals(-1, chessboardView.getSelectedRank());
+            assertEquals(-1, chessboardView.getSelectedFromFile());
+            assertEquals(-1, chessboardView.getSelectedFromRank());
         });
     }
 
