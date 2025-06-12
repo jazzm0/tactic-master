@@ -62,10 +62,6 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
         return move;
     }
 
-    public String getMoves() {
-        return String.join(" ", moves);
-    }
-
     public String getPuzzleId() {
         return puzzleId;
     }
@@ -87,7 +83,7 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
     }
 
     public boolean isSolutionFound() {
-        return currentMoveIndex == this.moves.length;
+        return currentMoveIndex == this.moves.length || solved;
     }
 
     public boolean isStarted() {

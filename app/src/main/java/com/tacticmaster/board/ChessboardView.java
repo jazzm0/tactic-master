@@ -32,6 +32,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     public static final int BOARD_SIZE = 8;
     private static final int NEXT_PUZZLE_DELAY = 3000;
+    private static final int MOVE_DELAY = 1300;
 
     private final ChessboardPieceManager bitmapManager;
 
@@ -50,7 +51,6 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.bitmapManager = new ChessboardPieceManager(context);
-        initPaints();
     }
 
     private void initPaints() {
@@ -79,7 +79,11 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private Paint createSelectionPaint(boolean isOpponent) {
         Paint paint = new Paint();
         if (isOpponent) {
-            paint.setColor(Color.WHITE);
+            if (chessboard.isPlayerWhite()) {
+                paint.setColor(Color.WHITE);
+            } else {
+                paint.setColor(Color.BLACK);
+            }
         } else {
             paint.setColor(Color.YELLOW);
         }
@@ -231,24 +235,31 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             return;
         }
 
-        postDelayed(this::removeSelection, 1300);
+        postDelayed(this::removeSelection, MOVE_DELAY);
 
         if (!chessboard.isMoveLeadingToMate(move) && !puzzleGame.isCorrectNextMove(move)) {
             makeText(R.string.wrong_solution);
             puzzleFinishedListener.onPuzzleNotSolved(puzzleGame);
             postDelayed(() -> puzzleFinishedListener.onAfterPuzzleFinished(puzzleGame), NEXT_PUZZLE_DELAY);
         } else {
-            doNextMove();
+            if (chessboard.isMoveLeadingToMate(move)) {
+                doNextMove(move);
+                puzzleGame.setSolved(true);
+            } else {
+                doNextMove(null);
+            }
             if (puzzleGame.isSolutionFound()) {
                 onPuzzleSolved(puzzleGame);
             } else {
-                postDelayed(this::doNextMove, 1300);
+                postDelayed(() -> this.doNextMove(null), MOVE_DELAY);
             }
         }
     }
 
-    private void doNextMove() {
-        var nextMove = puzzleGame.getNextMove();
+    private void doNextMove(String nextMove) {
+        if (isNull(nextMove) || nextMove.isEmpty()) {
+            nextMove = puzzleGame.getNextMove();
+        }
         chessboard.doMove(nextMove);
         if (chessboard.isPlayersTurn()) {
             var moveCoordinates = chessboard.transformFenMove(nextMove);
@@ -291,7 +302,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     void doFirstMove() {
         if (!puzzleGame.isStarted() && !chessboard.isPlayersTurn()) {
-            doNextMove();
+            doNextMove(null);
         }
     }
 
@@ -315,6 +326,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         this.puzzleGame = puzzle;
         puzzleGame.reset();
         this.chessboard = new Chessboard(puzzleGame.fen());
+        initPaints();
         updatePlayerTurnIcon();
         removeSelection();
         puzzleHintView.resetHintFirstClick();
