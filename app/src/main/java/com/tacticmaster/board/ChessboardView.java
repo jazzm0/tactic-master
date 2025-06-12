@@ -96,6 +96,22 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         return paint;
     }
 
+    private void drawRectangle(int fromRank, int fromFile, int toRank, int toFile, Canvas canvas, Paint paint) {
+        float tileSize = getTileSize();
+
+        if (fromRank != -1 && fromFile != -1 && !puzzleFinished) {
+            float left = fromFile * tileSize;
+            float top = fromRank * tileSize;
+            canvas.drawRect(left, top, left + tileSize, top + tileSize, paint);
+
+            if (toRank != -1 && toFile != -1) {
+                left = toFile * tileSize;
+                top = toRank * tileSize;
+                canvas.drawRect(left, top, left + tileSize, top + tileSize, paint);
+            }
+        }
+    }
+
     private void drawBoard(Canvas canvas) {
         float tileSize = getTileSize();
         for (int rank = 0; rank < BOARD_SIZE; rank++) {
@@ -104,29 +120,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 canvas.drawRect(file * tileSize, rank * tileSize, (file + 1) * tileSize, (rank + 1) * tileSize, paint);
             }
         }
-        if (selectedFromRank != -1 && selectedFromFile != -1 && !puzzleFinished) {
-            float left = selectedFromFile * tileSize;
-            float top = selectedFromRank * tileSize;
-            canvas.drawRect(left, top, left + tileSize, top + tileSize, selectionPaint);
 
-            if (selectedToRank != -1 && selectedToFile != -1) {
-                left = selectedToFile * tileSize;
-                top = selectedToRank * tileSize;
-                canvas.drawRect(left, top, left + tileSize, top + tileSize, selectionPaint);
-            }
-        }
-
-        if (opponentFromRank != -1 && opponentFromFile != -1 && !puzzleFinished) {
-            float left = opponentFromFile * tileSize;
-            float top = opponentFromRank * tileSize;
-            canvas.drawRect(left, top, left + tileSize, top + tileSize, opponentSelectionPaint);
-
-            if (opponentToRank != -1 && opponentToFile != -1) {
-                left = opponentToFile * tileSize;
-                top = opponentToRank * tileSize;
-                canvas.drawRect(left, top, left + tileSize, top + tileSize, opponentSelectionPaint);
-            }
-        }
+        drawRectangle(selectedFromRank, selectedFromFile, selectedToRank, selectedToFile, canvas, selectionPaint);
+        drawRectangle(opponentFromRank, opponentFromFile, opponentToRank, opponentToFile, canvas, opponentSelectionPaint);
     }
 
     private void drawLabels(Canvas canvas) {
