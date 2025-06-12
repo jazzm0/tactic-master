@@ -84,7 +84,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             paint.setColor(Color.YELLOW);
         }
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(6);
         return paint;
     }
 
