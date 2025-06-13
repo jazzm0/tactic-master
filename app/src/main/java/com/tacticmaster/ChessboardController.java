@@ -4,14 +4,10 @@ import android.content.Intent;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
-import com.tacticmaster.puzzle.Puzzle;
 import com.tacticmaster.puzzle.PuzzleGame;
+import com.tacticmaster.puzzle.PuzzleManager;
 import com.tacticmaster.rating.EloRatingCalculator;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class ChessboardController implements ChessboardView.PuzzleFinishedListener {
@@ -20,8 +16,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final ChessboardView chessboardView;
     private final PuzzleTextViews puzzleTextViews;
 
-    private int currentPuzzleIndex = -1;
-    private final Map<String, PuzzleGame> loadedPuzzles = new LinkedHashMap<>();
+    private final PuzzleManager puzzleManager;
     private int playerRating;
     private boolean autoplay;
 
@@ -30,6 +25,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             ChessboardView chessboardView,
             PuzzleTextViews puzzleTextViews) {
         this.databaseAccessor = databaseAccessor;
+        this.puzzleManager = new PuzzleManager(databaseAccessor, databaseAccessor.getPlayerRating());
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
         this.chessboardView.setPuzzleSolvedListener(this);
@@ -42,29 +38,11 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         databaseAccessor.storePlayerRating(newRating);
         puzzleTextViews.updatePlayerRating(playerRating, newRating);
         this.playerRating = newRating;
-    }
-
-    private void loadNextPuzzles() throws NoSuchElementException {
-        int lowestRating = playerRating - 50;
-        int highestRating = playerRating + 50;
-        List<Puzzle> nextPuzzles = new ArrayList<>();
-        while (nextPuzzles.isEmpty() && lowestRating > 0) {
-            nextPuzzles = databaseAccessor.getPuzzlesWithinRange(lowestRating, highestRating, loadedPuzzles.keySet());
-            lowestRating -= 50;
-            highestRating += 50;
-        }
-        if (nextPuzzles.isEmpty()) {
-            throw new NoSuchElementException("No more unsolved puzzles available");
-        }
-        nextPuzzles.forEach(puzzle -> loadedPuzzles.put(puzzle.puzzleId(), new PuzzleGame(puzzle)));
-    }
-
-    private PuzzleGame getCurrentPuzzle() {
-        return loadedPuzzles.get(new ArrayList<>(loadedPuzzles.keySet()).get(currentPuzzleIndex));
+        puzzleManager.updateRating(newRating);
     }
 
     public void renderPuzzle() {
-        var puzzle = getCurrentPuzzle();
+        var puzzle = puzzleManager.getCurrentPuzzle();
         chessboardView.setPuzzle(puzzle);
 
         puzzleTextViews.setPuzzleId(puzzle.getPuzzleId());
@@ -75,35 +53,22 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     public void loadPreviousPuzzle() {
-        currentPuzzleIndex = (currentPuzzleIndex - 1 + loadedPuzzles.size()) % loadedPuzzles.size();
+        puzzleManager.moveToPreviousPuzzle();
         renderPuzzle();
     }
 
     public void loadNextPuzzle() {
-        currentPuzzleIndex++;
-        if (currentPuzzleIndex >= loadedPuzzles.size()) {
-            try {
-                loadNextPuzzles();
-            } catch (NoSuchElementException e) {
-                currentPuzzleIndex--;
-                chessboardView.makeText(R.string.no_more_puzzles);
-                return;
-            }
-        }
-        if (currentPuzzleIndex < loadedPuzzles.size()) {
+        try {
+            puzzleManager.moveToNextPuzzle();
             renderPuzzle();
+        } catch (NoSuchElementException e) {
+            chessboardView.makeText(R.string.no_more_puzzles);
         }
     }
 
     public void loadPuzzleById(String puzzleId) {
         try {
-            Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
-            if (!loadedPuzzles.containsKey(puzzleId)) {
-                currentPuzzleIndex = loadedPuzzles.size();
-                loadedPuzzles.put(nextPuzzle.puzzleId(), new PuzzleGame(nextPuzzle));
-            } else {
-                currentPuzzleIndex = new ArrayList<>(loadedPuzzles.keySet()).lastIndexOf(nextPuzzle.puzzleId());
-            }
+            puzzleManager.loadPuzzleById(puzzleId);
             renderPuzzle();
         } catch (NoSuchElementException e) {
             chessboardView.makeText(R.string.invalid_puzzle_id);
@@ -113,7 +78,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void puzzleIdLinkClicked() {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "https://lichess.org/training/" + getCurrentPuzzle().getPuzzleId());
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "https://lichess.org/training/" + puzzleManager.getCurrentPuzzle().getPuzzleId());
         sendIntent.setType("text/plain");
 
         Intent shareIntent = Intent.createChooser(sendIntent, null);

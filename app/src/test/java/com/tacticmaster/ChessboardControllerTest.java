@@ -27,7 +27,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class ChessboardControllerTest {
 
@@ -39,9 +38,6 @@ public class ChessboardControllerTest {
 
     @Mock
     private PuzzleTextViews puzzleTextViews;
-
-    @Mock
-    private Random randomNumberGenerator;
 
     @InjectMocks
     private ChessboardController chessboardController;
