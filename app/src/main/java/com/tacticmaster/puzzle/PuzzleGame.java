@@ -1,5 +1,6 @@
 package com.tacticmaster.puzzle;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Arrays;
@@ -46,7 +47,10 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
     }
 
     public boolean isCorrectNextMove(String move) {
-        return this.moves[currentMoveIndex].equals(move);
+        if (isNull(move) || currentMoveIndex >= this.moves.length) {
+            return false;
+        }
+        return this.moves[currentMoveIndex].toLowerCase().startsWith(move.toLowerCase());
     }
 
     public String getNextMove() {
@@ -83,7 +87,7 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
     }
 
     public boolean isSolutionFound() {
-        return currentMoveIndex == this.moves.length || solved;
+        return currentMoveIndex == this.moves.length;
     }
 
     public boolean isStarted() {

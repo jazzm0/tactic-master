@@ -78,10 +78,19 @@ public class PuzzleGameTest {
     }
 
     @Test
-    public void testIsSolutionFoundWhenSolved() {
+    public void testIsCorrectNextMove() {
         PuzzleGame puzzleGame = new PuzzleGame("1", "fen1", "m1 m2 m3", 1500);
-        puzzleGame.setSolved(true);
-        assertTrue(puzzleGame.isSolutionFound());
+
+        assertTrue(puzzleGame.isCorrectNextMove("m1"));
+
+        assertFalse(puzzleGame.isCorrectNextMove("m4"));
+
+        assertFalse(puzzleGame.isCorrectNextMove(null));
+
+        puzzleGame.getNextMove();
+        puzzleGame.getNextMove();
+        puzzleGame.getNextMove();
+        assertFalse(puzzleGame.isCorrectNextMove("m1"));
     }
 
     @Test

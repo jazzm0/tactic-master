@@ -219,7 +219,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private void proposeMove(int rank, int file) {
         var proposedMove = chessboard.getProposedMove(selectedFromRank, selectedFromFile, rank, file);
         selectTargetSquare(rank, file);
-        if (chessboard.isPromotionMove(selectedFromRank, selectedFromFile, rank, file, true)) {
+        if (chessboard.isPromotionMove(selectedFromRank, selectedFromFile, rank, file)) {
             PromotionDialog.show(getContext(), bitmapManager, chessboard.isPlayerWhite(), getTileSize(), piece -> {
                 var proposedPromotionMove = chessboard.getPromotionMove(selectedFromRank, selectedFromFile, rank, file, piece);
                 handleMove(proposedPromotionMove);
@@ -244,7 +244,6 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         } else {
             if (chessboard.isMoveLeadingToMate(move)) {
                 doNextMove(move);
-                puzzleGame.setSolved(true);
             } else {
                 doNextMove(null);
             }
@@ -257,8 +256,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void doNextMove(String nextMove) {
+        var possibleNextMove = puzzleGame.getNextMove();
         if (isNull(nextMove) || nextMove.isEmpty()) {
-            nextMove = puzzleGame.getNextMove();
+            nextMove = possibleNextMove;
         }
         chessboard.doMove(nextMove);
         if (chessboard.isPlayersTurn()) {
