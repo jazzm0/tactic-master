@@ -235,8 +235,6 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             return;
         }
 
-        postDelayed(this::removeSelection, MOVE_DELAY);
-
         if (!chessboard.isMoveLeadingToMate(move) && !puzzleGame.isCorrectNextMove(move)) {
             makeText(R.string.wrong_solution);
             puzzleFinishedListener.onPuzzleNotSolved(puzzleGame);
@@ -359,6 +357,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             var piece = chessboard.getPiece(rank, file);
 
             if (Chessboard.NONE_PIECE != piece && chessboard.isOwnPiece(piece)) {
+                removeSelection();
                 selectPiece(rank, file);
             } else if (selectedFromRank != -1 && selectedFromFile != -1) {
                 proposeMove(rank, file);
