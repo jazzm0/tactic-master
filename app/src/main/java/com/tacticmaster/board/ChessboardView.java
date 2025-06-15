@@ -78,17 +78,13 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private Paint createSelectionPaint(boolean isOpponent) {
         Paint paint = new Paint();
-        if (isOpponent) {
-            if (chessboard.isPlayerWhite()) {
-                paint.setColor(Color.WHITE);
-            } else {
-                paint.setColor(Color.BLACK);
-            }
+        if (chessboard.isPlayerWhite() && !isOpponent || !chessboard.isPlayerWhite() && isOpponent) {
+            paint.setColor(Color.WHITE);
         } else {
-            paint.setColor(Color.YELLOW);
+            paint.setColor(Color.BLACK);
         }
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(6);
+        paint.setStrokeWidth(8);
         return paint;
     }
 
@@ -344,28 +340,29 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN && puzzleGame.isStarted() && !puzzleFinished) {
-            int tileSize = (int) getTileSize();
-
-            int file = (int) (event.getX() / tileSize);
-            int rank = (int) (event.getY() / tileSize);
-
-            if (rank < 0 || rank >= BOARD_SIZE || file < 0 || file >= BOARD_SIZE) {
-                return true;
-            }
-
-            var piece = chessboard.getPiece(rank, file);
-
-            if (Chessboard.NONE_PIECE != piece && chessboard.isOwnPiece(piece)) {
-                removeSelection();
-                selectPiece(rank, file);
-            } else if (selectedFromRank != -1 && selectedFromFile != -1) {
-                proposeMove(rank, file);
-            }
+        if (event.getAction() != MotionEvent.ACTION_DOWN || !puzzleGame.isStarted() || puzzleFinished) {
+            return false;
         }
+
+        int tileSize = (int) getTileSize();
+        int file = (int) (event.getX() / tileSize);
+        int rank = (int) (event.getY() / tileSize);
+
+        if (rank < 0 || rank >= BOARD_SIZE || file < 0 || file >= BOARD_SIZE) {
+            return true;
+        }
+
+        var piece = chessboard.getPiece(rank, file);
+
+        if (Chessboard.NONE_PIECE != piece && chessboard.isOwnPiece(piece)) {
+            removeSelection();
+            selectPiece(rank, file);
+        } else if (selectedFromRank != -1 && selectedFromFile != -1) {
+            proposeMove(rank, file);
+        }
+
         invalidate();
-        performClick();
-        return true;
+        return performClick();
     }
 
     @Override
