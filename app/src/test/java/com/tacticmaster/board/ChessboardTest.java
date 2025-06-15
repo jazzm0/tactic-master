@@ -73,6 +73,25 @@ public class ChessboardTest {
     }
 
     @Test
+    public void testIsMoveLegal() {
+        // Test legal move
+        assertTrue(chessboard.isMoveLegal("h5h4"));
+
+        // Test illegal move
+        Assertions.assertFalse(chessboard.isMoveLegal("g7f8q"));
+
+        // Test null move
+        Assertions.assertFalse(chessboard.isMoveLegal(null));
+
+        // Test invalid move format
+        Assertions.assertFalse(chessboard.isMoveLegal("invalid"));
+        chessboard.doMove("h5h4");
+
+        assertTrue(chessboard.isMoveLegal("G7F8"));
+        assertTrue(chessboard.isMoveLegal("g7f8q"));
+    }
+
+    @Test
     public void testIsWhiteToMove() {
         assertEquals(Side.BLACK, chessboard.getSideToMove());
     }
@@ -130,10 +149,10 @@ public class ChessboardTest {
 
     @ParameterizedTest
     @CsvSource({
-            "'1k6/6P1/8/8/8/8/8/1K6 w - - 0 1', 6, 1, 7, 1, true, 'Q'",
-            "'1k6/6P1/8/8/8/8/6p1/1K6 b - - 0 1', 6, 6, 7, 6, true, 'N'",
+            "'1k6/6P1/8/8/8/8/8/1K6 w - - 0 1', 6, 1, 7, 1, true",
+            "'1k6/6P1/8/8/8/8/6p1/1K6 b - - 0 1', 6, 6, 7, 6, true",
     })
-    public void testIsPromotionMove(String fen, int fromRow, int fromCol, int toRow, int toCol, boolean expected, char promotedPiece) {
+    public void testIsPromotionMove(String fen, int fromRow, int fromCol, int toRow, int toCol, boolean expected) {
         var promotionChessBoard = new Chessboard(fen);
         assertEquals(expected, promotionChessBoard.isPromotionMove(fromRow, fromCol, toRow, toCol));
     }
