@@ -364,7 +364,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         }
 
         invalidate();
-        return performClick();
+        performClick();
+        return true;
     }
 
     @Override

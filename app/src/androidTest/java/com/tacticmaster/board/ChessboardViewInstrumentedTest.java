@@ -91,7 +91,7 @@ public class ChessboardViewInstrumentedTest {
             assertEquals(-1, chessboardView.getSelectedFromRank());
             MotionEvent event = MotionEvent.obtain(100, 100, MotionEvent.ACTION_DOWN, 840, 840, 0);
             boolean result = chessboardView.onTouchEvent(event);
-            assertTrue(result);
+            assertFalse(result);
             assertEquals(-1, chessboardView.getSelectedFromFile());
             assertEquals(-1, chessboardView.getSelectedFromRank());
         });
