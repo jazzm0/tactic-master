@@ -33,6 +33,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     public static final int BOARD_SIZE = 8;
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private static final int MOVE_DELAY = 1300;
+    private static final int STROKE_WIDTH = 8;
 
     private final ChessboardPieceManager bitmapManager;
 
@@ -84,7 +85,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             paint.setColor(Color.BLACK);
         }
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(8);
+        paint.setStrokeWidth(STROKE_WIDTH);
         return paint;
     }
 
@@ -97,18 +98,21 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void drawRectangle(int fromRank, int fromFile, int toRank, int toFile, Canvas canvas, Paint paint) {
+        if (fromRank == -1 || fromFile == -1 || puzzleFinished) {
+            return;
+        }
+
         float tileSize = getTileSize();
+        float halfStroke = STROKE_WIDTH / 2f;
 
-        if (fromRank != -1 && fromFile != -1 && !puzzleFinished) {
-            float left = fromFile * tileSize;
-            float top = fromRank * tileSize;
-            canvas.drawRect(left, top, left + tileSize, top + tileSize, paint);
+        float left = fromFile * tileSize + halfStroke;
+        float top = fromRank * tileSize + halfStroke;
+        canvas.drawRect(left, top, left + tileSize - STROKE_WIDTH, top + tileSize - STROKE_WIDTH, paint);
 
-            if (toRank != -1 && toFile != -1) {
-                left = toFile * tileSize;
-                top = toRank * tileSize;
-                canvas.drawRect(left, top, left + tileSize, top + tileSize, paint);
-            }
+        if (toRank != -1 && toFile != -1) {
+            left = toFile * tileSize + halfStroke;
+            top = toRank * tileSize + halfStroke;
+            canvas.drawRect(left, top, left + tileSize - STROKE_WIDTH, top + tileSize - STROKE_WIDTH, paint);
         }
     }
 
