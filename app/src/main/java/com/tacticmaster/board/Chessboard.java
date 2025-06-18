@@ -1,6 +1,7 @@
 package com.tacticmaster.board;
 
 import static com.tacticmaster.board.ChessboardView.BOARD_SIZE;
+import static java.util.Objects.isNull;
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Piece;
@@ -62,13 +63,25 @@ public class Chessboard {
         // by searching in legalMoves()
         boolean isMated = false;
         var move = new Move(fenMove, chessboard.getSideToMove());
-        boolean isMoveLegal = chessboard.legalMoves().contains(move);
+        boolean isMoveLegal = isMoveLegal(fenMove);
         if (isMoveLegal) {
             chessboard.doMove(move, false);
             isMated = chessboard.isMated();
             chessboard.undoMove();
         }
         return isMated;
+    }
+
+    public boolean isMoveLegal(String fenMove) {
+        if (isNull(fenMove) || fenMove.length() < 4 || fenMove.length() > 5) {
+            return false;
+        }
+        for (var legalMove : chessboard.legalMoves()) {
+            if (legalMove.toString().toLowerCase().startsWith(fenMove.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getProposedMove(int fromRank, int fromFile, int toRank, int toFile) {
@@ -87,7 +100,9 @@ public class Chessboard {
 
     public boolean isPromotionMove(int fromRank, int fromFile, int toRank, int toFile) {
         Move move = new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile));
-
+        if (!isMoveLegal(move.toString())) {
+            return false;
+        }
         if (chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN && move.getTo().getRank().equals(Rank.RANK_8)) {
             return true;
         } else {

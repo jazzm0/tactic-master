@@ -76,4 +76,42 @@ public class PuzzleGameTest {
         assertEquals("", puzzleGame1.getNextMove());
         assertEquals("", puzzleGame1.getNextMove());
     }
+
+    @Test
+    public void testIsCorrectNextMove() {
+        PuzzleGame puzzleGame = new PuzzleGame("1", "fen1", "m1 m2 m3", 1500);
+
+        assertTrue(puzzleGame.isCorrectNextMove("m1"));
+
+        assertFalse(puzzleGame.isCorrectNextMove("m4"));
+
+        assertFalse(puzzleGame.isCorrectNextMove(null));
+
+        puzzleGame.getNextMove();
+        puzzleGame.getNextMove();
+        puzzleGame.getNextMove();
+        assertFalse(puzzleGame.isCorrectNextMove("m1"));
+    }
+
+    @Test
+    public void testIsSolutionFoundWhenAllMovesCompleted() {
+        PuzzleGame puzzleGame = new PuzzleGame("1", "fen1", "m1 m2 m3", 1500);
+        puzzleGame.getNextMove();
+        puzzleGame.getNextMove();
+        puzzleGame.getNextMove();
+        assertTrue(puzzleGame.isSolutionFound());
+    }
+
+    @Test
+    public void testIsSolutionFoundWhenNotSolved() {
+        PuzzleGame puzzleGame = new PuzzleGame("1", "fen1", "m1 m2 m3", 1500);
+        assertFalse(puzzleGame.isSolutionFound());
+    }
+
+    @Test
+    public void testIsSolutionFoundWhenPartiallyCompleted() {
+        PuzzleGame puzzleGame = new PuzzleGame("1", "fen1", "m1 m2 m3", 1500);
+        puzzleGame.getNextMove();
+        assertFalse(puzzleGame.isSolutionFound());
+    }
 }
