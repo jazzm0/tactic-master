@@ -13,6 +13,17 @@ the [lichess tactics database](https://database.lichess.org/lichess_db_puzzle.cs
 
 Simply clone the repository and import it to Android Studio.
 
+## Bugs
+
+Please report any bugs or issues you find in the [issue tracker](https://github.com/jazzm0/tactic-master/issues). 
+Make sure you use the latest version of the app before reporting an issue. F-Droid takes some time to update the app,
+so you may want to check the [GitHub releases](https://github.com/jazzm0/tactic-master/releases) Page for the latest version.
+
+When reporting an issue, please include the following information:
+- The puzzle ID with which the issue can be replicated.
+- The exact steps to reproduce the issue.
+- The expected behavior and the actual behavior you observed.
+
 ## Tactics Trainer Module
 
 The `tactics-trainer` module contains several Python scripts that help in processing and managing
