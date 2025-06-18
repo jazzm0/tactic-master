@@ -97,23 +97,21 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         return paint;
     }
 
-    private void drawRectangle(int fromRank, int fromFile, int toRank, int toFile, Canvas canvas, Paint paint) {
-        if (fromRank == -1 || fromFile == -1 || puzzleFinished) {
+    private void drawRectangle(Canvas canvas, int rank, int file, Paint paint) {
+        if (rank == -1 || file == -1 || puzzleFinished) {
             return;
         }
-
         float tileSize = getTileSize();
         float halfStroke = STROKE_WIDTH / 2f;
 
-        float left = fromFile * tileSize + halfStroke;
-        float top = fromRank * tileSize + halfStroke;
+        float left = file * tileSize + halfStroke;
+        float top = rank * tileSize + halfStroke;
         canvas.drawRect(left, top, left + tileSize - STROKE_WIDTH, top + tileSize - STROKE_WIDTH, paint);
+    }
 
-        if (toRank != -1 && toFile != -1) {
-            left = toFile * tileSize + halfStroke;
-            top = toRank * tileSize + halfStroke;
-            canvas.drawRect(left, top, left + tileSize - STROKE_WIDTH, top + tileSize - STROKE_WIDTH, paint);
-        }
+    private void drawSelection(int fromRank, int fromFile, int toRank, int toFile, Canvas canvas, Paint paint) {
+        drawRectangle(canvas, fromRank, fromFile, paint);
+        drawRectangle(canvas, toRank, toFile, paint);
     }
 
     private void drawBoard(Canvas canvas) {
@@ -125,8 +123,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             }
         }
 
-        drawRectangle(selectedFromRank, selectedFromFile, selectedToRank, selectedToFile, canvas, selectionPaint);
-        drawRectangle(opponentFromRank, opponentFromFile, opponentToRank, opponentToFile, canvas, opponentSelectionPaint);
+        drawSelection(selectedFromRank, selectedFromFile, selectedToRank, selectedToFile, canvas, selectionPaint);
+        drawSelection(opponentFromRank, opponentFromFile, opponentToRank, opponentToFile, canvas, opponentSelectionPaint);
     }
 
     private void drawLabels(Canvas canvas) {
