@@ -90,6 +90,15 @@ public class DatabaseAccessor {
             queryBuilder.append(")");
         }
 
+        if (!isNull(themes) && !themes.isEmpty()) {
+            queryBuilder.append(" AND (");
+            for (String theme : themes) {
+                queryBuilder.append(COLUMN_THEMES).append(" LIKE '%").append(theme).append("%' OR ");
+            }
+            queryBuilder.setLength(queryBuilder.length() - 4);
+            queryBuilder.append(")");
+        }
+
         queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY RANDOM() LIMIT 5");
 
         return executeQuery(db, queryBuilder.toString(), null);
@@ -108,7 +117,7 @@ public class DatabaseAccessor {
 
     public Set<String> getPuzzleThemes() {
         SQLiteDatabase db = dbHelper.openDatabase();
-        String query = "SELECT DISTINCT " + COLUMN_THEMES + " FROM " + PUZZLE_TABLE_NAME;
+        String query = "SELECT DISTINCT " + COLUMN_THEMES + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_THEMES + " IS NOT NULL AND " + COLUMN_THEMES + " != '' AND " + COLUMN_SOLVED + " = 0";
         Set<String> allThemes = new TreeSet<>();
         try (Cursor cursor = db.rawQuery(query, null)) {
             int themesIndex = cursor.getColumnIndex(COLUMN_THEMES);
