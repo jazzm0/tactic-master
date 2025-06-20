@@ -1,21 +1,26 @@
 package com.tacticmaster;
 
 import android.content.Intent;
+import android.widget.ArrayAdapter;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
 import com.tacticmaster.rating.EloRatingCalculator;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 public class ChessboardController implements ChessboardView.PuzzleFinishedListener {
 
     private final DatabaseAccessor databaseAccessor;
     private final ChessboardView chessboardView;
     private final PuzzleTextViews puzzleTextViews;
-
+    private final Set<String> selectedThemes = new HashSet<>();
     private final PuzzleManager puzzleManager;
     private int playerRating;
     private boolean autoplay;
@@ -41,6 +46,40 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleManager.updateRating(newRating);
     }
 
+    public void setThemes(Set<String> themes) {
+        var themesList = new ArrayList<>(themes);
+        var adapter = new ArrayAdapter<>(chessboardView.getContext(), android.R.layout.simple_dropdown_item_1line, themesList);
+        puzzleTextViews.getFilterDropdown().setAdapter(adapter);
+        puzzleTextViews.getFilterDropdown().setDropDownHeight(0);
+
+        puzzleTextViews.getFilterButton().setOnClickListener(v -> {
+            boolean[] checkedItems = new boolean[themesList.size()];
+
+            for (int i = 0; i < themesList.size(); i++) {
+                checkedItems[i] = selectedThemes.contains(themesList.get(i));
+            }
+
+            new MaterialAlertDialogBuilder(chessboardView.getContext())
+                    .setMultiChoiceItems(themesList.toArray(new String[0]), checkedItems, (dialog, which, checked) -> {
+                        String item = themesList.get(which);
+                        if (checked) {
+                            selectedThemes.add(item);
+                        } else {
+                            selectedThemes.remove(item);
+                        }
+                    })
+                    .setPositiveButton("Done", (dialog, which) -> {
+                        puzzleManager.updatePuzzleThemes(selectedThemes);
+                    })
+                    .setNeutralButton("Clear All", (dialog, which) -> {
+                        selectedThemes.clear();
+                        puzzleTextViews.getFilterDropdown().setText("");
+                        puzzleManager.updatePuzzleThemes(selectedThemes);
+                    })
+                    .show();
+        });
+    }
+
     public void renderPuzzle() {
         var puzzle = puzzleManager.getCurrentPuzzle();
         chessboardView.setPuzzle(puzzle);
@@ -50,8 +89,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
         puzzleTextViews.setPuzzleSolved(puzzle.solved());
-        puzzleTextViews.setPuzzleManager(puzzleManager);
-        puzzleTextViews.setThemes(databaseAccessor.getPuzzleThemes());
+        setThemes(databaseAccessor.getPuzzleThemes());
     }
 
     public void loadPreviousPuzzle() {

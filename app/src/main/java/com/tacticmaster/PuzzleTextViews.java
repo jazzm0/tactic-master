@@ -9,18 +9,11 @@ import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.tacticmaster.puzzle.PuzzleManager;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class PuzzleTextViews {
 
@@ -31,9 +24,6 @@ public class PuzzleTextViews {
     private final TextView puzzlesSolvedTextView;
     private final TextView playerRatingTextView;
     private final MaterialAutoCompleteTextView filterDropdown;
-    private final MaterialButton filterButton;
-    private final Set<String> selectedItems = new HashSet<>();
-    private PuzzleManager puzzleManager;
     private final Context context;
 
     public PuzzleTextViews(Context context) {
@@ -45,7 +35,6 @@ public class PuzzleTextViews {
         this.puzzlesSolvedTextView = findViewById(R.id.puzzles_count);
         this.playerRatingTextView = findViewById(R.id.player_rating);
         this.filterDropdown = findViewById(R.id.filter_dropdown);
-        this.filterButton = findViewById(R.id.filter_button);
     }
 
     <T extends android.view.View> T findViewById(int id) {
@@ -58,8 +47,12 @@ public class PuzzleTextViews {
         puzzleIdEditText.setTypeface(null, Typeface.BOLD);
     }
 
-    private void filterPuzzles(Set<String> selectedThemes) {
-        puzzleManager.updatePuzzleThemes(selectedThemes);
+    public MaterialButton getFilterButton() {
+        return findViewById(R.id.filter_button);
+    }
+
+    public MaterialAutoCompleteTextView getFilterDropdown() {
+        return filterDropdown;
     }
 
     public void setPuzzleRating(int rating) {
@@ -87,10 +80,6 @@ public class PuzzleTextViews {
         } else {
             setUnsolved();
         }
-    }
-
-    public void setPuzzleManager(PuzzleManager puzzleManager) {
-        this.puzzleManager = puzzleManager;
     }
 
     public void setPlayerRating(int playerRating) {
@@ -134,38 +123,38 @@ public class PuzzleTextViews {
         alphaAnimator.start();
     }
 
-    public void setThemes(Set<String> themes) {
-
-        var themesList = new ArrayList<>(themes);
-        var adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, themesList);
-        filterDropdown.setAdapter(adapter);
-        filterDropdown.setDropDownHeight(0);
-
-        filterButton.setOnClickListener(v -> {
-            boolean[] checkedItems = new boolean[themesList.size()];
-            for (int i = 0; i < themesList.size(); i++) {
-                checkedItems[i] = selectedItems.contains(themesList.get(i));
-            }
-
-            new MaterialAlertDialogBuilder(context)
-                    .setMultiChoiceItems(themesList.toArray(new String[0]), checkedItems, (dialog, which, checked) -> {
-                        String item = themesList.get(which);
-                        if (checked) {
-                            selectedItems.add(item);
-                        } else {
-                            selectedItems.remove(item);
-                        }
-                    })
-                    .setPositiveButton("Done", (dialog, which) -> {
-                        filterPuzzles(selectedItems);
-                    })
-                    .setNeutralButton("Clear All", (dialog, which) -> {
-                        selectedItems.clear();
-                        filterDropdown.setText(""); // Clear dropdown text
-                        // Reset filter
-                        filterPuzzles(selectedItems);
-                    })
-                    .show();
-        });
-    }
+//    public void setThemes(Set<String> themes) {
+//
+//        var themesList = new ArrayList<>(themes);
+//        var adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, themesList);
+//        filterDropdown.setAdapter(adapter);
+//        filterDropdown.setDropDownHeight(0);
+//
+//        filterButton.setOnClickListener(v -> {
+//            boolean[] checkedItems = new boolean[themesList.size()];
+//            for (int i = 0; i < themesList.size(); i++) {
+//                checkedItems[i] = selectedItems.contains(themesList.get(i));
+//            }
+//
+//            new MaterialAlertDialogBuilder(context)
+//                    .setMultiChoiceItems(themesList.toArray(new String[0]), checkedItems, (dialog, which, checked) -> {
+//                        String item = themesList.get(which);
+//                        if (checked) {
+//                            selectedItems.add(item);
+//                        } else {
+//                            selectedItems.remove(item);
+//                        }
+//                    })
+//                    .setPositiveButton("Done", (dialog, which) -> {
+//                        filterPuzzles(selectedItems);
+//                    })
+//                    .setNeutralButton("Clear All", (dialog, which) -> {
+//                        selectedItems.clear();
+//                        filterDropdown.setText(""); // Clear dropdown text
+//                        // Reset filter
+//                        filterPuzzles(selectedItems);
+//                    })
+//                    .show();
+//        });
+//    }
 }
