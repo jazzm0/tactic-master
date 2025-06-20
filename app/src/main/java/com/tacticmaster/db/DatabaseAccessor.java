@@ -8,7 +8,9 @@ import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
+import static com.tacticmaster.db.PuzzleTable.COLUMN_THEMES;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
+import static java.util.Objects.isNull;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class DatabaseAccessor {
 
@@ -71,7 +74,7 @@ public class DatabaseAccessor {
         return 0;
     }
 
-    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, Set<String> excludedPuzzleIds) {
+    public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, Set<String> excludedPuzzleIds, Set<String> themes) {
         SQLiteDatabase db = dbHelper.openDatabase();
         StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_RATING + " >= " + lowestRating +
@@ -103,6 +106,28 @@ public class DatabaseAccessor {
         return puzzles.get(0);
     }
 
+    public Set<String> getPuzzleThemes() {
+        SQLiteDatabase db = dbHelper.openDatabase();
+        String query = "SELECT DISTINCT " + COLUMN_THEMES + " FROM " + PUZZLE_TABLE_NAME;
+        Set<String> allThemes = new TreeSet<>();
+        try (Cursor cursor = db.rawQuery(query, null)) {
+            int themesIndex = cursor.getColumnIndex(COLUMN_THEMES);
+            while (cursor.moveToNext()) {
+                if (themesIndex >= 0) {
+                    String themes = cursor.getString(themesIndex);
+                    if (!isNull(themes) && !themes.isEmpty()) {
+                        for (String theme : themes.split(" ")) {
+                            if (!theme.isEmpty()) {
+                                allThemes.add(theme);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return allThemes;
+    }
+
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query, String[] selectionArgs) {
         List<Puzzle> puzzles = new ArrayList<>();
         try (Cursor cursor = db.rawQuery(query, selectionArgs)) {
@@ -110,7 +135,8 @@ public class DatabaseAccessor {
             int fenIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_FEN);
             int movesIndex = cursor.getColumnIndex(PuzzleTable.COLUMN_MOVES);
             int ratingIndex = cursor.getColumnIndex(COLUMN_RATING);
-            int solvedIndex = cursor.getColumnIndex(COLUMN_SOLVED); // Fetch the solved column index
+            int solvedIndex = cursor.getColumnIndex(COLUMN_SOLVED);
+            int themesIndex = cursor.getColumnIndex(COLUMN_THEMES);
             while (cursor.moveToNext()) {
                 if (puzzleIdIndex >= 0 && fenIndex >= 0 && movesIndex >= 0 && ratingIndex >= 0 && solvedIndex >= 0) {
                     puzzles.add(new Puzzle(
@@ -118,6 +144,7 @@ public class DatabaseAccessor {
                             cursor.getString(fenIndex),
                             cursor.getString(movesIndex),
                             cursor.getInt(ratingIndex),
+                            cursor.getString(themesIndex),
                             cursor.getInt(solvedIndex) == 1
                     ));
                 }

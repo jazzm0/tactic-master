@@ -8,5 +8,6 @@ public class PuzzleTable {
     public static final String COLUMN_MOVES = "Moves";
     public static final String COLUMN_RATING = "Rating";
     public static final String COLUMN_SOLVED = "Solved";
+    public static final String COLUMN_THEMES = "Themes";
 }
 

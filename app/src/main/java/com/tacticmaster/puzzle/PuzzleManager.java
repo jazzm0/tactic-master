@@ -1,11 +1,10 @@
 package com.tacticmaster.puzzle;
 
 
-import static java.util.Objects.isNull;
-
 import com.tacticmaster.db.DatabaseAccessor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +69,7 @@ public class PuzzleManager {
         var highestRating = rating + 50;
         List<Puzzle> nextPuzzles = new ArrayList<>();
         while (nextPuzzles.isEmpty() && lowestRating > 0) {
-            nextPuzzles = databaseAccessor.getPuzzlesWithinRange(lowestRating, highestRating, puzzles.keySet());
+            nextPuzzles = databaseAccessor.getPuzzlesWithinRange(lowestRating, highestRating, puzzles.keySet(), Collections.emptySet());
             lowestRating -= 50;
             highestRating += 50;
         }

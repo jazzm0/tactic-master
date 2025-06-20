@@ -16,6 +16,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static java.util.Collections.emptySet;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -111,7 +112,7 @@ class DatabaseAccessorTest {
         when(mockCursor.getString(8)).thenReturn("url1", "url2", "url3");
         when(mockCursor.getString(9)).thenReturn("opening1", "opening2", "opening3");
 
-        List<Puzzle> puzzles = databaseAccessor.getPuzzlesWithinRange(1600, 1800, excludedIds);
+        List<Puzzle> puzzles = databaseAccessor.getPuzzlesWithinRange(1600, 1800, excludedIds, emptySet());
 
         assertEquals(3, puzzles.size());
         assertEquals("puzzle1", puzzles.get(0).puzzleId());
