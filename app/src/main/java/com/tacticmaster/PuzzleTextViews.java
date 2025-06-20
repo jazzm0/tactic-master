@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.tacticmaster.puzzle.PuzzleManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ public class PuzzleTextViews {
     private final MaterialAutoCompleteTextView filterDropdown;
     private final MaterialButton filterButton;
     private final Set<String> selectedItems = new HashSet<>();
+    private PuzzleManager puzzleManager;
     private final Context context;
 
     public PuzzleTextViews(Context context) {
@@ -56,10 +58,8 @@ public class PuzzleTextViews {
         puzzleIdEditText.setTypeface(null, Typeface.BOLD);
     }
 
-    private void filterPuzzles(Set<String> selectedItems) {
-        // Implement your filtering logic here
-        // Example: Filter puzzles based on selected categories
-        // Log.d("MainActivity", "Filtering puzzles with: " + selectedItems);
+    private void filterPuzzles(Set<String> selectedThemes) {
+        puzzleManager.updatePuzzleThemes(selectedThemes);
     }
 
     public void setPuzzleRating(int rating) {
@@ -87,6 +87,10 @@ public class PuzzleTextViews {
         } else {
             setUnsolved();
         }
+    }
+
+    public void setPuzzleManager(PuzzleManager puzzleManager) {
+        this.puzzleManager = puzzleManager;
     }
 
     public void setPlayerRating(int playerRating) {
