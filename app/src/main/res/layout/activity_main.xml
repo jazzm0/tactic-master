@@ -34,7 +34,20 @@
             android:layout_height="20dp"
             android:contentDescription="@string/player_turn"
             android:src="@drawable/ic_white_turn" />
+
     </LinearLayout>
+
+    <include
+        android:id="@+id/filter_container"
+        layout="@layout/filter_multi_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        app:layout_constraintBottom_toTopOf="@id/chessboard_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_container" />
 
     <com.tacticmaster.board.ChessboardView
         android:id="@+id/chessboard_view"
@@ -43,7 +56,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_container" />
+        app:layout_constraintTop_toBottomOf="@id/filter_container" />
 
     <com.tacticmaster.board.PuzzleHintView
         android:id="@+id/hint_path_view"
@@ -172,6 +185,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:theme="@style/CustomSwitchMaterial"
         android:thumb="@drawable/autoplay"
         app:layout_constraintBottom_toTopOf="@id/puzzle_reload"
         app:layout_constraintStart_toStartOf="parent" />

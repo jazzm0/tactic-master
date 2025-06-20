@@ -50,6 +50,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
         puzzleTextViews.setPuzzleSolved(puzzle.solved());
+        puzzleTextViews.setThemes(databaseAccessor.getPuzzleThemes());
     }
 
     public void loadPreviousPuzzle() {
