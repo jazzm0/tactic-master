@@ -43,6 +43,7 @@ public class DatabaseAccessor {
         String query = "SELECT " + COLUMN_SOLVED + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_PUZZLE_ID + " = ?";
         try (Cursor cursor = db.rawQuery(query, new String[]{puzzleId})) {
             if (cursor.moveToFirst()) {
+                db.close();
                 return cursor.getInt(0) != 1;
             }
         }
@@ -52,12 +53,14 @@ public class DatabaseAccessor {
     public void setSolved(String puzzleId) {
         SQLiteDatabase db = dbHelper.openDatabase();
         db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET " + COLUMN_SOLVED + " = 1 WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
+        db.close();
     }
 
     public int getSolvedPuzzleCount() {
         SQLiteDatabase db = dbHelper.openDatabase();
         try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
             if (cursor.moveToFirst()) {
+                db.close();
                 return cursor.getInt(0);
             }
         }
@@ -68,6 +71,7 @@ public class DatabaseAccessor {
         SQLiteDatabase db = dbHelper.openDatabase();
         try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME, null)) {
             if (cursor.moveToFirst()) {
+                db.close();
                 return cursor.getInt(0);
             }
         }
@@ -101,7 +105,9 @@ public class DatabaseAccessor {
 
         queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY RANDOM() LIMIT 5");
 
-        return executeQuery(db, queryBuilder.toString(), null);
+        var result = executeQuery(db, queryBuilder.toString(), null);
+        db.close();
+        return result;
     }
 
     public Puzzle getPuzzleById(String puzzleId) throws NoSuchElementException {
@@ -109,6 +115,7 @@ public class DatabaseAccessor {
         String query = "SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_PUZZLE_ID + " = ?";
         List<Puzzle> puzzles = executeQuery(db, query, new String[]{puzzleId});
+        db.close();
         if (puzzles.isEmpty()) {
             throw new NoSuchElementException("Puzzle ID  not found");
         }
@@ -134,6 +141,7 @@ public class DatabaseAccessor {
                 }
             }
         }
+        db.close();
         return allThemes;
     }
 
@@ -167,6 +175,7 @@ public class DatabaseAccessor {
         ContentValues values = new ContentValues();
         values.put(COLUMN_PLAYER_RATING, rating);
         db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
+        db.close();
     }
 
     public int getPlayerRating() {
@@ -176,6 +185,7 @@ public class DatabaseAccessor {
                 return cursor.getInt(0);
             }
         }
+        db.close();
         return DEFAULT_PLAYER_RATING;
     }
 
@@ -184,12 +194,14 @@ public class DatabaseAccessor {
         ContentValues values = new ContentValues();
         values.put(COLUMN_AUTOPLAY_ENABLED, isChecked ? 1 : 0);
         db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
+        db.close();
     }
 
     public boolean getPlayerAutoplay() {
         SQLiteDatabase db = dbHelper.openDatabase();
         try (Cursor cursor = db.rawQuery("SELECT " + COLUMN_AUTOPLAY_ENABLED + " FROM " + PLAYER_TABLE_NAME, null)) {
             if (cursor.moveToFirst()) {
+                db.close();
                 return cursor.getInt(0) == 1;
             }
         }
