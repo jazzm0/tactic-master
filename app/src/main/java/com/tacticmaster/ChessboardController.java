@@ -1,7 +1,12 @@
 package com.tacticmaster;
 
+import static com.tacticmaster.db.PuzzleFilter.getThemeGroups;
+import static java.util.Objects.isNull;
+
 import android.content.Intent;
 import android.widget.ArrayAdapter;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tacticmaster.board.ChessboardView;
@@ -59,8 +64,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                 checkedItems[i] = selectedThemes.contains(themesList.get(i));
             }
 
-            new MaterialAlertDialogBuilder(chessboardView.getContext())
-                    .setMultiChoiceItems(themesList.toArray(new String[0]), checkedItems, (dialog, which, checked) -> {
+            var builder = new MaterialAlertDialogBuilder(chessboardView.getContext()).setMultiChoiceItems(themesList.toArray(new String[0]), checkedItems, (dialog, which, checked) -> {
                         String item = themesList.get(which);
                         if (checked) {
                             selectedThemes.add(item);
@@ -69,14 +73,30 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                         }
                     })
                     .setPositiveButton("Done", (dialog, which) -> {
-                        puzzleManager.updatePuzzleThemes(selectedThemes);
+                        Set<String> allThemesInGroup = new HashSet<>();
+                        selectedThemes.stream().forEach(theme -> {
+                            var themeGroup = getThemeGroups().get(theme);
+                            if (!isNull(themeGroup)) {
+                                allThemesInGroup.addAll(themeGroup);
+                            }
+                        });
+
+                        puzzleManager.updatePuzzleThemes(allThemesInGroup);
                     })
                     .setNeutralButton("Clear All", (dialog, which) -> {
                         selectedThemes.clear();
                         puzzleTextViews.getFilterDropdown().setText("");
                         puzzleManager.updatePuzzleThemes(selectedThemes);
                     })
-                    .show();
+                    .setNegativeButton("Cancel", null);
+
+            AlertDialog dialog = builder.create();
+            dialog.setOnShowListener(d -> {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray));
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray));
+            });
+            dialog.show();
         });
     }
 
@@ -89,7 +109,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
         puzzleTextViews.setPuzzleSolved(puzzle.solved());
-        setThemes(databaseAccessor.getPuzzleThemes());
+        setThemes(getThemeGroups().keySet());
     }
 
     public void loadPreviousPuzzle() {

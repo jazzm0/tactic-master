@@ -13,6 +13,8 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.Intent;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.Puzzle;
@@ -67,6 +69,8 @@ public class ChessboardControllerTest {
         this.puzzleRecords.add(new Puzzle("4", "fen3", "moves3", 1400));
         this.puzzleGames.add(new PuzzleGame("4", "fen3", "moves3", 1400));
         chessboardController = new ChessboardController(databaseAccessor, chessboardView, puzzleTextViews);
+        when(puzzleTextViews.getFilterDropdown()).thenReturn(mock(MaterialAutoCompleteTextView.class));
+        when(puzzleTextViews.getFilterButton()).thenReturn(mock(MaterialButton.class));
 
     }
 
