@@ -24,7 +24,7 @@ import java.io.OutputStream;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "puzzle.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 3; // change to 4
     private final Context context;
     private final String databasePath;
 
@@ -40,7 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Handle database upgrade if needed
-        if (oldVersion < 3 && newVersion == 3) {
+        if (oldVersion < 3 && newVersion == 3) { // change to if (oldVersion < 3 && newVersion >= 3)
             SQLiteDatabase localDb = openDatabase();
             localDb.execSQL("ALTER TABLE " + PLAYER_TABLE_NAME + " ADD COLUMN " + COLUMN_AUTOPLAY_ENABLED + " INTEGER DEFAULT 1");
             try (Cursor cursor = localDb.rawQuery("SELECT * FROM "+PLAYER_TABLE_NAME,null)) {
@@ -54,6 +54,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
             }
         }
+        // insert if-branch for (oldVersion < 4 && newVersion >= 4) with the following logic
+        // - read out values of table PLAYER_TABLE_NAME and temporary store them
+        // - read out ids of solved games in PUZZLE_TABLE_NAME and temporary store them
+        // - close the database
+        // - invoke copyDatabase()
+        // - add the COLUMN_SOLVED-column to PUZZLE_TABLE_NAME, create the PLAYER_TABLE_NAME (as done in createDatabase() )
+        // - restore the temporary stored values from PLAYER_TABLE_NAME and PUZZLE_TABLE_NAME
     }
 
     public void createDatabase() throws Error {
