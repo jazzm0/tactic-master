@@ -82,19 +82,21 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                         });
 
                         puzzleManager.updatePuzzleThemes(allThemesInGroup);
+                        renderPuzzle();
                     })
                     .setNeutralButton("Clear All", (dialog, which) -> {
                         selectedThemes.clear();
                         puzzleTextViews.getFilterDropdown().setText("");
                         puzzleManager.updatePuzzleThemes(selectedThemes);
+                        renderPuzzle();
                     })
                     .setNegativeButton("Cancel", null);
 
             AlertDialog dialog = builder.create();
             dialog.setOnShowListener(d -> {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray));
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray, null));
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray, null));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray, null));
             });
             dialog.show();
         });
