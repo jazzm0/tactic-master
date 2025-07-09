@@ -13,8 +13,7 @@
     </style>
 
     <style name="CustomSwitchMaterial" parent="Widget.Material3.CompoundButton.Switch">
-        <item name="iconTint">@android:color/white</item>
-        <item name="android:icon">@drawable/autoplay</item>
+        <item name="android:thumbTint">@color/switch_thumb_color</item>
     </style>
 
 </resources>
