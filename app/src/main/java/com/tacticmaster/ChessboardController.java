@@ -1,6 +1,5 @@
 package com.tacticmaster;
 
-import static com.tacticmaster.db.PuzzleFilter.getThemeGroups;
 import static java.util.Objects.isNull;
 
 import android.content.Intent;
@@ -11,6 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
+import com.tacticmaster.db.PuzzleFilter;
 import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
 import com.tacticmaster.rating.EloRatingCalculator;
@@ -27,6 +27,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final PuzzleTextViews puzzleTextViews;
     private final Set<String> selectedThemes = new HashSet<>();
     private final PuzzleManager puzzleManager;
+    private final PuzzleFilter puzzleFilter;
     private int playerRating;
     private boolean autoplay;
 
@@ -39,6 +40,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
         this.chessboardView.setPuzzleSolvedListener(this);
+        this.puzzleFilter = new PuzzleFilter(databaseAccessor);
         this.playerRating = databaseAccessor.getPlayerRating();
         this.autoplay = databaseAccessor.getPlayerAutoplay();
     }
@@ -49,6 +51,13 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleTextViews.updatePlayerRating(playerRating, newRating);
         this.playerRating = newRating;
         puzzleManager.updateRating(newRating);
+    }
+
+    private void setDialogButtonColors(AlertDialog dialog) {
+        int color = chessboardView.getContext().getResources().getColor(android.R.color.darker_gray, null);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(color);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
     }
 
     public void setThemes(Set<String> themes) {
@@ -75,7 +84,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                     .setPositiveButton("Done", (dialog, which) -> {
                         Set<String> allThemesInGroup = new HashSet<>();
                         selectedThemes.stream().forEach(theme -> {
-                            var themeGroup = getThemeGroups().get(theme);
+                            var themeGroup = puzzleFilter.getThemeGroups().get(theme);
                             if (!isNull(themeGroup)) {
                                 allThemesInGroup.addAll(themeGroup);
                             }
@@ -93,11 +102,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                     .setNegativeButton("Cancel", null);
 
             AlertDialog dialog = builder.create();
-            dialog.setOnShowListener(d -> {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray, null));
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray, null));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(chessboardView.getContext().getResources().getColor(android.R.color.darker_gray, null));
-            });
+            dialog.setOnShowListener(d -> setDialogButtonColors(dialog));
             dialog.show();
         });
     }
@@ -111,7 +116,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
         puzzleTextViews.setPuzzleSolved(puzzle.solved());
-        setThemes(getThemeGroups().keySet());
+        setThemes(puzzleFilter.getThemeGroups().keySet());
     }
 
     public void loadPreviousPuzzle() {

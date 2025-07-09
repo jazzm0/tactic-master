@@ -23,7 +23,6 @@ public class PuzzleTextViews {
     private final TextView puzzleRatingTextView;
     private final TextView puzzlesSolvedTextView;
     private final TextView playerRatingTextView;
-    private final MaterialAutoCompleteTextView filterDropdown;
     private final Context context;
 
     public PuzzleTextViews(Context context) {
@@ -34,7 +33,6 @@ public class PuzzleTextViews {
         this.puzzleRatingTextView = findViewById(R.id.puzzle_rating);
         this.puzzlesSolvedTextView = findViewById(R.id.puzzles_count);
         this.playerRatingTextView = findViewById(R.id.player_rating);
-        this.filterDropdown = findViewById(R.id.filter_dropdown);
     }
 
     <T extends android.view.View> T findViewById(int id) {
@@ -52,7 +50,7 @@ public class PuzzleTextViews {
     }
 
     public MaterialAutoCompleteTextView getFilterDropdown() {
-        return filterDropdown;
+        return findViewById(R.id.filter_dropdown);
     }
 
     public void setPuzzleRating(int rating) {
@@ -122,39 +120,4 @@ public class PuzzleTextViews {
         animator.start();
         alphaAnimator.start();
     }
-
-//    public void setThemes(Set<String> themes) {
-//
-//        var themesList = new ArrayList<>(themes);
-//        var adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, themesList);
-//        filterDropdown.setAdapter(adapter);
-//        filterDropdown.setDropDownHeight(0);
-//
-//        filterButton.setOnClickListener(v -> {
-//            boolean[] checkedItems = new boolean[themesList.size()];
-//            for (int i = 0; i < themesList.size(); i++) {
-//                checkedItems[i] = selectedItems.contains(themesList.get(i));
-//            }
-//
-//            new MaterialAlertDialogBuilder(context)
-//                    .setMultiChoiceItems(themesList.toArray(new String[0]), checkedItems, (dialog, which, checked) -> {
-//                        String item = themesList.get(which);
-//                        if (checked) {
-//                            selectedItems.add(item);
-//                        } else {
-//                            selectedItems.remove(item);
-//                        }
-//                    })
-//                    .setPositiveButton("Done", (dialog, which) -> {
-//                        filterPuzzles(selectedItems);
-//                    })
-//                    .setNeutralButton("Clear All", (dialog, which) -> {
-//                        selectedItems.clear();
-//                        filterDropdown.setText(""); // Clear dropdown text
-//                        // Reset filter
-//                        filterPuzzles(selectedItems);
-//                    })
-//                    .show();
-//        });
-//    }
 }
