@@ -19,15 +19,13 @@ public class PuzzleFilter {
     public static final String SHORT_AND_LONG = "Puzzle Complexity and Skill Level";
     public static final String PIECE_EXPLOITATION = "Piece Exploitation";
 
-    private final Map<String, Set<String>> themeGroups;
     private final DatabaseAccessor databaseAccessor;
 
     public PuzzleFilter(DatabaseAccessor databaseAccessor) {
         this.databaseAccessor = databaseAccessor;
-        this.themeGroups = createChessThemeGroups();
     }
 
-    public Map<String, Set<String>> createChessThemeGroups() {
+    public Map<String, Set<String>> getThemeGroups() {
         Map<String, Set<String>> themeGroups = new TreeMap<>();
 
         themeGroups.put(MATE_PATTERNS, new HashSet<>(Arrays.asList(
@@ -88,9 +86,5 @@ public class PuzzleFilter {
         }
 
         return themeGroupsCopy;
-    }
-
-    public Map<String, Set<String>> getThemeGroups() {
-        return themeGroups;
     }
 }

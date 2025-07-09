@@ -44,7 +44,7 @@ public class PuzzleFilterTest {
 
     @Test
     public void testAllThemesExistInMap() {
-        Map<String, Set<String>> themeGroups = puzzleFilter.createChessThemeGroups();
+        Map<String, Set<String>> themeGroups = puzzleFilter.getThemeGroups();
 
 
         for (String theme : allThemes) {
@@ -62,7 +62,7 @@ public class PuzzleFilterTest {
         puzzleFilter = new PuzzleFilter(databaseAccessor);
 
 
-        Map<String, Set<String>> themeGroups = puzzleFilter.createChessThemeGroups();
+        Map<String, Set<String>> themeGroups = puzzleFilter.getThemeGroups();
         assertEquals(themeGroups.size(), 9);
         var totalSize = themeGroups.values().stream()
                 .mapToInt(Set::size)
