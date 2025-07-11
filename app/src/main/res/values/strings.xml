@@ -19,4 +19,5 @@
     <string name="rook">Rook</string>
     <string name="bishop">Bishop</string>
     <string name="knight">Knight</string>
+    <string name="filter">Filter</string>
 </resources>

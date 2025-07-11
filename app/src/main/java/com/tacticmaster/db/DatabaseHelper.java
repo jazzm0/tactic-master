@@ -5,6 +5,7 @@ import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_ID;
 import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
+import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static java.util.Objects.isNull;
@@ -24,7 +25,7 @@ import java.io.OutputStream;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "puzzle.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private final Context context;
     private final String databasePath;
 
@@ -35,24 +36,83 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {}
+    public void onCreate(SQLiteDatabase db) {
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Handle database upgrade if needed
-        if (oldVersion < 3 && newVersion == 3) {
+        if (oldVersion < 3 && newVersion >= 3) {
             SQLiteDatabase localDb = openDatabase();
             localDb.execSQL("ALTER TABLE " + PLAYER_TABLE_NAME + " ADD COLUMN " + COLUMN_AUTOPLAY_ENABLED + " INTEGER DEFAULT 1");
-            try (Cursor cursor = localDb.rawQuery("SELECT * FROM "+PLAYER_TABLE_NAME,null)) {
+            try (Cursor cursor = localDb.rawQuery("SELECT * FROM " + PLAYER_TABLE_NAME, null)) {
                 if (cursor.getCount() > 0) {
                     ContentValues values = new ContentValues();
                     values.put(COLUMN_PLAYER_ID, 1);
-                    localDb.update(PLAYER_TABLE_NAME, values,COLUMN_PLAYER_ID + " != 1", null);
-                }
-                else {
+                    localDb.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " != 1", null);
+                } else {
                     createPlayer(localDb);
                 }
             }
+        }
+        if (oldVersion < 4 && newVersion >= 4) {
+            SQLiteDatabase localDb = openDatabase();
+
+            // Store player table data
+            ContentValues[] playerData = null;
+            try (Cursor cursor = localDb.rawQuery("SELECT * FROM " + PLAYER_TABLE_NAME, null)) {
+                playerData = new ContentValues[cursor.getCount()];
+                int index = 0;
+                while (cursor.moveToNext()) {
+                    ContentValues values = new ContentValues();
+                    values.put(COLUMN_PLAYER_ID, cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_PLAYER_ID)));
+                    values.put(COLUMN_PLAYER_RATING, cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_PLAYER_RATING)));
+                    values.put(COLUMN_AUTOPLAY_ENABLED, cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_AUTOPLAY_ENABLED)));
+                    playerData[index++] = values;
+                }
+            }
+
+            // Store solved puzzle IDs
+            String[] solvedPuzzleIds = null;
+            try (Cursor cursor = localDb.rawQuery("SELECT " + COLUMN_PUZZLE_ID + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
+                solvedPuzzleIds = new String[cursor.getCount()];
+                int index = 0;
+                while (cursor.moveToNext()) {
+                    solvedPuzzleIds[index++] = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PUZZLE_ID));
+                }
+            }
+
+            // Close database
+            localDb.close();
+
+            // Copy new database
+            try {
+                copyDatabase();
+            } catch (IOException e) {
+                throw new Error("Error copying database during upgrade");
+            }
+
+            // Reopen database and apply schema changes
+            localDb = openDatabase();
+            localDb.execSQL("ALTER TABLE " + PUZZLE_TABLE_NAME + " ADD COLUMN " + COLUMN_SOLVED + " INTEGER DEFAULT 0");
+            createPlayerRatingTable(localDb);
+
+            if (!isNull(playerData)) {
+                for (ContentValues values : playerData) {
+                    localDb.insert(PLAYER_TABLE_NAME, null, values);
+                }
+            } else {
+                createPlayer(localDb);
+            }
+
+            if (!isNull(solvedPuzzleIds) && solvedPuzzleIds.length > 0) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_SOLVED, 1);
+                for (String puzzleId : solvedPuzzleIds) {
+                    localDb.update(PUZZLE_TABLE_NAME, values, COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
+                }
+            }
+
+            localDb.close();
         }
     }
 
