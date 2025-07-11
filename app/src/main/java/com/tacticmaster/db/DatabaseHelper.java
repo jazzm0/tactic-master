@@ -41,21 +41,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Handle database upgrade if needed
-        if (oldVersion < 3 && newVersion == 3) { // change to if (oldVersion < 3 && newVersion >= 3)
-            SQLiteDatabase localDb = openDatabase();
-            localDb.execSQL("ALTER TABLE " + PLAYER_TABLE_NAME + " ADD COLUMN " + COLUMN_AUTOPLAY_ENABLED + " INTEGER DEFAULT 1");
-            try (Cursor cursor = localDb.rawQuery("SELECT * FROM " + PLAYER_TABLE_NAME, null)) {
-                if (cursor.getCount() > 0) {
-                    ContentValues values = new ContentValues();
-                    values.put(COLUMN_PLAYER_ID, 1);
-                    localDb.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " != 1", null);
-                } else {
-                    createPlayer(localDb);
-                }
-            }
-        }
-        if (oldVersion < 3 && newVersion == 3) {
+        if (oldVersion < 3 && newVersion >= 3) {
             SQLiteDatabase localDb = openDatabase();
             localDb.execSQL("ALTER TABLE " + PLAYER_TABLE_NAME + " ADD COLUMN " + COLUMN_AUTOPLAY_ENABLED + " INTEGER DEFAULT 1");
             try (Cursor cursor = localDb.rawQuery("SELECT * FROM " + PLAYER_TABLE_NAME, null)) {
@@ -122,7 +108,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_SOLVED, 1);
                 for (String puzzleId : solvedPuzzleIds) {
-                    localDb.update(PUZZLE_TABLE_NAME, values, "puzzle_id = ?", new String[]{puzzleId});
+                    localDb.update(PUZZLE_TABLE_NAME, values, COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
                 }
             }
 
