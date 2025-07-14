@@ -76,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
                         new int[]{-android.R.attr.state_checked}
                 },
                 new int[]{
-                        getResources().getColor(R.color.switch_track_on_color),
-                        getResources().getColor(R.color.switch_track_off_color)
+                        getResources().getColor(R.color.switch_track_on_color, null),
+                        getResources().getColor(R.color.switch_track_off_color, null)
                 }
         );
 
