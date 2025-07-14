@@ -23,14 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class DatabaseAccessor {
 
     private final DatabaseHelper dbHelper;
+    private final PuzzleThemesManager puzzleThemesManager;
 
-    public DatabaseAccessor(DatabaseHelper dbHelper) {
+    public DatabaseAccessor(DatabaseHelper dbHelper, boolean withPeriodicUpdate) {
         this.dbHelper = dbHelper;
+        this.puzzleThemesManager = new PuzzleThemesManager(dbHelper, withPeriodicUpdate);
         try {
             dbHelper.createDatabase();
         } catch (Error e) {
@@ -123,26 +124,7 @@ public class DatabaseAccessor {
     }
 
     public Set<String> getPuzzleThemes() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        String query = "SELECT DISTINCT " + COLUMN_THEMES + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_THEMES + " IS NOT NULL AND " + COLUMN_THEMES + " != '' AND " + COLUMN_SOLVED + " = 0";
-        Set<String> allThemes = new TreeSet<>();
-        try (Cursor cursor = db.rawQuery(query, null)) {
-            int themesIndex = cursor.getColumnIndex(COLUMN_THEMES);
-            while (cursor.moveToNext()) {
-                if (themesIndex >= 0) {
-                    String themes = cursor.getString(themesIndex);
-                    if (!isNull(themes) && !themes.isEmpty()) {
-                        for (String theme : themes.split(" ")) {
-                            if (!theme.isEmpty()) {
-                                allThemes.add(theme);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        db.close();
-        return allThemes;
+        return puzzleThemesManager.getPuzzleThemes();
     }
 
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query, String[] selectionArgs) {

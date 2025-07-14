@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        DatabaseAccessor databaseAccessor = new DatabaseAccessor(new DatabaseHelper(this));
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(new DatabaseHelper(this), true);
         ChessboardView chessboardView = findViewById(R.id.chessboard_view);
         chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
         chessboardView.setPuzzleHintView(findViewById(R.id.hint_path_view));
