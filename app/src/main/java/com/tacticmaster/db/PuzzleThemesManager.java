@@ -14,13 +14,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class PuzzleThemesManager {
+class PuzzleThemesManager {
+
     private final Set<String> allThemes = ConcurrentHashMap.newKeySet();
     private final DatabaseHelper dbHelper;
     private final ScheduledExecutorService scheduler;
     private static final long UPDATE_INTERVAL_SECONDS = 60;
 
-    public PuzzleThemesManager(DatabaseHelper dbHelper, boolean withPeriodicUpdate) {
+    PuzzleThemesManager(DatabaseHelper dbHelper, boolean withPeriodicUpdate) {
         this.dbHelper = dbHelper;
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
         if (withPeriodicUpdate) {
@@ -55,7 +56,7 @@ public class PuzzleThemesManager {
         }
     }
 
-    public Set<String> getPuzzleThemes() {
+    Set<String> getPuzzleThemes() {
         if (allThemes.isEmpty()) {
             updateThemes();
         }
