@@ -18,11 +18,14 @@ public class PuzzleFilter {
     public static final String MATE_IN_X_MOVES = "Mate in Fixed Moves";
     public static final String SHORT_AND_LONG = "Puzzle Complexity and Skill Level";
     public static final String PIECE_EXPLOITATION = "Piece Exploitation";
+    private final DatabaseAccessor databaseAccessor;
 
-    public PuzzleFilter() {
+    public PuzzleFilter(DatabaseAccessor databaseAccessor) {
+        this.databaseAccessor = databaseAccessor;
     }
 
-    public Map<String, Set<String>> getThemeGroups(Set<String> themesInDatabase) {
+    public Map<String, Set<String>> getThemeGroups() {
+        var themesInDatabase = databaseAccessor.getPuzzleThemes();
         Map<String, Set<String>> themeGroups = new TreeMap<>();
 
         themeGroups.put(MATE_PATTERNS, new HashSet<>(Arrays.asList(

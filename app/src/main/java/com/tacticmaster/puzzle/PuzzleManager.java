@@ -4,7 +4,7 @@ package com.tacticmaster.puzzle;
 import static java.util.Objects.isNull;
 
 import com.tacticmaster.db.DatabaseAccessor;
-import com.tacticmaster.db.PuzzleThemesManager;
+import com.tacticmaster.db.PuzzleThemesDialogHelper;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class PuzzleManager implements PuzzleThemesManager.PuzzleThemesListener {
+public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListener {
 
     private final DatabaseAccessor databaseAccessor;
     private final Set<String> puzzleThemes = new TreeSet<>();

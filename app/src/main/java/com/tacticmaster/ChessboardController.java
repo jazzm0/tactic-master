@@ -4,7 +4,7 @@ import android.content.Intent;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
-import com.tacticmaster.db.PuzzleThemesManager;
+import com.tacticmaster.db.PuzzleThemesDialogHelper;
 import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
 import com.tacticmaster.rating.EloRatingCalculator;
@@ -17,7 +17,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final ChessboardView chessboardView;
     private final PuzzleTextViews puzzleTextViews;
     private final PuzzleManager puzzleManager;
-    private final PuzzleThemesManager puzzleThemesManager;
+    private final PuzzleThemesDialogHelper puzzleThemesDialogHelper;
 
     private int playerRating;
     private boolean autoplay;
@@ -25,12 +25,12 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public ChessboardController(
             DatabaseAccessor databaseAccessor,
             PuzzleManager puzzleManager,
-            PuzzleThemesManager puzzleThemesManager,
+            PuzzleThemesDialogHelper puzzleThemesDialogHelper,
             ChessboardView chessboardView,
             PuzzleTextViews puzzleTextViews) {
         this.databaseAccessor = databaseAccessor;
         this.puzzleManager = puzzleManager;
-        this.puzzleThemesManager = puzzleThemesManager;
+        this.puzzleThemesDialogHelper = puzzleThemesDialogHelper;
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
         this.chessboardView.setPuzzleSolvedListener(this);
@@ -56,7 +56,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
         puzzleTextViews.setPuzzleSolved(puzzle.solved());
-        puzzleThemesManager.setThemes(chessboardView.getContext(), puzzleTextViews.getFilterButton(), puzzleTextViews.getFilterDropdown(), this::renderPuzzle);
+        puzzleThemesDialogHelper.prepareDialogContent(chessboardView.getContext(), puzzleTextViews.getFilterButton(), puzzleTextViews.getFilterDropdown(), this::renderPuzzle);
     }
 
     public void loadPreviousPuzzle() {

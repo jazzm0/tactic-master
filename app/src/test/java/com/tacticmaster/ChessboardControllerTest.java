@@ -17,7 +17,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
-import com.tacticmaster.db.PuzzleThemesManager;
+import com.tacticmaster.db.PuzzleThemesDialogHelper;
 import com.tacticmaster.puzzle.Puzzle;
 import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
@@ -38,7 +38,7 @@ public class ChessboardControllerTest {
     private DatabaseAccessor databaseAccessor;
 
     @Mock
-    private PuzzleThemesManager puzzleThemesManager;
+    private PuzzleThemesDialogHelper puzzleThemesDialogHelper;
 
     @Mock
     private ChessboardView chessboardView;
@@ -73,7 +73,7 @@ public class ChessboardControllerTest {
         this.puzzleGames.add(new PuzzleGame("3", "fen2", "moves2", 1600));
         this.puzzleRecords.add(new Puzzle("4", "fen3", "moves3", 1400));
         this.puzzleGames.add(new PuzzleGame("4", "fen3", "moves3", 1400));
-        chessboardController = new ChessboardController(databaseAccessor, new PuzzleManager(databaseAccessor), puzzleThemesManager, chessboardView, puzzleTextViews);
+        chessboardController = new ChessboardController(databaseAccessor, new PuzzleManager(databaseAccessor), puzzleThemesDialogHelper, chessboardView, puzzleTextViews);
         when(puzzleTextViews.getFilterDropdown()).thenReturn(mock(MaterialAutoCompleteTextView.class));
         when(puzzleTextViews.getFilterButton()).thenReturn(mock(MaterialButton.class));
 
@@ -94,7 +94,7 @@ public class ChessboardControllerTest {
         verify(puzzleTextViews).setPuzzleRating(puzzleGame.rating());
         verify(puzzleTextViews).setPuzzlesSolvedCount(5, 256);
         verify(puzzleTextViews).setPlayerRating(2333);
-        verify(puzzleThemesManager).setThemes(any(), any(), any(), any());
+        verify(puzzleThemesDialogHelper).prepareDialogContent(any(), any(), any(), any());
     }
 
     @Test
@@ -195,7 +195,7 @@ public class ChessboardControllerTest {
 
         verify(databaseAccessor).storePlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
-        verify(puzzleThemesManager).setThemes(any(), any(), any(), any());
+        verify(puzzleThemesDialogHelper).prepareDialogContent(any(), any(), any(), any());
     }
 
     @Test
@@ -209,7 +209,7 @@ public class ChessboardControllerTest {
 
         verify(databaseAccessor).setSolved(puzzleGame.getPuzzleId());
         Assertions.assertTrue(puzzleGame.solved());
-        verify(puzzleThemesManager).setThemes(any(), any(), any(), any());
+        verify(puzzleThemesDialogHelper).prepareDialogContent(any(), any(), any(), any());
     }
 
     @Test

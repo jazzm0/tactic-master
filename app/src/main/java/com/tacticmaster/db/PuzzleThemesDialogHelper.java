@@ -14,12 +14,9 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class PuzzleThemesManager {
+public class PuzzleThemesDialogHelper {
 
-    private final Set<String> allThemes = ConcurrentHashMap.newKeySet();
-    private final DatabaseAccessor databaseAccessor;
     private final PuzzleFilter puzzleFilter;
     private final PuzzleThemesListener puzzleThemesListener;
     private final Set<String> selectedThemes = new HashSet<>();
@@ -28,10 +25,9 @@ public class PuzzleThemesManager {
         void onThemesUpdated(Set<String> themes);
     }
 
-    public PuzzleThemesManager(DatabaseAccessor databaseAccessor, PuzzleThemesListener puzzleThemesListener) {
-        this.databaseAccessor = databaseAccessor;
+    public PuzzleThemesDialogHelper(PuzzleFilter puzzleFilter, PuzzleThemesListener puzzleThemesListener) {
         this.puzzleThemesListener = puzzleThemesListener;
-        this.puzzleFilter = new PuzzleFilter();
+        this.puzzleFilter = puzzleFilter;
 
     }
 
@@ -42,15 +38,8 @@ public class PuzzleThemesManager {
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
     }
 
-    Set<String> getPuzzleThemes() {
-        if (allThemes.isEmpty()) {
-            allThemes.addAll(databaseAccessor.getPuzzleThemes());
-        }
-        return allThemes;
-    }
-
-    public void setThemes(Context context, MaterialButton filterButton, MaterialAutoCompleteTextView filterDropdown, Runnable callback) {
-        var themesList = new ArrayList<>(puzzleFilter.getThemeGroups(getPuzzleThemes()).keySet());
+    public void prepareDialogContent(Context context, MaterialButton filterButton, MaterialAutoCompleteTextView filterDropdown, Runnable callback) {
+        var themesList = new ArrayList<>(puzzleFilter.getThemeGroups().keySet());
         var adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, themesList);
 
         filterDropdown.setAdapter(adapter);
@@ -74,7 +63,7 @@ public class PuzzleThemesManager {
                     .setPositiveButton("Done", (dialog, which) -> {
                         Set<String> allThemesInGroup = new HashSet<>();
                         selectedThemes.forEach(theme -> {
-                            var themeGroup = puzzleFilter.getThemeGroups(getPuzzleThemes()).get(theme);
+                            var themeGroup = puzzleFilter.getThemeGroups().get(theme);
                             if (!isNull(themeGroup)) {
                                 allThemesInGroup.addAll(themeGroup);
                             }
