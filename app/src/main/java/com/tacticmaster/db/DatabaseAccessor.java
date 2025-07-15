@@ -29,9 +29,9 @@ public class DatabaseAccessor {
     private final DatabaseHelper dbHelper;
     private final PuzzleThemesManager puzzleThemesManager;
 
-    public DatabaseAccessor(DatabaseHelper dbHelper, boolean withPeriodicUpdate) {
+    public DatabaseAccessor(DatabaseHelper dbHelper) {
         this.dbHelper = dbHelper;
-        this.puzzleThemesManager = new PuzzleThemesManager(dbHelper, withPeriodicUpdate);
+        this.puzzleThemesManager = new PuzzleThemesManager(dbHelper, false);
         try {
             dbHelper.createDatabase();
         } catch (Error e) {

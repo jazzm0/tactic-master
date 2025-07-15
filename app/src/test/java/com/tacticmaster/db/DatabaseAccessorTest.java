@@ -51,7 +51,7 @@ class DatabaseAccessorTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(mockDbHelper.openDatabase()).thenReturn(mockDatabase);
-        databaseAccessor = new DatabaseAccessor(mockDbHelper, false);
+        databaseAccessor = new DatabaseAccessor(mockDbHelper);
     }
 
     @Test
