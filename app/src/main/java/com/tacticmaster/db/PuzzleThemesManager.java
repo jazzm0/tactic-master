@@ -1,13 +1,8 @@
 package com.tacticmaster.db;
 
-import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
-import static com.tacticmaster.db.PuzzleTable.COLUMN_THEMES;
-import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static java.util.Objects.isNull;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.widget.ArrayAdapter;
 
 import androidx.appcompat.app.AlertDialog;
@@ -15,59 +10,29 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.tacticmaster.puzzle.PuzzleManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class PuzzleThemesManager {
 
     private final Set<String> allThemes = ConcurrentHashMap.newKeySet();
     private final DatabaseAccessor databaseAccessor;
     private final PuzzleFilter puzzleFilter;
-    private final ScheduledExecutorService scheduler;
-    private static final long UPDATE_INTERVAL_SECONDS = 60;
+    private final PuzzleThemesListener puzzleThemesListener;
     private final Set<String> selectedThemes = new HashSet<>();
 
-    public PuzzleThemesManager(DatabaseAccessor databaseAccessor, boolean withPeriodicUpdate) {
+    public interface PuzzleThemesListener {
+        void onThemesUpdated(Set<String> themes);
+    }
+
+    public PuzzleThemesManager(DatabaseAccessor databaseAccessor, PuzzleThemesListener puzzleThemesListener) {
         this.databaseAccessor = databaseAccessor;
+        this.puzzleThemesListener = puzzleThemesListener;
         this.puzzleFilter = new PuzzleFilter();
-        this.scheduler = Executors.newSingleThreadScheduledExecutor();
-        if (withPeriodicUpdate) {
-            startPeriodicUpdate();
-        }
-    }
 
-    private void startPeriodicUpdate() {
-        scheduler.scheduleWithFixedDelay(this::updateThemes, 0, UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS);
-    }
-
-    private void updateThemes() {
-        String query = "SELECT DISTINCT " + COLUMN_THEMES + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_THEMES + " IS NOT NULL AND " + COLUMN_THEMES + " != '' AND " + COLUMN_SOLVED + " = 0";
-
-        try (SQLiteDatabase db = databaseAccessor.getDbHelper().openDatabase(); Cursor cursor = db.rawQuery(query, null)) {
-            Set<String> newThemes = ConcurrentHashMap.newKeySet();
-            int themesIndex = cursor.getColumnIndex(COLUMN_THEMES);
-            while (cursor.moveToNext()) {
-                if (themesIndex >= 0) {
-                    String themes = cursor.getString(themesIndex);
-                    if (!isNull(themes) && !themes.isEmpty()) {
-                        for (String theme : themes.split(" ")) {
-                            if (!theme.isEmpty()) {
-                                newThemes.add(theme);
-                            }
-                        }
-                    }
-                }
-            }
-            allThemes.clear();
-            allThemes.addAll(newThemes);
-        }
     }
 
     private void setDialogButtonColors(Context context, AlertDialog dialog) {
@@ -79,12 +44,12 @@ public class PuzzleThemesManager {
 
     Set<String> getPuzzleThemes() {
         if (allThemes.isEmpty()) {
-            updateThemes();
+            allThemes.addAll(databaseAccessor.getPuzzleThemes());
         }
         return allThemes;
     }
 
-    public void setThemes(Context context, PuzzleManager puzzleManager, MaterialButton filterButton, MaterialAutoCompleteTextView filterDropdown, Runnable callback) {
+    public void setThemes(Context context, MaterialButton filterButton, MaterialAutoCompleteTextView filterDropdown, Runnable callback) {
         var themesList = new ArrayList<>(puzzleFilter.getThemeGroups(getPuzzleThemes()).keySet());
         var adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, themesList);
 
@@ -115,13 +80,13 @@ public class PuzzleThemesManager {
                             }
                         });
 
-                        puzzleManager.updatePuzzleThemes(allThemesInGroup);
+                        puzzleThemesListener.onThemesUpdated(allThemesInGroup);
                         callback.run();
                     })
                     .setNeutralButton("Clear All", (dialog, which) -> {
                         selectedThemes.clear();
                         filterButton.setText("");
-                        puzzleManager.updatePuzzleThemes(selectedThemes);
+                        puzzleThemesListener.onThemesUpdated(selectedThemes);
                         callback.run();
                     })
                     .setNegativeButton("Cancel", null);

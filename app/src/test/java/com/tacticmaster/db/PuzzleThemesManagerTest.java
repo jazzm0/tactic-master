@@ -27,7 +27,7 @@ public class PuzzleThemesManagerTest {
     private DatabaseHelper dbHelper;
 
     @Mock
-    private DatabaseAccessor dbAccessor;
+    PuzzleThemesManager.PuzzleThemesListener puzzleThemesListener;
 
     @Mock
     private SQLiteDatabase db;
@@ -40,9 +40,8 @@ public class PuzzleThemesManagerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(dbAccessor.getDbHelper()).thenReturn(dbHelper);
         when(dbHelper.openDatabase()).thenReturn(db);
-        puzzleThemesManager = new PuzzleThemesManager(dbAccessor, false);
+        puzzleThemesManager = new PuzzleThemesManager(new DatabaseAccessor(dbHelper), puzzleThemesListener);
     }
 
     @Test

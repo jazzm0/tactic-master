@@ -24,6 +24,7 @@ import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
 import com.tacticmaster.db.PuzzleThemesManager;
+import com.tacticmaster.puzzle.PuzzleManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,9 +52,11 @@ public class MainActivity extends AppCompatActivity {
         chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
         chessboardView.setPuzzleHintView(findViewById(R.id.hint_path_view));
 
+        var puzzleManager = new PuzzleManager(databaseAccessor);
         chessboardController = new ChessboardController(
                 databaseAccessor,
-                new PuzzleThemesManager(databaseAccessor, false),
+                puzzleManager,
+                new PuzzleThemesManager(databaseAccessor, puzzleManager),
                 chessboardView,
                 new PuzzleTextViews(this));
 

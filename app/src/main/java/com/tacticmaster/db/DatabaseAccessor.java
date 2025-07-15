@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DatabaseAccessor {
 
@@ -35,10 +36,6 @@ public class DatabaseAccessor {
         } catch (Error e) {
             Log.e("The following error occurred: ", e.getMessage());
         }
-    }
-
-    public DatabaseHelper getDbHelper() {
-        return dbHelper;
     }
 
     public boolean wasNotSolved(String puzzleId) {
@@ -186,5 +183,27 @@ public class DatabaseAccessor {
             }
         }
         return true;
+    }
+
+    public Set<String> getPuzzleThemes() {
+        String query = "SELECT DISTINCT " + COLUMN_THEMES + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_THEMES + " IS NOT NULL AND " + COLUMN_THEMES + " != '' AND " + COLUMN_SOLVED + " = 0";
+
+        try (SQLiteDatabase db = dbHelper.openDatabase(); Cursor cursor = db.rawQuery(query, null)) {
+            Set<String> newThemes = ConcurrentHashMap.newKeySet();
+            int themesIndex = cursor.getColumnIndex(COLUMN_THEMES);
+            while (cursor.moveToNext()) {
+                if (themesIndex >= 0) {
+                    String themes = cursor.getString(themesIndex);
+                    if (!isNull(themes) && !themes.isEmpty()) {
+                        for (String theme : themes.split(" ")) {
+                            if (!theme.isEmpty()) {
+                                newThemes.add(theme);
+                            }
+                        }
+                    }
+                }
+            }
+            return newThemes;
+        }
     }
 }

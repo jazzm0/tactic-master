@@ -28,7 +28,8 @@ class PuzzleManagerTest {
     @BeforeEach
     void setUp() {
         databaseAccessor = mock(DatabaseAccessor.class);
-        puzzleManager = new PuzzleManager(databaseAccessor, 1200);
+        when(databaseAccessor.getPlayerRating()).thenReturn(1200);
+        puzzleManager = new PuzzleManager(databaseAccessor);
     }
 
     @Test

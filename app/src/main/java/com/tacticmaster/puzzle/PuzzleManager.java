@@ -4,6 +4,7 @@ package com.tacticmaster.puzzle;
 import static java.util.Objects.isNull;
 
 import com.tacticmaster.db.DatabaseAccessor;
+import com.tacticmaster.db.PuzzleThemesManager;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,7 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class PuzzleManager {
+public class PuzzleManager implements PuzzleThemesManager.PuzzleThemesListener {
 
     private final DatabaseAccessor databaseAccessor;
     private final Set<String> puzzleThemes = new TreeSet<>();
@@ -21,9 +22,9 @@ public class PuzzleManager {
     private int currentIndex = -1;
     private int rating = 0;
 
-    public PuzzleManager(DatabaseAccessor databaseAccessor, int rating) {
+    public PuzzleManager(DatabaseAccessor databaseAccessor) {
         this.databaseAccessor = databaseAccessor;
-        this.rating = rating;
+        this.rating = databaseAccessor.getPlayerRating();
     }
 
     public void updateRating(int rating) {
@@ -53,7 +54,8 @@ public class PuzzleManager {
         }
     }
 
-    public void updatePuzzleThemes(Set<String> themes) {
+    @Override
+    public void onThemesUpdated(Set<String> themes) {
         puzzleThemes.clear();
         if (!isNull(themes) && !themes.isEmpty()) {
             puzzleThemes.addAll(themes);

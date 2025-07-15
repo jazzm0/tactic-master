@@ -24,11 +24,12 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     public ChessboardController(
             DatabaseAccessor databaseAccessor,
+            PuzzleManager puzzleManager,
             PuzzleThemesManager puzzleThemesManager,
             ChessboardView chessboardView,
             PuzzleTextViews puzzleTextViews) {
         this.databaseAccessor = databaseAccessor;
-        this.puzzleManager = new PuzzleManager(databaseAccessor, databaseAccessor.getPlayerRating());
+        this.puzzleManager = puzzleManager;
         this.puzzleThemesManager = puzzleThemesManager;
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
@@ -55,7 +56,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
         puzzleTextViews.setPuzzleSolved(puzzle.solved());
-        puzzleThemesManager.setThemes(chessboardView.getContext(), puzzleManager, puzzleTextViews.getFilterButton(), puzzleTextViews.getFilterDropdown(), this::renderPuzzle);
+        puzzleThemesManager.setThemes(chessboardView.getContext(), puzzleTextViews.getFilterButton(), puzzleTextViews.getFilterDropdown(), this::renderPuzzle);
     }
 
     public void loadPreviousPuzzle() {
