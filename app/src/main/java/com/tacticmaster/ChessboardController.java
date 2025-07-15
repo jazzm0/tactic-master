@@ -83,7 +83,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
                     })
                     .setPositiveButton("Done", (dialog, which) -> {
                         Set<String> allThemesInGroup = new HashSet<>();
-                        selectedThemes.stream().forEach(theme -> {
+                        selectedThemes.forEach(theme -> {
                             var themeGroup = puzzleFilter.getThemeGroups().get(theme);
                             if (!isNull(themeGroup)) {
                                 allThemesInGroup.addAll(themeGroup);
