@@ -27,16 +27,18 @@ import java.util.Set;
 public class DatabaseAccessor {
 
     private final DatabaseHelper dbHelper;
-    private final PuzzleThemesManager puzzleThemesManager;
 
     public DatabaseAccessor(DatabaseHelper dbHelper) {
         this.dbHelper = dbHelper;
-        this.puzzleThemesManager = new PuzzleThemesManager(dbHelper, false);
         try {
             dbHelper.createDatabase();
         } catch (Error e) {
             Log.e("The following error occurred: ", e.getMessage());
         }
+    }
+
+    public DatabaseHelper getDbHelper() {
+        return dbHelper;
     }
 
     public boolean wasNotSolved(String puzzleId) {
@@ -121,10 +123,6 @@ public class DatabaseAccessor {
             throw new NoSuchElementException("Puzzle ID  not found");
         }
         return puzzles.get(0);
-    }
-
-    public Set<String> getPuzzleThemes() {
-        return puzzleThemesManager.getPuzzleThemes();
     }
 
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query, String[] selectionArgs) {

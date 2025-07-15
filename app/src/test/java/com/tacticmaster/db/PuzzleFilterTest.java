@@ -2,12 +2,9 @@ package com.tacticmaster.db;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -15,9 +12,6 @@ import java.util.Set;
 
 
 public class PuzzleFilterTest {
-
-    @Mock
-    DatabaseAccessor databaseAccessor;
 
     private final Set<String> allThemes = Set.of(
             "advancedPawn", "advantage", "anastasiaMate", "arabianMate", "attackingF2F7",
@@ -37,14 +31,12 @@ public class PuzzleFilterTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        when(databaseAccessor.getPuzzleThemes()).thenReturn(allThemes);
-        puzzleFilter = new PuzzleFilter(databaseAccessor);
+        puzzleFilter = new PuzzleFilter();
     }
 
     @Test
     public void testAllThemesExistInMap() {
-        Map<String, Set<String>> themeGroups = puzzleFilter.getThemeGroups();
+        Map<String, Set<String>> themeGroups = puzzleFilter.getThemeGroups(allThemes);
 
 
         for (String theme : allThemes) {
@@ -58,11 +50,9 @@ public class PuzzleFilterTest {
     public void testThemesAreRemovedIfNotInDB() {
         var reducedThemes = new HashSet<>(allThemes);
         reducedThemes.removeAll(Set.of("mateIn1", "mateIn2", "mateIn3", "mateIn4", "mateIn5", "oneMove"));
-        when(databaseAccessor.getPuzzleThemes()).thenReturn(reducedThemes);
-        puzzleFilter = new PuzzleFilter(databaseAccessor);
 
 
-        Map<String, Set<String>> themeGroups = puzzleFilter.getThemeGroups();
+        Map<String, Set<String>> themeGroups = puzzleFilter.getThemeGroups(reducedThemes);
         assertEquals(themeGroups.size(), 9);
         var totalSize = themeGroups.values().stream()
                 .mapToInt(Set::size)

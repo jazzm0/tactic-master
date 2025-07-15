@@ -19,13 +19,10 @@ public class PuzzleFilter {
     public static final String SHORT_AND_LONG = "Puzzle Complexity and Skill Level";
     public static final String PIECE_EXPLOITATION = "Piece Exploitation";
 
-    private final DatabaseAccessor databaseAccessor;
-
-    public PuzzleFilter(DatabaseAccessor databaseAccessor) {
-        this.databaseAccessor = databaseAccessor;
+    public PuzzleFilter() {
     }
 
-    public Map<String, Set<String>> getThemeGroups() {
+    public Map<String, Set<String>> getThemeGroups(Set<String> themesInDatabase) {
         Map<String, Set<String>> themeGroups = new TreeMap<>();
 
         themeGroups.put(MATE_PATTERNS, new HashSet<>(Arrays.asList(
@@ -73,13 +70,12 @@ public class PuzzleFilter {
                 "hangingPiece", "trappedPiece"
         )));
 
-        var puzzleThemes = databaseAccessor.getPuzzleThemes();
         Map<String, Set<String>> themeGroupsCopy = new TreeMap<>();
 
         for (Map.Entry<String, Set<String>> entry : themeGroups.entrySet()) {
             var themes = entry.getValue();
             var themeGroupKey = entry.getKey();
-            themes.removeIf(theme -> !puzzleThemes.contains(theme));
+            themes.removeIf(theme -> !themesInDatabase.contains(theme));
             if (!themes.isEmpty()) {
                 themeGroupsCopy.put(themeGroupKey, themes);
             }
