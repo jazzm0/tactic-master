@@ -4,9 +4,9 @@ import android.content.Intent;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
-import com.tacticmaster.db.PuzzleThemesDialogHelper;
 import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
+import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
 import com.tacticmaster.rating.EloRatingCalculator;
 
 import java.util.NoSuchElementException;

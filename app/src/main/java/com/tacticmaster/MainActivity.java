@@ -23,9 +23,8 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
-import com.tacticmaster.db.PuzzleFilter;
-import com.tacticmaster.db.PuzzleThemesDialogHelper;
 import com.tacticmaster.puzzle.PuzzleManager;
+import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         chessboardController = new ChessboardController(
                 databaseAccessor,
                 puzzleManager,
-                new PuzzleThemesDialogHelper(new PuzzleFilter(databaseAccessor), puzzleManager),
+                new PuzzleThemesDialogHelper(databaseAccessor, puzzleManager),
                 chessboardView,
                 new PuzzleTextViews(this));
 

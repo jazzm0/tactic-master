@@ -4,7 +4,6 @@ package com.tacticmaster.puzzle;
 import static java.util.Objects.isNull;
 
 import com.tacticmaster.db.DatabaseAccessor;
-import com.tacticmaster.db.PuzzleThemesDialogHelper;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

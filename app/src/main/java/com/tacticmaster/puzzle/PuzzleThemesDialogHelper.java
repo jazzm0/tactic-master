@@ -1,4 +1,4 @@
-package com.tacticmaster.db;
+package com.tacticmaster.puzzle;
 
 import static java.util.Objects.isNull;
 
@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.tacticmaster.db.DatabaseAccessor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,9 +26,9 @@ public class PuzzleThemesDialogHelper {
         void onThemesUpdated(Set<String> themes);
     }
 
-    public PuzzleThemesDialogHelper(PuzzleFilter puzzleFilter, PuzzleThemesListener puzzleThemesListener) {
+    public PuzzleThemesDialogHelper(DatabaseAccessor databaseAccessor, PuzzleThemesListener puzzleThemesListener) {
         this.puzzleThemesListener = puzzleThemesListener;
-        this.puzzleFilter = puzzleFilter;
+        this.puzzleFilter = new PuzzleFilter(databaseAccessor);
 
     }
 

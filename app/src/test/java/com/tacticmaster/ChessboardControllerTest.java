@@ -17,10 +17,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
-import com.tacticmaster.db.PuzzleThemesDialogHelper;
 import com.tacticmaster.puzzle.Puzzle;
 import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
+import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

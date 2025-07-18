@@ -1,4 +1,6 @@
-package com.tacticmaster.db;
+package com.tacticmaster.puzzle;
+
+import com.tacticmaster.db.DatabaseAccessor;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -6,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class PuzzleFilter {
+class PuzzleFilter {
 
     public static final String MATE_PATTERNS = "Mate Patterns";
     public static final String TACTICAL_MOTIFS = "Tactical Motifs";
@@ -20,11 +22,11 @@ public class PuzzleFilter {
     public static final String PIECE_EXPLOITATION = "Piece Exploitation";
     private final DatabaseAccessor databaseAccessor;
 
-    public PuzzleFilter(DatabaseAccessor databaseAccessor) {
+    PuzzleFilter(DatabaseAccessor databaseAccessor) {
         this.databaseAccessor = databaseAccessor;
     }
 
-    public Map<String, Set<String>> getThemeGroups() {
+    Map<String, Set<String>> getThemeGroups() {
         var themesInDatabase = databaseAccessor.getPuzzleThemes();
         Map<String, Set<String>> themeGroups = new TreeMap<>();
 
