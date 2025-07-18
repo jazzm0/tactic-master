@@ -28,7 +28,8 @@ class PuzzleManagerTest {
     @BeforeEach
     void setUp() {
         databaseAccessor = mock(DatabaseAccessor.class);
-        puzzleManager = new PuzzleManager(databaseAccessor, 1200);
+        when(databaseAccessor.getPlayerRating()).thenReturn(1200);
+        puzzleManager = new PuzzleManager(databaseAccessor);
     }
 
     @Test
@@ -38,7 +39,7 @@ class PuzzleManagerTest {
 
     @Test
     void testMoveToNextPuzzleLoadsNewPuzzles() {
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet()))
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
                 .thenReturn(List.of(new Puzzle("1", "fen", "moves", 1000)));
 
         puzzleManager.moveToNextPuzzle();
@@ -48,7 +49,7 @@ class PuzzleManagerTest {
 
     @Test
     void testMoveToNextPuzzleThrowsExceptionWhenNoPuzzlesAvailable() {
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet()))
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
                 .thenReturn(List.of());
 
         assertThrows(NoSuchElementException.class, puzzleManager::moveToNextPuzzle);
@@ -56,7 +57,7 @@ class PuzzleManagerTest {
 
     @Test
     void testMoveToPreviousPuzzleWrapsAround() {
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet()))
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
                 .thenReturn(List.of(new Puzzle("1", "fen", "moves", 1000), new Puzzle("2", "fen", "moves", 1100)));
 
         puzzleManager.moveToNextPuzzle();
@@ -69,9 +70,9 @@ class PuzzleManagerTest {
     @Test
     void testMoveToPreviousPuzzleLoadsPuzzles() {
         assertThrows(NoSuchElementException.class, () -> puzzleManager.moveToPreviousPuzzle());
-        verify(databaseAccessor, times(23)).getPuzzlesWithinRange(anyInt(), anyInt(), anySet());
+        verify(databaseAccessor, times(23)).getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet());
 
-        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet()))
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
                 .thenReturn(List.of(new Puzzle("1", "fen", "moves", 1000)));
 
         puzzleManager.moveToPreviousPuzzle();

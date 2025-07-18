@@ -10,17 +10,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.TreeSet;
 
-public class PuzzleManager {
+public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListener {
 
     private final DatabaseAccessor databaseAccessor;
+    private final Set<String> puzzleThemes = new TreeSet<>();
     private final Map<String, PuzzleGame> puzzles = new LinkedHashMap<>();
     private int currentIndex = -1;
     private int rating = 0;
 
-    public PuzzleManager(DatabaseAccessor databaseAccessor, int rating) {
+    public PuzzleManager(DatabaseAccessor databaseAccessor) {
         this.databaseAccessor = databaseAccessor;
-        this.rating = rating;
+        this.rating = databaseAccessor.getPlayerRating();
     }
 
     public void updateRating(int rating) {
@@ -50,6 +53,16 @@ public class PuzzleManager {
         }
     }
 
+    @Override
+    public void onThemesUpdated(Set<String> themes) {
+        puzzleThemes.clear();
+        if (!isNull(themes) && !themes.isEmpty()) {
+            puzzleThemes.addAll(themes);
+        }
+        currentIndex = puzzles.size();
+        moveToNextPuzzle();
+    }
+
     public void moveToPreviousPuzzle() {
         if (puzzles.isEmpty()) {
             loadNextPuzzles();
@@ -70,7 +83,7 @@ public class PuzzleManager {
         var highestRating = rating + 50;
         List<Puzzle> nextPuzzles = new ArrayList<>();
         while (nextPuzzles.isEmpty() && lowestRating > 0) {
-            nextPuzzles = databaseAccessor.getPuzzlesWithinRange(lowestRating, highestRating, puzzles.keySet());
+            nextPuzzles = databaseAccessor.getPuzzlesWithinRange(lowestRating, highestRating, puzzles.keySet(), puzzleThemes);
             lowestRating -= 50;
             highestRating += 50;
         }

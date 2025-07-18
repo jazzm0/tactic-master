@@ -5,13 +5,13 @@ public record Puzzle(
         String fen,
         String moves,
         int rating,
+        String themes,
         boolean solved
 ) {
-
     public Puzzle(String puzzleId,
                   String fen,
                   String moves,
                   int rating) {
-        this(puzzleId, fen, moves, rating, false);
+        this(puzzleId, fen, moves, rating, "", false);
     }
 }

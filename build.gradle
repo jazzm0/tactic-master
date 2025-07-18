@@ -13,7 +13,6 @@ plugins {
     alias(libs.plugins.android.application) apply false
 }
 
-apply plugin: 'android-reporting'
 tasks.register('clean', Delete) {
     delete rootProject.layout.buildDirectory
 }

@@ -1,11 +1,19 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/button_background_color</item>
+        <item name="colorOnSurface">@android:color/white</item>
         <item name="android:windowFullscreen">true</item>
+        <item name="materialButtonStyle">@style/CustomSwitchMaterial</item>
     </style>
 
     <style name="TransparentDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+
+    <style name="CustomSwitchMaterial" parent="Widget.Material3.CompoundButton.Switch">
+        <item name="android:thumbTint">@color/switch_thumb_color</item>
+    </style>
+
 </resources>

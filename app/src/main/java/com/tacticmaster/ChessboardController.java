@@ -6,6 +6,7 @@ import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
+import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
 import com.tacticmaster.rating.EloRatingCalculator;
 
 import java.util.NoSuchElementException;
@@ -15,17 +16,21 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final DatabaseAccessor databaseAccessor;
     private final ChessboardView chessboardView;
     private final PuzzleTextViews puzzleTextViews;
-
     private final PuzzleManager puzzleManager;
+    private final PuzzleThemesDialogHelper puzzleThemesDialogHelper;
+
     private int playerRating;
     private boolean autoplay;
 
     public ChessboardController(
             DatabaseAccessor databaseAccessor,
+            PuzzleManager puzzleManager,
+            PuzzleThemesDialogHelper puzzleThemesDialogHelper,
             ChessboardView chessboardView,
             PuzzleTextViews puzzleTextViews) {
         this.databaseAccessor = databaseAccessor;
-        this.puzzleManager = new PuzzleManager(databaseAccessor, databaseAccessor.getPlayerRating());
+        this.puzzleManager = puzzleManager;
+        this.puzzleThemesDialogHelper = puzzleThemesDialogHelper;
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
         this.chessboardView.setPuzzleSolvedListener(this);
@@ -41,6 +46,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleManager.updateRating(newRating);
     }
 
+
     public void renderPuzzle() {
         var puzzle = puzzleManager.getCurrentPuzzle();
         chessboardView.setPuzzle(puzzle);
@@ -50,6 +56,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleTextViews.setPuzzlesSolvedCount(databaseAccessor.getSolvedPuzzleCount(), databaseAccessor.getAllPuzzleCount());
         puzzleTextViews.setPlayerRating(playerRating);
         puzzleTextViews.setPuzzleSolved(puzzle.solved());
+        puzzleThemesDialogHelper.prepareDialogContent(chessboardView.getContext(), puzzleTextViews.getFilterButton(), puzzleTextViews.getFilterDropdown(), this::renderPuzzle);
     }
 
     public void loadPreviousPuzzle() {

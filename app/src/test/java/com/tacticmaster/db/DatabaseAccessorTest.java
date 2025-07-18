@@ -6,14 +6,17 @@ import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
+import static com.tacticmaster.db.PuzzleTable.COLUMN_THEMES;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,11 +89,15 @@ class DatabaseAccessorTest {
         excludedIds.add("123");
         excludedIds.add("456");
 
+        Set<String> themes = new HashSet<>();
+        themes.add("theme1");
+        themes.add("theme2");
+
         String expectedQuery = "SELECT * FROM " + PUZZLE_TABLE_NAME +
                 " WHERE " + COLUMN_RATING + " >= 1600 AND "
                 + COLUMN_RATING + " <= 1800 AND "
                 + COLUMN_SOLVED + " = 0 AND "
-                + COLUMN_PUZZLE_ID + " NOT IN ('123','456') GROUP BY " + COLUMN_RATING + " ORDER BY RANDOM() LIMIT 5";
+                + COLUMN_PUZZLE_ID + " NOT IN ('123','456') AND (" + COLUMN_THEMES + " LIKE '%theme2%' OR " + COLUMN_THEMES + " LIKE '%theme1%') GROUP BY " + COLUMN_RATING + " ORDER BY RANDOM() LIMIT 5";
 
         when(mockDatabase.rawQuery(expectedQuery, null)).thenReturn(mockCursor);
 
@@ -99,6 +106,7 @@ class DatabaseAccessorTest {
         when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_FEN)).thenReturn(1);
         when(mockCursor.getColumnIndex(PuzzleTable.COLUMN_MOVES)).thenReturn(2);
         when(mockCursor.getColumnIndex(COLUMN_RATING)).thenReturn(3);
+        when(mockCursor.getColumnIndex(COLUMN_THEMES)).thenReturn(7);
 
         when(mockCursor.getString(0)).thenReturn("puzzle1", "puzzle2", "puzzle3");
         when(mockCursor.getString(1)).thenReturn("fen1", "fen2", "fen3");
@@ -111,7 +119,7 @@ class DatabaseAccessorTest {
         when(mockCursor.getString(8)).thenReturn("url1", "url2", "url3");
         when(mockCursor.getString(9)).thenReturn("opening1", "opening2", "opening3");
 
-        List<Puzzle> puzzles = databaseAccessor.getPuzzlesWithinRange(1600, 1800, excludedIds);
+        List<Puzzle> puzzles = databaseAccessor.getPuzzlesWithinRange(1600, 1800, excludedIds, themes);
 
         assertEquals(3, puzzles.size());
         assertEquals("puzzle1", puzzles.get(0).puzzleId());
@@ -217,5 +225,65 @@ class DatabaseAccessorTest {
 
         result = databaseAccessor.getPlayerAutoplay();
         assertTrue(result);
+    }
+
+    @Test
+    public void testGetPuzzleThemes_emptyResult() {
+        when(mockDatabase.rawQuery(anyString(), any())).thenReturn(mockCursor);
+        when(mockCursor.getColumnIndex(COLUMN_THEMES)).thenReturn(-1);
+        when(mockCursor.moveToNext()).thenReturn(false);
+
+        Set<String> themes = databaseAccessor.getPuzzleThemes();
+        assertTrue(themes.isEmpty());
+    }
+
+    @Test
+    public void testGetPuzzleThemes_singleTheme() {
+        when(mockDatabase.rawQuery(anyString(), any())).thenReturn(mockCursor);
+        when(mockCursor.getColumnIndex(COLUMN_THEMES)).thenReturn(0);
+        when(mockCursor.moveToNext()).thenReturn(true, false);
+        when(mockCursor.getString(0)).thenReturn("strategy");
+
+        Set<String> themes = databaseAccessor.getPuzzleThemes();
+        assertEquals(1, themes.size());
+        assertTrue(themes.contains("strategy"));
+    }
+
+    @Test
+    public void testGetPuzzleThemes_multipleThemes() {
+        when(mockDatabase.rawQuery(anyString(), any())).thenReturn(mockCursor);
+        when(mockCursor.getColumnIndex(COLUMN_THEMES)).thenReturn(0);
+        when(mockCursor.moveToNext()).thenReturn(true, true, false);
+        when(mockCursor.getString(0)).thenReturn("strategy tactics", "endgame");
+
+        Set<String> themes = databaseAccessor.getPuzzleThemes();
+        assertEquals(3, themes.size());
+        assertTrue(themes.contains("strategy"));
+        assertTrue(themes.contains("tactics"));
+        assertTrue(themes.contains("endgame"));
+    }
+
+    @Test
+    public void testGetPuzzleThemes_emptyAndNullThemes() {
+        when(mockDatabase.rawQuery(anyString(), any())).thenReturn(mockCursor);
+        when(mockCursor.getColumnIndex(COLUMN_THEMES)).thenReturn(0);
+        when(mockCursor.moveToNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false);
+        when(mockCursor.getString(0)).thenReturn("").thenReturn(null).thenReturn("  ");
+
+        Set<String> themes = databaseAccessor.getPuzzleThemes();
+        assertTrue(themes.isEmpty());
+    }
+
+    @Test
+    public void testGetPuzzleThemes_queryConstruction() {
+        String expectedQuery = "SELECT DISTINCT " + COLUMN_THEMES + " FROM " + PUZZLE_TABLE_NAME +
+                " WHERE " + COLUMN_THEMES + " IS NOT NULL AND " +
+                COLUMN_THEMES + " != '' AND " + COLUMN_SOLVED + " = 0";
+        when(mockDatabase.rawQuery(expectedQuery, null)).thenReturn(mockCursor);
+        when(mockCursor.getColumnIndex(COLUMN_THEMES)).thenReturn(0);
+        when(mockCursor.moveToNext()).thenReturn(false);
+
+        databaseAccessor.getPuzzleThemes();
+        verify(mockDatabase, times(1)).rawQuery(expectedQuery, null);
     }
 }

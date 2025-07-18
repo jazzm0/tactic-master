@@ -3,6 +3,7 @@ package com.tacticmaster;
 import static java.util.Objects.isNull;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -21,6 +23,8 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
+import com.tacticmaster.puzzle.PuzzleManager;
+import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,8 +52,11 @@ public class MainActivity extends AppCompatActivity {
         chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
         chessboardView.setPuzzleHintView(findViewById(R.id.hint_path_view));
 
+        var puzzleManager = new PuzzleManager(databaseAccessor);
         chessboardController = new ChessboardController(
                 databaseAccessor,
+                puzzleManager,
+                new PuzzleThemesDialogHelper(databaseAccessor, puzzleManager),
                 chessboardView,
                 new PuzzleTextViews(this));
 
@@ -66,6 +73,20 @@ public class MainActivity extends AppCompatActivity {
         autoplay.setChecked(chessboardController.getAutoplay());
         autoplay.setOnCheckedChangeListener((buttonView, isChecked)
                 -> chessboardController.setAutoplay(isChecked));
+        autoplay.setThumbDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.autoplay, null));
+
+        ColorStateList trackTintList = new ColorStateList(
+                new int[][]{
+                        new int[]{android.R.attr.state_checked},
+                        new int[]{-android.R.attr.state_checked}
+                },
+                new int[]{
+                        getResources().getColor(R.color.switch_track_on_color, null),
+                        getResources().getColor(R.color.switch_track_off_color, null)
+                }
+        );
+
+        autoplay.setTrackTintList(trackTintList);
 
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());

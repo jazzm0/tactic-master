@@ -12,6 +12,9 @@ import android.text.style.ForegroundColorSpan;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+
 public class PuzzleTextViews {
 
     private final TextView puzzleIdLabelTextView;
@@ -40,6 +43,14 @@ public class PuzzleTextViews {
         puzzleIdEditText.clearFocus();
         puzzleIdEditText.setTextColor(Color.BLACK);
         puzzleIdEditText.setTypeface(null, Typeface.BOLD);
+    }
+
+    public MaterialButton getFilterButton() {
+        return findViewById(R.id.filter_button);
+    }
+
+    public MaterialAutoCompleteTextView getFilterDropdown() {
+        return findViewById(R.id.filter_dropdown);
     }
 
     public void setPuzzleRating(int rating) {
