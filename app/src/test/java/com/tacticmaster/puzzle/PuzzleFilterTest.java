@@ -1,10 +1,10 @@
-package com.tacticmaster.db;
+package com.tacticmaster.puzzle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.tacticmaster.puzzle.PuzzleFilter;
+import com.tacticmaster.db.DatabaseAccessor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
