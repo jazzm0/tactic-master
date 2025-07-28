@@ -112,6 +112,14 @@ public class MainActivity extends AppCompatActivity {
         chessboardController.renderPuzzle();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (chessboardController != null) {
+            chessboardController.cleanup();
+        }
+    }
+
     private void onReloadPuzzleClicked() {
         chessboardController.renderPuzzle();
     }

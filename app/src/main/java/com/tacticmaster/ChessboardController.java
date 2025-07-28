@@ -128,4 +128,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             loadNextPuzzle();
         }
     }
+
+    /**
+     * Cleans up resources and cancels any running operations.
+     * Should be called when the controller is no longer needed.
+     */
+    public void cleanup() {
+        if (puzzleTextViews != null) {
+            puzzleTextViews.cleanup();
+        }
+    }
 }
