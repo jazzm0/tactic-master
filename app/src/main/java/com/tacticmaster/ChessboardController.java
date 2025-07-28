@@ -1,6 +1,9 @@
 package com.tacticmaster;
 
+import static java.util.Objects.isNull;
+
 import android.content.Intent;
+import android.util.Log;
 
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
@@ -12,6 +15,9 @@ import com.tacticmaster.rating.EloRatingCalculator;
 import java.util.NoSuchElementException;
 
 public class ChessboardController implements ChessboardView.PuzzleFinishedListener {
+
+    private static final String TAG = "ChessboardController";
+    private static final String LICHESS_TRAINING_URL = "https://lichess.org/training/";
 
     private final DatabaseAccessor databaseAccessor;
     private final ChessboardView chessboardView;
@@ -28,6 +34,23 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             PuzzleThemesDialogHelper puzzleThemesDialogHelper,
             ChessboardView chessboardView,
             PuzzleTextViews puzzleTextViews) {
+
+        if (isNull(databaseAccessor)) {
+            throw new IllegalArgumentException("DatabaseAccessor cannot be null");
+        }
+        if (isNull(puzzleManager)) {
+            throw new IllegalArgumentException("PuzzleManager cannot be null");
+        }
+        if (isNull(puzzleThemesDialogHelper)) {
+            throw new IllegalArgumentException("PuzzleThemesDialogHelper cannot be null");
+        }
+        if (isNull(chessboardView)) {
+            throw new IllegalArgumentException("ChessboardView cannot be null");
+        }
+        if (isNull(puzzleTextViews)) {
+            throw new IllegalArgumentException("PuzzleTextViews cannot be null");
+        }
+
         this.databaseAccessor = databaseAccessor;
         this.puzzleManager = puzzleManager;
         this.puzzleThemesDialogHelper = puzzleThemesDialogHelper;
@@ -36,6 +59,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.chessboardView.setPuzzleSolvedListener(this);
         this.playerRating = databaseAccessor.getPlayerRating();
         this.autoplay = databaseAccessor.getPlayerAutoplay();
+
+        Log.d(TAG, "ChessboardController initialized with player rating: " + playerRating);
     }
 
     private void updatePlayerRating(int opponentRating, double result) {
@@ -68,28 +93,55 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         try {
             puzzleManager.moveToNextPuzzle();
             renderPuzzle();
+            Log.d(TAG, "Successfully loaded next puzzle");
         } catch (NoSuchElementException e) {
+            chessboardView.makeText(R.string.no_more_puzzles);
+            Log.w(TAG, "No more puzzles available", e);
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading next puzzle", e);
             chessboardView.makeText(R.string.no_more_puzzles);
         }
     }
 
     public void loadPuzzleById(String puzzleId) {
+        if (isNull(puzzleId) || puzzleId.trim().isEmpty()) {
+            Log.w(TAG, "Invalid puzzle ID provided: " + puzzleId);
+            chessboardView.makeText(R.string.invalid_puzzle_id);
+            return;
+        }
+
         try {
             puzzleManager.loadPuzzleById(puzzleId);
             renderPuzzle();
+            Log.d(TAG, "Successfully loaded puzzle by ID: " + puzzleId);
         } catch (NoSuchElementException e) {
+            chessboardView.makeText(R.string.invalid_puzzle_id);
+            Log.w(TAG, "Invalid puzzle ID: " + puzzleId, e);
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading puzzle by ID: " + puzzleId, e);
             chessboardView.makeText(R.string.invalid_puzzle_id);
         }
     }
 
     public void puzzleIdLinkClicked() {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "https://lichess.org/training/" + puzzleManager.getCurrentPuzzle().getPuzzleId());
-        sendIntent.setType("text/plain");
+        try {
+            PuzzleGame currentPuzzle = puzzleManager.getCurrentPuzzle();
+            if (isNull(currentPuzzle)) {
+                Log.w(TAG, "No current puzzle available for sharing");
+                return;
+            }
 
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        chessboardView.getContext().startActivity(shareIntent);
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, LICHESS_TRAINING_URL + currentPuzzle.getPuzzleId());
+            sendIntent.setType("text/plain");
+
+            Intent shareIntent = Intent.createChooser(sendIntent, null);
+            chessboardView.getContext().startActivity(shareIntent);
+            Log.d(TAG, "Shared puzzle link: " + currentPuzzle.getPuzzleId());
+        } catch (Exception e) {
+            Log.e(TAG, "Error sharing puzzle link", e);
+        }
     }
 
     public void puzzleHintClicked() {
