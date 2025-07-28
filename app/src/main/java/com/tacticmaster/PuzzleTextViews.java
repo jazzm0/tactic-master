@@ -65,7 +65,7 @@ public class PuzzleTextViews {
      * @throws IllegalArgumentException if context is null or not an Activity
      */
     public PuzzleTextViews(@NonNull Context context) {
-        if (!isNull(context)) {
+        if (isNull(context)) {
             throw new IllegalArgumentException("Context cannot be null");
         }
 
