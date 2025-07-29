@@ -45,8 +45,7 @@ public class ChessboardControllerTest {
 
     @Mock
     private PuzzleTextViews puzzleTextViews;
-
-    //    @InjectMocks
+    
     private ChessboardController chessboardController;
 
     private PuzzleGame puzzleGame;
