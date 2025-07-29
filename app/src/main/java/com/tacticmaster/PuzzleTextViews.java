@@ -276,7 +276,7 @@ public class PuzzleTextViews {
      * @param solved True if the puzzle is solved, false otherwise
      */
     public void setPuzzleSolved(boolean solved) {
-        if (!isNull(puzzleIdEditText)) {
+        if (isNull(puzzleIdEditText)) {
             Log.w(TAG, "puzzleIdEditText is null in setPuzzleSolved");
             return;
         }
