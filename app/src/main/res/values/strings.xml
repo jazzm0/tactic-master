@@ -20,4 +20,5 @@
     <string name="bishop">Bishop</string>
     <string name="knight">Knight</string>
     <string name="filter">Filter</string>
+    <string name="share_fen">Share FEN</string>
 </resources>

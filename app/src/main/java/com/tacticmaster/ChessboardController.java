@@ -144,6 +144,29 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         }
     }
 
+    public void shareFenClicked() {
+        try {
+            PuzzleGame currentPuzzle = puzzleManager.getCurrentPuzzle();
+            if (isNull(currentPuzzle)) {
+                Log.w(TAG, "No current puzzle available for sharing FEN");
+                return;
+            }
+
+            String fen = currentPuzzle.fen();
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, fen);
+            sendIntent.setType("text/plain");
+
+            Intent shareIntent = Intent.createChooser(sendIntent, "Share FEN");
+            chessboardView.getContext().startActivity(shareIntent);
+            Log.d(TAG, "Shared puzzle FEN: " + fen);
+        } catch (Exception e) {
+            Log.e(TAG, "Error sharing puzzle FEN", e);
+        }
+    }
+
     public void puzzleHintClicked() {
         chessboardView.puzzleHintClicked();
     }

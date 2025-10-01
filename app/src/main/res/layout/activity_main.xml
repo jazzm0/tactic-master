@@ -144,6 +144,16 @@
                 android:gravity="center"
                 android:text="@string/puzzle_id_sharing"
                 android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/share_fen_button"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="6dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/share_fen"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_share" />
         </LinearLayout>
 
         <TextView
