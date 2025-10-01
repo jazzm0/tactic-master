@@ -32,7 +32,6 @@ class PuzzleTextViewsTest {
     private Context mockContext;
     private TextView mockPuzzleIdLabelTextView;
     private EditText mockPuzzleIdEditText;
-    private TextView mockPuzzleIdLinkTextView;
     private TextView mockPuzzleRatingTextView;
     private TextView mockPuzzlesSolvedTextView;
     private TextView mockPlayerRatingTextView;
@@ -45,7 +44,6 @@ class PuzzleTextViewsTest {
         mockContext = mock(Context.class);
         mockPuzzleIdLabelTextView = mock(TextView.class);
         mockPuzzleIdEditText = mock(EditText.class);
-        mockPuzzleIdLinkTextView = mock(TextView.class);
         mockPuzzleRatingTextView = mock(TextView.class);
         mockPuzzlesSolvedTextView = mock(TextView.class);
         mockPlayerRatingTextView = mock(TextView.class);
@@ -54,7 +52,6 @@ class PuzzleTextViewsTest {
 
         when(mockActivity.findViewById(R.id.puzzle_id_label)).thenReturn(mockPuzzleIdLabelTextView);
         when(mockActivity.findViewById(R.id.puzzle_id)).thenReturn(mockPuzzleIdEditText);
-        when(mockActivity.findViewById(R.id.puzzle_id_link)).thenReturn(mockPuzzleIdLinkTextView);
         when(mockActivity.findViewById(R.id.puzzle_rating)).thenReturn(mockPuzzleRatingTextView);
         when(mockActivity.findViewById(R.id.puzzles_count)).thenReturn(mockPuzzlesSolvedTextView);
         when(mockActivity.findViewById(R.id.player_rating)).thenReturn(mockPlayerRatingTextView);
@@ -120,7 +117,6 @@ class PuzzleTextViewsTest {
         verify(mockPuzzleIdLabelTextView).setTypeface(null, Typeface.BOLD);
         verify(mockPuzzleIdEditText).setText(puzzleId);
         verify(mockPuzzleIdEditText).setContentDescription("Puzzle ID: " + puzzleId);
-        verify(mockPuzzleIdLinkTextView).setTypeface(null, Typeface.BOLD);
     }
 
     @Test
