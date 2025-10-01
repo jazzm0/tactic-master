@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton hint = findViewById(R.id.puzzle_hint);
         ImageButton shareFenButton = findViewById(R.id.share_fen_button);
         EditText puzzleId = findViewById(R.id.puzzle_id);
-        TextView puzzleIdLink = findViewById(R.id.puzzle_id_link);
+        ImageButton puzzleIdLink = findViewById(R.id.puzzle_id_link);
 
         SwitchMaterial autoplay = findViewById(R.id.toggle_autoplay);
         autoplay.setChecked(chessboardController.getAutoplay());

@@ -48,7 +48,6 @@ public class PuzzleTextViews {
 
     private final TextView puzzleIdLabelTextView;
     private final EditText puzzleIdEditText;
-    private final TextView puzzleIdLinkTextView;
     private final TextView puzzleRatingTextView;
     private final TextView puzzlesSolvedTextView;
     private final TextView playerRatingTextView;
@@ -78,7 +77,6 @@ public class PuzzleTextViews {
         try {
             this.puzzleIdLabelTextView = findViewById(R.id.puzzle_id_label);
             this.puzzleIdEditText = findViewById(R.id.puzzle_id);
-            this.puzzleIdLinkTextView = findViewById(R.id.puzzle_id_link);
             this.puzzleRatingTextView = findViewById(R.id.puzzle_rating);
             this.puzzlesSolvedTextView = findViewById(R.id.puzzles_count);
             this.playerRatingTextView = findViewById(R.id.player_rating);
@@ -113,8 +111,7 @@ public class PuzzleTextViews {
      * @throws RuntimeException if any required view is null
      */
     private void validateViewReferences() {
-        if (isNull(puzzleIdLabelTextView) || isNull(puzzleIdEditText) ||
-                isNull(puzzleIdLinkTextView) || isNull(puzzleRatingTextView) ||
+        if (isNull(puzzleIdLabelTextView) || isNull(puzzleIdEditText) || isNull(puzzleRatingTextView) ||
                 isNull(puzzlesSolvedTextView) || isNull(playerRatingTextView)) {
             throw new RuntimeException("One or more required views could not be found");
         }
@@ -231,10 +228,6 @@ public class PuzzleTextViews {
             }
 
             setUnsolvedState();
-
-            if (!isNull(puzzleIdLinkTextView)) {
-                puzzleIdLinkTextView.setTypeface(null, Typeface.BOLD);
-            }
         } catch (Exception e) {
             Log.e(TAG, "Error setting puzzle ID", e);
         }
