@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (chessboardController != null) {
+        if (!isNull(chessboardController)) {
             chessboardController.cleanup();
         }
     }
