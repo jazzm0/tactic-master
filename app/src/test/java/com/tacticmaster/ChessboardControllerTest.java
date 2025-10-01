@@ -2,6 +2,7 @@ package com.tacticmaster;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -25,7 +26,6 @@ import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -45,8 +45,7 @@ public class ChessboardControllerTest {
 
     @Mock
     private PuzzleTextViews puzzleTextViews;
-
-    @InjectMocks
+    
     private ChessboardController chessboardController;
 
     private PuzzleGame puzzleGame;
@@ -235,5 +234,186 @@ public class ChessboardControllerTest {
         expectedIntent.setType("text/plain");
 
         verify(chessboardView.getContext()).startActivity(Intent.createChooser(expectedIntent, null));
+    }
+
+    @Test
+    void testConstructorWithNullDatabaseAccessorThrowsException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new ChessboardController(null, mock(PuzzleManager.class), mock(PuzzleThemesDialogHelper.class),
+                        mock(ChessboardView.class), mock(PuzzleTextViews.class)));
+    }
+
+    @Test
+    void testConstructorWithNullPuzzleManagerThrowsException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new ChessboardController(mock(DatabaseAccessor.class), null, mock(PuzzleThemesDialogHelper.class),
+                        mock(ChessboardView.class), mock(PuzzleTextViews.class)));
+    }
+
+    @Test
+    void testConstructorWithNullChessboardViewThrowsException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new ChessboardController(mock(DatabaseAccessor.class), mock(PuzzleManager.class),
+                        mock(PuzzleThemesDialogHelper.class), null, mock(PuzzleTextViews.class)));
+    }
+
+    @Test
+    void testConstructorWithNullPuzzleTextViewsThrowsException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new ChessboardController(mock(DatabaseAccessor.class), mock(PuzzleManager.class),
+                        mock(PuzzleThemesDialogHelper.class), mock(ChessboardView.class), null));
+    }
+
+    @Test
+    void testLoadPuzzleByIdWithNullIdDoesNotLoad() {
+        chessboardController.loadPuzzleById(null);
+
+        verify(chessboardView).makeText(R.string.invalid_puzzle_id);
+        verify(chessboardView, never()).setPuzzle(any());
+    }
+
+    @Test
+    void testLoadPuzzleByIdWithEmptyIdDoesNotLoad() {
+        chessboardController.loadPuzzleById("   ");
+
+        verify(chessboardView).makeText(R.string.invalid_puzzle_id);
+        verify(chessboardView, never()).setPuzzle(any());
+    }
+
+    @Test
+    void testLoadNextPuzzleWithExceptionShowsMessage() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenThrow(new RuntimeException("Database error"));
+
+        chessboardController.loadNextPuzzle();
+
+        verify(chessboardView).makeText(R.string.no_more_puzzles);
+    }
+
+    @Test
+    void testLoadPuzzleByIdWithExceptionShowsMessage() {
+        when(databaseAccessor.getPuzzleById("invalid")).thenThrow(new RuntimeException("Database error"));
+
+        chessboardController.loadPuzzleById("invalid");
+
+        verify(chessboardView).makeText(R.string.invalid_puzzle_id);
+    }
+
+    @Test
+    void testPuzzleHintClickedCallsChessboardView() {
+        chessboardController.puzzleHintClicked();
+
+        verify(chessboardView).puzzleHintClicked();
+    }
+
+    @Test
+    void testSetAutoplayUpdatesStateAndDatabase() {
+        chessboardController.setAutoplay(true);
+
+        Assertions.assertTrue(chessboardController.getAutoplay());
+        verify(databaseAccessor).storePlayerAutoplay(true);
+
+        chessboardController.setAutoplay(false);
+
+        Assertions.assertFalse(chessboardController.getAutoplay());
+        verify(databaseAccessor).storePlayerAutoplay(false);
+    }
+
+    @Test
+    void testRenderPuzzleUpdatesAllViews() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+        when(databaseAccessor.getAllPuzzleCount()).thenReturn(100);
+        when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(25);
+
+        chessboardController.loadNextPuzzle();
+
+        verify(chessboardView).setPuzzle(any(PuzzleGame.class));
+        verify(puzzleTextViews).setPuzzleId(anyString());
+        verify(puzzleTextViews).setPuzzleRating(anyInt());
+        verify(puzzleTextViews).setPuzzlesSolvedCount(25, 100);
+        verify(puzzleTextViews).setPlayerRating(anyInt());
+        verify(puzzleTextViews).setPuzzleSolved(any(Boolean.class));
+        verify(puzzleThemesDialogHelper).prepareDialogContent(any(), any(), any(), any());
+    }
+
+    @Test
+    void testOnPuzzleSolvedWithAlreadySolvedPuzzleDoesNotUpdate() {
+        when(databaseAccessor.wasNotSolved(puzzleGame.getPuzzleId())).thenReturn(false);
+
+        chessboardController.onPuzzleSolved(puzzleGame);
+
+        verify(databaseAccessor, never()).setSolved(anyString());
+        verify(databaseAccessor, never()).storePlayerRating(anyInt());
+    }
+
+    @Test
+    void testOnPuzzleNotSolvedWithAlreadySolvedPuzzleDoesNotUpdate() {
+        when(databaseAccessor.wasNotSolved(puzzleGame.getPuzzleId())).thenReturn(false);
+
+        chessboardController.onPuzzleNotSolved(puzzleGame);
+
+        verify(databaseAccessor, never()).storePlayerRating(anyInt());
+    }
+
+    @Test
+    void testOnAfterPuzzleFinishedWithAutoplayLoadsNext() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+
+        chessboardController.setAutoplay(true);
+        chessboardController.loadNextPuzzle(); // Load first puzzle
+
+        chessboardController.onAfterPuzzleFinished(puzzleGame);
+
+        verify(chessboardView, times(2)).setPuzzle(any()); // Once for initial load, once for autoplay
+    }
+
+    @Test
+    void testOnAfterPuzzleFinishedWithoutAutoplayDoesNotLoadNext() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+
+        chessboardController.setAutoplay(false);
+        chessboardController.loadNextPuzzle(); // Load first puzzle
+
+        chessboardController.onAfterPuzzleFinished(puzzleGame);
+
+        verify(chessboardView, times(1)).setPuzzle(any()); // Only once for initial load
+    }
+
+    @Test
+    void testCleanupCallsPuzzleTextViewsCleanup() {
+        chessboardController.cleanup();
+
+        verify(puzzleTextViews).cleanup();
+    }
+
+    @Test
+    void testMultipleCleanupCallsAreSafe() {
+        chessboardController.cleanup();
+        chessboardController.cleanup();
+
+        verify(puzzleTextViews, times(2)).cleanup();
+    }
+
+    @Test
+    void testPlayerRatingUpdateFlow() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+
+        String fen = "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29";
+        String moves = "f8f7 c2h7 g8h7 g7g8q";
+
+        var puzzleGame = new PuzzleGame("1", fen, moves, 2600);
+
+        when(databaseAccessor.wasNotSolved(puzzleGame.getPuzzleId())).thenReturn(true);
+
+        chessboardController.loadNextPuzzle();
+
+        chessboardController.onPuzzleSolved(puzzleGame);
+
+        verify(databaseAccessor).storePlayerRating(2359);
+        verify(puzzleTextViews).updatePlayerRating(2333, 2359);
     }
 }

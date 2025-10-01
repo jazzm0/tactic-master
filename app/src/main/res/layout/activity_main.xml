@@ -136,14 +136,25 @@
                 android:textIsSelectable="true"
                 android:textSize="14sp" />
 
-            <TextView
+            <ImageButton
                 android:id="@+id/puzzle_id_link"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
                 android:layout_marginStart="6dp"
-                android:gravity="center"
-                android:text="@string/puzzle_id_sharing"
-                android:textSize="12sp" />
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/puzzle_id_sharing"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_link" />
+
+            <ImageButton
+                android:id="@+id/share_fen_button"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="6dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/share_fen"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_share" />
         </LinearLayout>
 
         <TextView

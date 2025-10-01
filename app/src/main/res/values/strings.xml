@@ -13,11 +13,12 @@
     <string name="show_next_puzzle">Show next puzzle</string>
     <string name="player_rating">Player Rating: %d</string>
     <string name="player_turn">move</string>
-    <string name="puzzle_id_sharing">↗️</string>
+    <string name="puzzle_id_sharing">Share via link</string>
     <string name="no_more_puzzles">No more unsolved puzzles available</string>
     <string name="queen">Queen</string>
     <string name="rook">Rook</string>
     <string name="bishop">Bishop</string>
     <string name="knight">Knight</string>
     <string name="filter">Filter</string>
+    <string name="share_fen">Share FEN</string>
 </resources>

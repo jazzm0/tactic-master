@@ -66,8 +66,9 @@ public class MainActivity extends AppCompatActivity {
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
         ImageButton hint = findViewById(R.id.puzzle_hint);
+        ImageButton shareFenButton = findViewById(R.id.share_fen_button);
         EditText puzzleId = findViewById(R.id.puzzle_id);
-        TextView puzzleIdLink = findViewById(R.id.puzzle_id_link);
+        ImageButton puzzleIdLink = findViewById(R.id.puzzle_id_link);
 
         SwitchMaterial autoplay = findViewById(R.id.toggle_autoplay);
         autoplay.setChecked(chessboardController.getAutoplay());
@@ -104,12 +105,21 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
         puzzleIdLink.setOnClickListener(v -> onPuzzleIdLinkClicked());
+        shareFenButton.setOnClickListener(v -> onShareFenClicked());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         chessboardController.renderPuzzle();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!isNull(chessboardController)) {
+            chessboardController.cleanup();
+        }
     }
 
     private void onReloadPuzzleClicked() {
@@ -130,5 +140,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void onPuzzleIdLinkClicked() {
         chessboardController.puzzleIdLinkClicked();
+    }
+
+    private void onShareFenClicked() {
+        chessboardController.shareFenClicked();
     }
 }
