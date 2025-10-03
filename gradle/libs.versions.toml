@@ -1,8 +1,8 @@
 [versions]
-agp = "8.13.0"
+agp = "8.11.1"
 appcompat = "1.7.1"
 core = "1.7.0"
-gradle = "8.13.0"
+gradle = "8.11.1"
 junitJupiterApi = "6.0.0"
 junitPlatformLauncher = "6.0.0"
 junit = "4.13.2"
