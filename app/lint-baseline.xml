@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.13.1" type="baseline" client="gradle" dependencies="true" name="AGP (8.13.1)" variant="all" version="8.13.1">
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="            if (legalMove.toString().toLowerCase().startsWith(fenMove.toLowerCase())) {"
+        errorLine2="                                     ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/tacticmaster/board/Chessboard.java"
+            line="80"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="            if (legalMove.toString().toLowerCase().startsWith(fenMove.toLowerCase())) {"
+        errorLine2="                                                                      ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/tacticmaster/board/Chessboard.java"
+            line="80"
+            column="71"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="        return new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile)).toString().toLowerCase();"
+        errorLine2="                                                                                           ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/tacticmaster/board/Chessboard.java"
+            line="88"
+            column="92"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="                .toLowerCase();"
+        errorLine2="                 ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/tacticmaster/board/Chessboard.java"
+            line="94"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="        return this.moves[currentMoveIndex].toLowerCase().startsWith(move.toLowerCase());"
+        errorLine2="                                            ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/tacticmaster/puzzle/PuzzleGame.java"
+            line="53"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
+        errorLine1="        return this.moves[currentMoveIndex].toLowerCase().startsWith(move.toLowerCase());"
+        errorLine2="                                                                          ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/tacticmaster/puzzle/PuzzleGame.java"
+            line="53"
+            column="75"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
+        errorLine1="    android:width=&quot;1606dp&quot;"
+        errorLine2="                   ~~~~~~">
+        <location
+            file="src/main/res/drawable/tactic_trainer.xml"
+            line="2"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of Gradle than 8.14 is available: 8.14.3"
+        errorLine1="distributionUrl=https\://services.gradle.org/distributions/gradle-8.14-bin.zip"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../gradle/wrapper/gradle-wrapper.properties"
+            line="4"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of com.android.tools.build:gradle than 8.11.1 is available: 8.13.1. (There is also a newer version of 8.11.𝑥 available, if upgrading to 8.13.1 is difficult: 8.11.2)"
+        errorLine1="gradle = &quot;8.11.1&quot;"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="5"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="LockedOrientationActivity"
+        message="Expecting `android:screenOrientation=&quot;unspecified&quot;` or `&quot;fullSensor&quot;` for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices"
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="17"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.junit.jupiter:junit-jupiter-api than 6.0.0 is available: 6.0.1"
+        errorLine1="junitJupiterApi = &quot;6.0.0&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="6"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.junit.jupiter:junit-jupiter-engine than 6.0.0 is available: 6.0.1"
+        errorLine1="junitJupiterApi = &quot;6.0.0&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="6"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.junit.jupiter:junit-jupiter-params than 6.0.0 is available: 6.0.1"
+        errorLine1="junitJupiterApi = &quot;6.0.0&quot;"
+        errorLine2="                  ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="6"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.junit.platform:junit-platform-launcher than 6.0.0 is available: 6.0.1"
+        errorLine1="junitPlatformLauncher = &quot;6.0.0&quot;"
+        errorLine2="                        ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="7"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Fixed screen orientations will be ignored in most cases, starting from Android 16. Android is moving toward a model where apps are expected to adapt to various orientations, display sizes, and aspect ratios."
+        errorLine1="            android:screenOrientation=&quot;portrait&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="17"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;puzzles&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;puzzles_solved&quot;>Solved %1$d of %2$d puzzles&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="    &lt;LinearLayout"
+        errorLine2="     ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_main.xml"
+            line="10"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (7174 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M1523.7,2370.6c-1.6,-9.1 -4.7,-18.2 -10.3,-25.7c-9.3,-13 -24.7,-20.9 -40.3,-22.6c-14.2,-0.6 -28.4,-0.1 -42.6,-0.3c-9.7,-21.8 -25.1,-40.5 -42,-57.2c-33.3,-32.5 -73.2,-57.4 -114.2,-78.9c-5.3,-3.4 -7.8,-9.6 -10.9,-14.9c-8.8,-17.7 -14.4,-37 -16.6,-56.6c-3.6,-29 3,-59.8 21.2,-83c16,-0.1 32.1,-0.1 48.1,0c0.1,-0 0.2,-0 0.3,-0l8.2,-2.4c14.7,-1.3 29.6,-7.1 39.2,-18.6c7.4,-9 11.3,-20.5 12.1,-32c0.8,-7 0.5,-14 0.5,-21c-0,-15.4 0,-30.7 -0,-46.1c-0.3,-13.6 -3.2,-27.8 -11.9,-38.7c-10.3,-13.2 -27.4,-19.6 -43.8,-19.7c2.5,-0.2 5,-0.5 7.5,-0.7c0.7,-45.3 8.6,-90.1 19.5,-134c11.1,-44.1 24.9,-87.4 39.4,-130.4c13.1,-39.5 26.6,-78.8 39.7,-118.3c28.9,-87.8 54.1,-177.3 67.1,-269c4.4,-30.7 7.6,-61.5 9.1,-92.5c1,-7.9 0.3,-15.8 0.9,-23.7c0.7,-12.3 0.8,-24.6 0.7,-37c-0.1,-10.4 -1.1,-20.7 -1,-31c-2,-43.1 -6.7,-86.1 -14.4,-128.6c-15.1,-84 -41.6,-165.8 -76.1,-243.9c-7.6,-17.3 -15.4,-34.6 -25.1,-50.9c-33.8,-58.4 -75.4,-112.2 -122.1,-160.9c-57.2,-59.5 -122.8,-111 -195.1,-150.9c-84.1,-46.7 -177.1,-77.1 -272.4,-89.8c10.9,6.6 22.3,12.4 33.3,18.8c66.9,37.8 132.4,78.2 194.2,123.9c67,49.3 130.1,104.4 184.3,167.7c26.4,30.8 50.7,63.5 71.8,98.2c9.3,14.9 17.7,30.4 26.1,45.8c20.4,37.9 39.7,76.5 55.3,116.7c14.7,37.4 25.5,76.3 32.1,115.9c4.1,24.2 7.1,48.6 10.1,72.9c0.6,6.2 2,12.3 2,18.5c-5.6,-19.7 -10.4,-39.6 -16.4,-59.2c-24.3,-81.6 -58.8,-160 -101,-233.9c-18.6,-32.8 -38.2,-65 -60.4,-95.5c-48.6,-67.7 -107.5,-128.1 -175.1,-176.9C1003.9,367.4 948,336.9 888.6,315.7c-19.8,-7.2 -40.1,-12.9 -60.7,-17.5c16.5,-5 33.2,-9.7 49.6,-15C865.5,271.3 852,261 838.5,250.7c-32.1,-24.1 -65.3,-46.9 -98.6,-69.3C706.8,159.1 673.3,137.2 639.8,115.5c-7.1,-4.9 -14.7,-8.8 -22.3,-12.8c-12.4,-6.2 -24.9,-12.3 -37,-19c-2.1,7.1 -1.2,14.7 -2.2,21.9c-2.2,54.7 0.9,110.3 17.7,162.7c5.1,15.9 11.4,31.5 20.1,45.8c34.1,-14.3 71.5,-18.5 108.2,-19.6c-73.3,27.2 -143.9,62.7 -207.3,108.7c-16.7,12.1 -32.9,25 -48,39.2c-1.6,1.9 -4.2,0.6 -6.3,0.4c-19.7,-4.3 -40.4,0.1 -58,9.3c-5.8,3.2 -12.6,5.8 -16.5,11.6c-5.7,8.5 -8.3,18.6 -10.6,28.4c-6.8,29.8 -8.6,60.4 -14.4,90.3c-1.4,5.6 -2.1,11.8 -5.5,16.6C284.1,690 212,782.6 149.4,881.6C138.7,898.3 128.2,915 117.1,931.4c-9.6,13.3 -18.1,27.6 -22.5,43.5c-4.1,14.4 -4.3,30.1 0.4,44.4c9.3,29.3 24.1,57.2 44.8,80.1c13.1,14.5 28.5,26.9 45.5,36.6c5.9,3.5 12.4,6.1 18.3,9.6c12.3,4.7 25.4,6.8 38.3,8.7c13.5,1.8 27.1,2.6 40.7,2.6c12.9,-19.4 27.9,-37.3 43.5,-54.5c28.3,-31 58.9,-59.9 90.7,-87.3c3,-3.2 7.5,-1.3 11.3,-1.4c63.6,3 128,0.8 190.1,-14.3c48.8,-11.8 96.2,-32.6 134.4,-65.6c17.7,-14.9 32.8,-32.5 46.4,-51c-0.4,4.6 -0.4,9.4 -2.9,13.5c-1.8,3.9 -5.1,7.4 -5.2,12c-4,42.7 -16.5,84.3 -33.3,123.6c-16.6,38.9 -37.5,76 -60.5,111.4C655.7,1206.9 607.2,1265.5 555.8,1321.2c-24.1,26.5 -49.9,51.4 -74.6,77.3c-53.3,56.5 -99.6,119.9 -134.9,189.1c-40.5,79.6 -67,167.1 -71.3,256.6c-0.1,2.7 -0,5.3 -0,8c-9.5,-0 -19.2,-0.4 -28.6,1.6c-15.8,2.9 -31.4,10.5 -41.1,23.6c-5.5,7.2 -8.5,16 -10.1,24.8c-1.3,13.9 -0.5,27.9 -0.7,41.9c0.3,13.6 -0.9,27.4 1.7,40.8c2.5,12.4 9.8,23.6 19.8,31.3C226.6,2024.5 239.8,2028.8 253,2030.3c12.5,1.8 25.1,0.2 37.6,1.3c12.4,13.5 20.2,31 23.1,49.1c3.8,24.6 -0.2,50 -9.1,73.2c-3.4,8.5 -7.2,16.9 -12.5,24.5c-1.5,2.1 -3.2,4.2 -5.5,5.5c-35,17.7 -69.1,37.7 -99.4,62.7c-24.9,20.7 -48.2,45.1 -60.4,75.6c-17.6,0.6 -35.5,4.8 -50.6,14.3c-10.6,6.5 -19.5,15.9 -24.9,27.1c-3.8,7.3 -5.3,15.4 -7.2,23.3L44,2522.3c493.7,0.1 987.3,0 1481,0c0,-39 0,-78 0,-117C1524.8,2393.7 1525.6,2382 1523.7,2370.6zM1408.2,970.9c1.4,-0.3 1.6,2.1 0.6,2.7C1407.3,973.9 1407.1,971.5 1408.2,970.9zM1317,1982.3c-100.7,0 -201.3,0 -302,0c-11.8,-0.2 -23.7,0.4 -35.5,-0.3c1.4,-0.7 2.9,-1.1 4.4,-1c115.7,0 231.4,0 347,0c3.8,0.1 7.8,-0.6 11.5,0.9C1334,1982.8 1325.5,1982.1 1317,1982.3zM552.6,674c8.6,-1.6 17.7,-0.7 25.6,3.1c8.8,4.2 15,13.4 15.1,23.3c1,12.2 -6.2,23.5 -15.5,30.8C559.4,745.3 534.8,749.7 512,747.3c-21.1,-2.1 -42.7,-1.6 -63.2,4c5.1,-7.2 11.3,-13.4 17.1,-20c12.1,-13.3 25.5,-25.5 40,-36C520,685.3 535.5,676.7 552.6,674zM439.6,528.9c1.4,-2.8 3.3,-5.5 6.2,-6.8c5,-2.4 10.7,-1.2 15.9,-0.6c18,3.3 34.9,10.7 51.4,18.3c-2.7,1.7 -5.5,3 -8.5,4.1c-12,5 -24.2,10 -37.2,11.8c-5.5,0.7 -11.1,1.8 -16.6,1.5c-6.6,-0.4 -12.5,-5.6 -13.9,-12.1C436.3,539.7 437.2,533.9 439.6,528.9zM759.6,873.9c-20.4,21.2 -45.2,37.8 -71.7,50.2c-20.3,9.5 -41.6,16.6 -63,23.1c-32.9,9.6 -66.7,16 -100.9,18.2c-23.3,1.8 -46.6,1.1 -69.9,1.6c-20.2,0.3 -41.2,1.6 -59.8,10.4c-11.8,5.5 -21.6,14.2 -31.1,23c-23,22 -43.4,46.5 -66.6,68.3c-17,16 -37.6,29.4 -60.9,33.9c-10.3,2 -21,1.6 -31.2,-0.7c-4.8,-1.2 -9.6,-2.7 -13.5,-5.7c5,1.5 9.8,4 15.1,4.1c14.7,0.9 28.4,-6.1 40.3,-13.9c22.7,-15.5 42,-35.2 60.9,-55c20.1,-20.9 39.3,-42.7 60.9,-62.1c4.5,-3.8 9,-7.8 13.9,-11.2c9.8,-7 21.1,-11.7 32.8,-14.2c22.2,-4.7 44.9,-3.5 67.4,-3.6c10.7,0.2 21.3,-1.1 32,-1c27.5,-1.5 55,-4.9 81.8,-11.3c28.2,-6.4 55.9,-15.3 82.7,-26.3C705.6,890.1 731.3,874.4 752.8,854c19.1,-17.9 34.9,-39.2 46.3,-62.7c13.9,-27.9 21.3,-58.5 24.6,-89.3c0.7,8.4 0.5,16.9 -0.5,25.2C819.2,781.3 797.9,835 759.6,873.9zM431.6,1558.9c34.4,-66.3 79.3,-127.1 132.2,-179.9c13.9,-14.1 28.8,-27.2 43.5,-40.5c55.6,-50.3 109.6,-102.4 160.8,-157.2c27.1,-29.1 53.2,-59 77.9,-90.1c24.8,-31.5 48.3,-64.1 68.2,-98.9c17.7,-31 33,-64 39.8,-99.3c-3,44.1 -12.6,88 -30.6,128.6c-15.3,34.8 -35.7,67.2 -58.2,97.8c-22.6,30.7 -47.4,59.7 -73.1,87.8c-24.3,26.4 -49.2,52.1 -74.8,77.2c-12.5,12.8 -25.8,24.9 -38.5,37.5c-16.5,15.5 -32.8,31.2 -49.5,46.5C571.3,1421.5 521.8,1484.3 486.1,1554.3c-18.8,36.6 -33.9,75.2 -45.3,114.8c-12.7,43.5 -20.4,88.3 -25.9,133.2c-0.2,1.7 -0.5,3.4 -0.8,5.1c-20.3,0.1 -40.6,0.3 -60.8,-0.1C365.1,1720.9 391.2,1636.3 431.6,1558.9zM296,1916.3c-8.7,-0.1 -19.1,-6.6 -17.8,-16.4c-1.5,-0.1 -3,-0.3 -4.5,-0.4c2,-14.5 10.9,-27.5 23.1,-35.5c9.4,-6.3 20.3,-9.8 31.4,-11.4c8.3,-0.8 16.5,-1.1 24.8,-1c53,-0 106.1,0.1 159.1,-0c-6.9,1.7 -13.9,2.6 -20.6,5.3c-14.7,5.5 -28.2,16.3 -33.7,31.4c168.7,0 337.4,-0 506.1,0c4.2,0 8.5,0.3 12.6,-0.8c-3,-5.7 -6.3,-11.3 -11,-15.8c-12.3,-12.2 -29.6,-18 -46.6,-19c11.3,-0.9 22.7,-0.3 34.1,-0.4c100.3,0 200.7,0 301,0c11.9,0.1 23.9,-0.6 35.6,1.4c15.3,2.6 30.6,9.1 40.9,21c6.2,7.4 10.7,16.5 11.8,26.1c-0.3,-0.2 -1,-0.6 -1.3,-0.8l-1,0.6c0.9,6.1 -3.8,11.2 -9,13.6c-5.6,2.9 -12,1.9 -18,2.1c-104,-0 -208,-0 -312,-0c-6.3,-0 -12.6,0.1 -18.9,-0.1c-175.6,0.2 -351.2,-0 -526.7,0.1C402.2,1916.3 349.1,1916.4 296,1916.3zM354.8,2055.4c-3.3,-9 -7.3,-17.6 -11.9,-26c20.2,-0.1 40.5,-0.2 60.7,0.1c10.3,19.2 18.1,40 20.4,61.8c4.1,31.9 -4,64.4 -18.2,92.9c-20.2,0.2 -40.4,0.1 -60.6,0.1c9.1,-18.5 15.8,-38.3 18.2,-58.8C365.9,2101.9 363.3,2077.7 354.8,2055.4zM1473.1,2382.5c-4.8,6.6 -13.4,8.8 -21.1,8.9c-117,-0 -234,0 -351,0c-25.2,-0.1 -50.5,0.2 -75.7,-0.2c-138.8,0.1 -277.5,0 -416.3,0.1c-56,-0.1 -112.1,0.1 -168.1,-0.1c-41.6,0.4 -83.3,0.1 -124.9,0.2c-50,-0 -100,0 -150,-0c-8.3,0.1 -16.8,-3.3 -22.1,-9.9l-1.2,-0.1c0.1,-3.4 0.3,-7 2.3,-9.9c3.2,-12.6 11.7,-23.4 21.7,-31.5c14,-11 31.6,-16.6 49.2,-18.2c8.3,-1.1 16.7,-0.4 25,-0.5c84.7,-0 169.3,0 254,-0c6,0 12.1,-0.3 18.1,0.4c-16.9,1.6 -33.8,6.9 -47.4,17.2c-8.6,6.2 -15.6,14.7 -19.9,24.3h0.9c190.2,0 380.3,0 570.5,-0l0.9,0c-6.9,-14.1 -19.3,-25 -33.5,-31.6c-10.3,-4.9 -21.6,-7.5 -32.9,-8.9c5.7,-1 11.5,-0.3 17.3,-0.5c135,0 270,0 405,0c12.4,0.1 24.9,-0.7 37.1,1.7c23.2,3.7 46.5,16 58,37.3c1.4,3.2 4.4,6.6 3.1,10.3c2.1,3.1 3.4,6.8 3.8,10.6C1475.3,2382.2 1473.8,2382.4 1473.1,2382.5z&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/tactic_trainer.xml"
+            line="8"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `#663511` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;#663511&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_main.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.style.Theme_TacticMaster` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Theme.TacticMaster&quot; parent=&quot;Theme.MaterialComponents.DayNight.DarkActionBar&quot;>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/themes.xml"
+            line="3"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/bb.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/bb.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/bk.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/bk.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/bn.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/bn.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/bp.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/bp.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/bq.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/bq.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/br.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/br.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/ic_black_turn.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/ic_black_turn.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/ic_hint.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/ic_hint.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/ic_left.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/ic_left.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/ic_reload.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/ic_reload.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/ic_right.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/ic_right.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/ic_white_turn.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/ic_white_turn.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/wb.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/wb.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/wk.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/wk.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/wn.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/wn.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/wp.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/wp.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/wq.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/wq.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/wr.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/wr.png"/>
+    </issue>
+
+</issues>
