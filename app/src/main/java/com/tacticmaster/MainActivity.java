@@ -30,12 +30,17 @@ public class MainActivity extends AppCompatActivity {
 
     private ChessboardController chessboardController;
 
+    private static final long FIVE_MINUTES = 1000 * 60 * 5;
+    private Handler handler = new Handler();
+    private Runnable clearKeepScreenOn = () -> 
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        
 
         View rootView = findViewById(R.id.root_layout);
 
@@ -107,6 +112,12 @@ public class MainActivity extends AppCompatActivity {
         puzzleIdLink.setOnClickListener(v -> onPuzzleIdLinkClicked());
         shareFenButton.setOnClickListener(v -> onShareFenClicked());
     }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(clearKeepScreenOn);
+    }
 
     @Override
     protected void onResume() {
@@ -120,6 +131,15 @@ public class MainActivity extends AppCompatActivity {
         if (!isNull(chessboardController)) {
             chessboardController.cleanup();
         }
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        // Reset screen-on timer on each touch
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        handler.removeCallbacks(clearKeepScreenOn);
+        handler.postDelayed(clearKeepScreenOn, FIVE_MINUTES);
     }
 
     private void onReloadPuzzleClicked() {
@@ -145,4 +165,6 @@ public class MainActivity extends AppCompatActivity {
     private void onShareFenClicked() {
         chessboardController.shareFenClicked();
     }
+
+    
 }
