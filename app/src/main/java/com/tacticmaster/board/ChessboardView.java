@@ -202,6 +202,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         animator.addListener(new android.animation.AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
+                var isCaptureMove = chessboard.isCaptureMove(nextMove);
                 chessboard.doMove(nextMove);
                 isAnimating = false;
                 animPieceBitmap = null;
