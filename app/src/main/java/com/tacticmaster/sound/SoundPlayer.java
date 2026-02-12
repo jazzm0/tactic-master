@@ -5,8 +5,10 @@ import static java.util.Objects.isNull;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.util.Log;
 
 import com.tacticmaster.R;
@@ -19,6 +21,9 @@ public final class SoundPlayer {
     private static SoundPlayer INSTANCE;
     private final ReentrantLock lock = new ReentrantLock();
     private MediaPlayer mediaPlayer;
+    private AudioManager audioManager;
+    private AudioFocusRequest audioFocusRequest;
+    private boolean hasAudioFocus = false;
 
     private SoundPlayer() {
     }
@@ -32,24 +37,61 @@ public final class SoundPlayer {
         return INSTANCE;
     }
 
+    /**
+     * Plays a move or capture sound. If a sound is already playing, this call returns early.
+     * Uses application context to avoid memory leaks.
+     *
+     * @param context       Activity or application context
+     * @param isCaptureMove true for capture sound, false for move sound
+     */
     public void playMoveSound(Context context, boolean isCaptureMove) {
         lock.lock();
         AssetFileDescriptor afd = null;
         try {
-            if (!isNull(mediaPlayer) && mediaPlayer.isPlaying()) return;
-            stopLocked();
-            afd = isCaptureMove ? context.getResources().openRawResourceFd(R.raw.capture) : context.getResources().openRawResourceFd(R.raw.move);
-            if (isNull(afd)) {
-                Log.w(TAG, "Raw resource not found id=" + (isCaptureMove ? R.raw.capture : R.raw.move));
+            if (!isNull(mediaPlayer) && isMediaPlayerPlaying()) {
                 return;
             }
+
+            stopLocked();
+
+            Context appContext = context.getApplicationContext();
+
+            afd = isCaptureMove ?
+                    appContext.getResources().openRawResourceFd(R.raw.capture) :
+                    appContext.getResources().openRawResourceFd(R.raw.move);
+
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            applyAttributesAndStart(context);
-            Log.i(TAG, "Custom raw alarm started");
+
+            mediaPlayer.setOnCompletionListener(mp -> {
+                lock.lock();
+                try {
+                    abandonAudioFocus();
+                    releaseMediaPlayer();
+                    Log.d(TAG, "Move sound playback completed");
+                } finally {
+                    lock.unlock();
+                }
+            });
+
+            mediaPlayer.setOnErrorListener((mp, what, extra) -> {
+                Log.e(TAG, "MediaPlayer error: what=" + what + " extra=" + extra);
+                lock.lock();
+                try {
+                    abandonAudioFocus();
+                    releaseMediaPlayer();
+                } finally {
+                    lock.unlock();
+                }
+                return true;
+            });
+
+            applyAttributesAndStart(appContext);
+            Log.d(TAG, "Move sound started: " + (isCaptureMove ? "capture" : "move"));
         } catch (Exception e) {
-            Log.e(TAG, "Failed to start raw alarm", e);
-            stopLocked();
+            Log.e(TAG, "Failed to play move sound", e);
+            abandonAudioFocus();
+            releaseMediaPlayer();
         } finally {
             try {
                 if (!isNull(afd)) afd.close();
@@ -66,32 +108,123 @@ public final class SoundPlayer {
                 .build();
         mediaPlayer.setAudioAttributes(attrs);
         mediaPlayer.setLooping(false);
-        try {
-            AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            if (!isNull(audioManager)) {
-                int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
-                audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, maxVolume, 0);
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Unable to set alarm stream volume", e);
+
+        // Request audio focus before playing
+        if (!requestAudioFocus(context, attrs)) {
+            Log.w(TAG, "Failed to gain audio focus, playing anyway");
         }
         mediaPlayer.prepare();
         mediaPlayer.start();
     }
 
+    private boolean requestAudioFocus(Context context, AudioAttributes attrs) {
+        try {
+            audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            if (isNull(audioManager)) {
+                return false;
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                        .setAudioAttributes(attrs)
+                        .setOnAudioFocusChangeListener(focusChange -> {
+                            if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                                lock.lock();
+                                try {
+                                    stopLocked();
+                                } finally {
+                                    lock.unlock();
+                                }
+                            }
+                        })
+                        .build();
+                int result = audioManager.requestAudioFocus(audioFocusRequest);
+                hasAudioFocus = (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED);
+                return hasAudioFocus;
+            } else {
+                int result = audioManager.requestAudioFocus(
+                        focusChange -> {
+                            if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                                lock.lock();
+                                try {
+                                    stopLocked();
+                                } finally {
+                                    lock.unlock();
+                                }
+                            }
+                        },
+                        AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
+                );
+                hasAudioFocus = (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED);
+                return hasAudioFocus;
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error requesting audio focus", e);
+            return false;
+        }
+    }
+
+    private void abandonAudioFocus() {
+        if (hasAudioFocus && !isNull(audioManager)) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !isNull(audioFocusRequest)) {
+                    audioManager.abandonAudioFocusRequest(audioFocusRequest);
+                } else {
+                    audioManager.abandonAudioFocus(null);
+                }
+                hasAudioFocus = false;
+                Log.d(TAG, "Audio focus abandoned");
+            } catch (Exception e) {
+                Log.w(TAG, "Error abandoning audio focus", e);
+            }
+        }
+    }
+
+    private boolean isMediaPlayerPlaying() {
+        try {
+            return mediaPlayer.isPlaying();
+        } catch (IllegalStateException e) {
+            Log.w(TAG, "MediaPlayer in invalid state when checking isPlaying", e);
+            return false;
+        }
+    }
+
+    private void releaseMediaPlayer() {
+        if (!isNull(mediaPlayer)) {
+            try {
+                mediaPlayer.release();
+            } catch (Exception e) {
+                Log.w(TAG, "Error releasing MediaPlayer", e);
+            }
+            mediaPlayer = null;
+        }
+    }
+
     private void stopLocked() {
         if (!isNull(mediaPlayer)) {
             try {
-                if (mediaPlayer.isPlaying()) mediaPlayer.stop();
+                if (isMediaPlayerPlaying()) {
+                    mediaPlayer.stop();
+                }
             } catch (IllegalStateException e) {
                 Log.w(TAG, "MediaPlayer state error on stop", e);
             }
-            try {
-                mediaPlayer.release();
-            } catch (Exception ignore) {
-            }
-            mediaPlayer = null;
-            Log.i(TAG, "Alarm sound stopped");
+            abandonAudioFocus();
+            releaseMediaPlayer();
+            Log.d(TAG, "Move sound stopped");
+        }
+    }
+
+    public void release() {
+        lock.lock();
+        try {
+            stopLocked();
+            audioManager = null;
+            audioFocusRequest = null;
+            Log.d(TAG, "SoundPlayer released");
+        } finally {
+            lock.unlock();
         }
     }
 }
