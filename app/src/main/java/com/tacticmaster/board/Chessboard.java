@@ -118,6 +118,32 @@ public class Chessboard {
         return chessboard.getPiece(squareAt(rank, file)).getFenSymbol().charAt(0);
     }
 
+    public boolean isCaptureMove(String nextMove) {
+        if (!isMoveLegal(nextMove)) {
+            return false;
+        }
+
+        Move move = new Move(nextMove, chessboard.getSideToMove());
+
+        if (!chessboard.getPiece(move.getTo()).equals(Piece.NONE)) {
+            return true;
+        }
+
+        Square ep = chessboard.getEnPassant();
+        if (!isNull(ep) && ep != Square.NONE && move.getTo().equals(ep)) {
+            Piece moving = chessboard.getPiece(move.getFrom());
+            int fileDelta = Math.abs(move.getFrom().getFile().ordinal() - move.getTo().getFile().ordinal());
+            int rankDelta = move.getTo().getRank().ordinal() - move.getFrom().getRank().ordinal();
+
+            boolean isWhiteEp = moving == Piece.WHITE_PAWN && fileDelta == 1 && rankDelta == 1;
+            boolean isBlackEp = moving == Piece.BLACK_PAWN && fileDelta == 1 && rankDelta == -1;
+
+            return isWhiteEp || isBlackEp;
+        }
+
+        return false;
+    }
+
     public void doMove(String nextMove) {
         Move move = new Move(nextMove, chessboard.getSideToMove());
         chessboard.doMove(move, true);

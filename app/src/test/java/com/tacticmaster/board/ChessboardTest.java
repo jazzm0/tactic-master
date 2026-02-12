@@ -303,4 +303,68 @@ public class ChessboardTest {
         }
         assertTrue(castlingChecked);
     }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            // Simple captures (black to move)
+            "'4k3/8/8/4p3/3P4/8/8/4K3 w - - 0 1', 'd4e5', true",   // white pawn captures black pawn
+            "'4k3/8/8/4p3/3P4/8/8/4K3 b - - 0 1', 'e5d4', true",   // black pawn captures white pawn
+            // Non-captures
+            "'4k3/8/8/4p3/3P4/8/8/4K3 b - - 0 1', 'e5e4', false",
+            "'4k3/8/8/8/2N5/8/8/4K3 w - - 0 1', 'c4e5', false",    // knight to empty
+            // Knight capture
+            "'4k3/8/8/3p4/2N5/8/8/4K3 b - - 0 1', 'd5c4', true",
+            // Queen capture
+            "'4k3/8/8/3p4/3Q4/8/8/4K3 w - - 0 1', 'd4d5', true",
+            // Rook capture
+            "'4k3/8/8/3p4/3R4/8/8/4K3 w - - 0 1', 'd4d5', true",
+            // Bishop capture
+            "'4k3/8/8/3p4/4B3/8/8/4K3 w - - 0 1', 'e4d5', true",
+            // King non-capture
+            "'4k3/8/8/8/8/8/8/4K3 w - - 0 1', 'e1e2', false",
+    })
+    void testIsCaptureMoveVariousPositions(String fen, String move, boolean expected) {
+        Chessboard board = new Chessboard(fen);
+        assertEquals(expected, board.isCaptureMove(move));
+    }
+
+    @Test
+    void testPromotionCaptureAndNonCapture() {
+        // White pawn promotes by capturing on e8
+        Chessboard boardCapture = new Chessboard("1k1r4/4P3/8/8/8/8/8/3K4 w - - 0 1");
+        assertTrue(boardCapture.isCaptureMove("e7d8q")); // e8 occupied by black king -> capture
+
+        Chessboard noBoardCapture = new Chessboard("1k1r4/4P3/8/8/8/8/8/3K4 w - - 0 1");
+        assertFalse(noBoardCapture.isCaptureMove("e7e8q"));
+    }
+
+    @Test
+    void testCastlingIsNotCapture() {
+        Chessboard whiteCastle = new Chessboard("r3k2r/ppp2ppp/8/8/8/8/PPP2PPP/R3K2R w KQkq - 0 1");
+        Assertions.assertFalse(whiteCastle.isCaptureMove("e1g1"));
+        Assertions.assertFalse(whiteCastle.isCaptureMove("e1c1"));
+
+        Chessboard blackCastle = new Chessboard("r3k2r/ppp2ppp/8/8/8/8/PPP2PPP/R3K2R b KQkq - 0 1");
+        Assertions.assertFalse(blackCastle.isCaptureMove("e8g8"));
+        Assertions.assertFalse(blackCastle.isCaptureMove("e8c8"));
+    }
+
+    @Test
+    void testEnPassantReportedAsCapture() {
+        // En passant scenario: black just advanced c7->c5, white can play d5xc6 en passant.
+        Chessboard board = new Chessboard("4k3/2p5/8/3P4/8/8/8/4K3 b - - 0 1");
+        board.doMove("c7c5"); // black pawn to c5
+
+        Chessboard after = new Chessboard("4k3/8/8/2pP4/8/8/8/4K3 w - c6 0 2");
+        Assertions.assertTrue(after.isCaptureMove("d5c6"));
+    }
+
+    @Test
+    void testBlackSideCaptureWithFlippedOrientation() {
+        // Ensure orientation does not affect capture detection
+        Chessboard board = new Chessboard("8/8/8/8/4p3/3P4/8/4k2K w - - 0 1");
+        assertTrue(board.isCaptureMove("d3e4"));
+        Assertions.assertFalse(board.isCaptureMove("d3d4"));
+    }
 }

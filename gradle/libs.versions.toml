@@ -1,15 +1,15 @@
 [versions]
-agp = "8.13.1"
+agp = "9.0.0"
 appcompat = "1.7.1"
 core = "1.7.0"
-gradle = "8.13.1"
-junitJupiterApi = "6.0.1"
-junitPlatformLauncher = "6.0.1"
+gradle = "9.0.0"
+junitJupiterApi = "6.0.2"
+junitPlatformLauncher = "6.0.2"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 materialVersion = "1.13.0"
-mockitoCore = "5.20.0"
+mockitoCore = "5.21.0"
 runner = "1.7.0"
 
 [libraries]

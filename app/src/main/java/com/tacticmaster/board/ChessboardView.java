@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 
 import com.tacticmaster.R;
 import com.tacticmaster.puzzle.PuzzleGame;
+import com.tacticmaster.sound.SoundPlayer;
 
 public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener {
 
@@ -32,6 +33,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     public static final int BOARD_SIZE = 8;
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private static final int MOVE_DELAY = 1300;
+    private static final int PIECE_MOVE_DELAY = 800;
     private static final int STROKE_WIDTH = 8;
 
     private final ChessboardPieceManager bitmapManager;
@@ -43,6 +45,11 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private PuzzleHintView puzzleHintView;
     private PuzzleFinishedListener puzzleFinishedListener;
     private ImageView playerTurnIcon;
+
+    private boolean isAnimating = false;
+    private float animProgress = 0f;
+    private int animFromRank = -1, animFromFile = -1, animToRank = -1, animToFile = -1;
+    private Bitmap animPieceBitmap = null;
 
     private int selectedFromRank = -1, selectedFromFile = -1, selectedToRank = -1, selectedToFile = -1;
     private int opponentFromRank = -1, opponentFromFile = -1, opponentToRank = -1, opponentToFile = -1;
@@ -140,20 +147,86 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private void drawPieces(Canvas canvas) {
         float tileSize = getTileSize();
+
         for (int rank = 0; rank < BOARD_SIZE; rank++) {
             for (int file = 0; file < BOARD_SIZE; file++) {
                 var currentPiece = chessboard.getPiece(rank, file);
-                if (Chessboard.NONE_PIECE != currentPiece) {
-                    Bitmap pieceBitmap = bitmapManager.getPieceBitmap(currentPiece);
-                    if (!isNull(pieceBitmap)) {
-                        float left = file * tileSize + puzzleHintView.getShakeOffset(rank, file);
-                        float top = rank * tileSize;
-                        canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
-                    }
+                if (Chessboard.NONE_PIECE == currentPiece) continue;
+
+                if (isAnimating && rank == animFromRank && file == animFromFile) {
+                    continue;
                 }
+
+                Bitmap pieceBitmap = bitmapManager.getPieceBitmap(currentPiece);
+                if (isNull(pieceBitmap)) continue;
+
+                float left = file * tileSize + puzzleHintView.getShakeOffset(rank, file);
+                float top = rank * tileSize;
+                canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
             }
         }
+
+        if (isAnimating && !isNull(animPieceBitmap)) {
+
+            float fromLeft = animFromFile * tileSize + puzzleHintView.getShakeOffset(animFromRank, animFromFile);
+            float fromTop = animFromRank * tileSize;
+            float toLeft = animToFile * tileSize + puzzleHintView.getShakeOffset(animToRank, animToFile);
+            float toTop = animToRank * tileSize;
+
+            float curLeft = fromLeft + (toLeft - fromLeft) * animProgress;
+            float curTop = fromTop + (toTop - fromTop) * animProgress;
+
+            canvas.drawBitmap(animPieceBitmap, curLeft, curTop, bitmapPaint);
+        }
     }
+
+    private void animateMove(String nextMove) {
+        int[] coords = chessboard.transformFenMove(nextMove);
+        animFromRank = coords[0];
+        animFromFile = coords[1];
+        animToRank = coords[2];
+        animToFile = coords[3];
+
+        char movingPiece = chessboard.getPiece(animFromRank, animFromFile);
+        animPieceBitmap = bitmapManager.getPieceBitmap(movingPiece);
+
+        isAnimating = true;
+        animProgress = 0f;
+
+        android.animation.ValueAnimator animator = android.animation.ValueAnimator.ofFloat(0f, 1f);
+        animator.setDuration(PIECE_MOVE_DELAY);
+        animator.setInterpolator(new android.view.animation.LinearInterpolator());
+        animator.addUpdateListener(a -> {
+            animProgress = (float) a.getAnimatedValue();
+            postInvalidateOnAnimation();
+        });
+        animator.addListener(new android.animation.AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(android.animation.Animator animation) {
+                var isCaptureMove = chessboard.isCaptureMove(nextMove);
+                chessboard.doMove(nextMove);
+                isAnimating = false;
+                animPieceBitmap = null;
+                SoundPlayer.getInstance().playMoveSound(getContext(), isCaptureMove);
+
+                if (chessboard.isPlayersTurn()) {
+                    int[] moveCoordinates = chessboard.transformFenMove(nextMove);
+                    opponentFromRank = moveCoordinates[0];
+                    opponentFromFile = moveCoordinates[1];
+                    opponentToRank = moveCoordinates[2];
+                    opponentToFile = moveCoordinates[3];
+                }
+
+                invalidate();
+
+                if (!chessboard.isPlayersTurn() && puzzleGame.isStarted() && !puzzleFinished) {
+                    postDelayed(() -> doNextMove(null), 100);
+                }
+            }
+        });
+        animator.start();
+    }
+
 
     public void makeText(int resourceId) {
         var toast = Toast.makeText(getContext(), resourceId, Toast.LENGTH_SHORT);
@@ -244,19 +317,13 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void doNextMove(String nextMove) {
+        if (isAnimating) return;
+
         var possibleNextMove = puzzleGame.getNextMove();
         if (isNull(nextMove) || nextMove.isEmpty()) {
             nextMove = possibleNextMove;
         }
-        chessboard.doMove(nextMove);
-        if (chessboard.isPlayersTurn()) {
-            var moveCoordinates = chessboard.transformFenMove(nextMove);
-            opponentFromRank = moveCoordinates[0];
-            opponentFromFile = moveCoordinates[1];
-            opponentToRank = moveCoordinates[2];
-            opponentToFile = moveCoordinates[3];
-        }
-        invalidate();
+        animateMove(nextMove);
     }
 
 

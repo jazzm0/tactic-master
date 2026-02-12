@@ -11,6 +11,7 @@ import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
 import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
 import com.tacticmaster.rating.EloRatingCalculator;
+import com.tacticmaster.sound.SoundPlayer;
 
 import java.util.NoSuchElementException;
 
@@ -212,5 +213,8 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         if (puzzleTextViews != null) {
             puzzleTextViews.cleanup();
         }
+        // Release sound player resources
+        SoundPlayer.getInstance().release();
+        Log.d(TAG, "ChessboardController cleanup completed");
     }
 }
