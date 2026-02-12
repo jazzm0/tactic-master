@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 
 import com.tacticmaster.R;
 import com.tacticmaster.puzzle.PuzzleGame;
+import com.tacticmaster.sound.SoundPlayer;
 
 public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener {
 
@@ -206,6 +207,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 chessboard.doMove(nextMove);
                 isAnimating = false;
                 animPieceBitmap = null;
+                SoundPlayer.getInstance().playMoveSound(getContext(), isCaptureMove);
 
                 if (chessboard.isPlayersTurn()) {
                     int[] moveCoordinates = chessboard.transformFenMove(nextMove);
