@@ -59,6 +59,7 @@ dependencies {
     implementation libs.chesslib
     implementation libs.acra.core
     implementation libs.acra.mail
+    implementation libs.acra.toast
 
     testImplementation libs.junit
     testImplementation libs.junit.jupiter.api
