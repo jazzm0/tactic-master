@@ -10,9 +10,13 @@ android {
         applicationId = "com.tacticmaster"
         minSdk = 24
         targetSdk = 36
-        versionCode = 27
-        versionName = "1.0.27"
+        versionCode = 28
+        versionName = "1.0.28"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {
@@ -57,6 +61,9 @@ dependencies {
     implementation libs.appcompat
     implementation libs.material
     implementation libs.chesslib
+    implementation libs.acra.core
+    implementation libs.acra.mail
+    implementation libs.acra.toast
 
     testImplementation libs.junit
     testImplementation libs.junit.jupiter.api
