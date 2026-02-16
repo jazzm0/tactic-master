@@ -33,7 +33,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     public static final int BOARD_SIZE = 8;
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private static final int MOVE_DELAY = 1300;
-    private static final int PIECE_MOVE_DELAY = 600;
+    private static final int PIECE_MOVE_DELAY = 300;
     private static final int STROKE_WIDTH = 8;
 
     private final ChessboardPieceManager bitmapManager;
@@ -218,10 +218,6 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 }
 
                 invalidate();
-
-                if (!chessboard.isPlayersTurn() && puzzleGame.isStarted() && !puzzleFinished) {
-                    postDelayed(() -> doNextMove(null), 100);
-                }
             }
         });
         animator.start();
