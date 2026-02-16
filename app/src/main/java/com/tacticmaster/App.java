@@ -3,7 +3,6 @@ package com.tacticmaster;
 import android.app.Application;
 
 import org.acra.ACRA;
-import org.acra.BuildConfig;
 import org.acra.config.CoreConfigurationBuilder;
 import org.acra.config.MailSenderConfigurationBuilder;
 import org.acra.config.ToastConfigurationBuilder;
