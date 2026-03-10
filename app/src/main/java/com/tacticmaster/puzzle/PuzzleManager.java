@@ -59,7 +59,8 @@ public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListe
         if (!isNull(themes) && !themes.isEmpty()) {
             puzzleThemes.addAll(themes);
         }
-        currentIndex = puzzles.size();
+        puzzles.clear();
+        currentIndex = -1;
         moveToNextPuzzle();
     }
 
