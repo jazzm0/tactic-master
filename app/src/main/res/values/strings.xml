@@ -66,10 +66,14 @@
     <string name="animations_enabled_title">Enable Animations</string>
     <string name="animations_enabled_summary">Animate piece movements</string>
     <string name="animation_speed_title">Animation Speed</string>
-    <string name="animation_speed_slow">Slow</string>
-    <string name="animation_speed_normal">Normal</string>
-    <string name="animation_speed_fast">Fast</string>
-    <string name="animation_speed_slow_summary">800ms - Slower animations for better visibility</string>
-    <string name="animation_speed_normal_summary">300ms - Default animation speed</string>
-    <string name="animation_speed_fast_summary">150ms - Faster animations for quick play</string>
+    <string name="animation_speed_summary">Adjust animation duration (300–800ms)</string>
+
+    <!-- Display settings -->
+    <string name="display_category_title">Display</string>
+    <string name="show_puzzle_rating_title">Show Puzzle Rating</string>
+    <string name="show_puzzle_rating_summary">Display the puzzle difficulty rating</string>
+    <string name="show_puzzle_id_title">Show Puzzle ID</string>
+    <string name="show_puzzle_id_summary">Display the puzzle ID and sharing options</string>
+    <string name="show_puzzles_count_title">Show Puzzles Count</string>
+    <string name="show_puzzles_count_summary">Display the number of puzzles solved</string>
 </resources>

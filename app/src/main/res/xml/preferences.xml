@@ -5,11 +5,11 @@
     <PreferenceCategory android:title="@string/autoplay_category_title">
 
         <SwitchPreferenceCompat
-            android:key="autoplay"
-            android:title="@string/autoplay_title"
-            android:summary="@string/autoplay_summary"
             android:defaultValue="false"
-            android:icon="@drawable/autoplay" />
+            android:icon="@drawable/autoplay"
+            android:key="autoplay"
+            android:summary="@string/autoplay_summary"
+            android:title="@string/autoplay_title" />
 
     </PreferenceCategory>
 
@@ -17,10 +17,10 @@
     <PreferenceCategory android:title="@string/sound_category_title">
 
         <SwitchPreferenceCompat
+            android:defaultValue="true"
             android:key="sound_enabled"
-            android:title="@string/sound_enabled_title"
             android:summary="@string/sound_enabled_summary"
-            android:defaultValue="true" />
+            android:title="@string/sound_enabled_title" />
 
     </PreferenceCategory>
 
@@ -28,18 +28,42 @@
     <PreferenceCategory android:title="@string/animation_category_title">
 
         <SwitchPreferenceCompat
+            android:defaultValue="true"
             android:key="animations_enabled"
-            android:title="@string/animations_enabled_title"
             android:summary="@string/animations_enabled_summary"
-            android:defaultValue="true" />
+            android:title="@string/animations_enabled_title" />
 
-        <ListPreference
+        <SeekBarPreference
+            android:defaultValue="300"
+            android:dependency="animations_enabled"
             android:key="animation_speed"
+            android:max="800"
+            android:min="300"
             android:title="@string/animation_speed_title"
-            android:entries="@array/animation_speed_entries"
-            android:entryValues="@array/animation_speed_values"
-            android:defaultValue="normal"
-            android:dependency="animations_enabled" />
+            android:summary="@string/animation_speed_summary" />
+
+    </PreferenceCategory>
+
+    <!-- Display Section -->
+    <PreferenceCategory android:title="@string/display_category_title">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="show_puzzle_rating"
+            android:summary="@string/show_puzzle_rating_summary"
+            android:title="@string/show_puzzle_rating_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="show_puzzle_id"
+            android:summary="@string/show_puzzle_id_summary"
+            android:title="@string/show_puzzle_id_title" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="show_puzzles_count"
+            android:summary="@string/show_puzzles_count_summary"
+            android:title="@string/show_puzzles_count_title" />
 
     </PreferenceCategory>
 

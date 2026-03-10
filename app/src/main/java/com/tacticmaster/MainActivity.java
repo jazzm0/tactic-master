@@ -99,6 +99,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         chessboardController.renderPuzzle();
+
+        applyDisplaySettings();
+    }
+
+    private void applyDisplaySettings() {
+        TextView puzzleRating = findViewById(R.id.puzzle_rating);
+        View puzzleIdContainer = findViewById(R.id.puzzle_id_container);
+        TextView puzzlesCount = findViewById(R.id.puzzles_count);
+
+        puzzleRating.setVisibility(settingsManager.isShowPuzzleRating() ? View.VISIBLE : View.GONE);
+        puzzleIdContainer.setVisibility(settingsManager.isShowPuzzleId() ? View.VISIBLE : View.GONE);
+        puzzlesCount.setVisibility(settingsManager.isShowPuzzlesCount() ? View.VISIBLE : View.GONE);
     }
 
     @Override

@@ -4,8 +4,9 @@ import static java.util.Objects.isNull;
 
 import android.os.Bundle;
 
-import androidx.preference.ListPreference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SeekBarPreference;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.tacticmaster.R;
@@ -16,10 +17,14 @@ import com.tacticmaster.R;
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     private SettingsManager settingsManager;
-    private ListPreference animationSpeedPref;
+    private SeekBarPreference animationSpeedPref;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        // Use the same SharedPreferences as SettingsManager
+        PreferenceManager prefManager = getPreferenceManager();
+        prefManager.setSharedPreferencesName("TacticMasterSettings");
+
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
         settingsManager = SettingsManager.getInstance(requireContext());
@@ -58,15 +63,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
 
         if (!isNull(animationSpeedPref)) {
-            String currentSpeed = SettingsManager.animationSpeedToString(settingsManager.getAnimationSpeed());
+            int currentSpeed = ensureSpeedLimits(settingsManager.getAnimationSpeed());
+            settingsManager.setAnimationSpeed(currentSpeed);
+
+            animationSpeedPref.setMin(300);
+            animationSpeedPref.setMax(800);
             animationSpeedPref.setValue(currentSpeed);
-            updateAnimationSpeedSummary(currentSpeed);
+            animationSpeedPref.setShowSeekBarValue(true);
 
             animationSpeedPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                String speedValue = (String) newValue;
-                int speedMs = SettingsManager.animationSpeedFromString(speedValue);
+                int speedMs = ensureSpeedLimits((Integer) newValue);
                 settingsManager.setAnimationSpeed(speedMs);
-                updateAnimationSpeedSummary(speedValue);
                 return true;
             });
 
@@ -75,20 +82,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
+    private int ensureSpeedLimits(int speed) {
+        if (speed < 300) {
+            return 300;
+        } else if (speed > 800) {
+            return 800;
+        }
+        return speed;
+    }
+
     private void updateAnimationSpeedVisibility(boolean animationsEnabled) {
         if (!isNull(animationSpeedPref)) {
             animationSpeedPref.setVisible(animationsEnabled);
-        }
-    }
-
-    private void updateAnimationSpeedSummary(String speedValue) {
-        if (!isNull(animationSpeedPref)) {
-            String summary = switch (speedValue) {
-                case "slow" -> getString(R.string.animation_speed_slow_summary);
-                case "fast" -> getString(R.string.animation_speed_fast_summary);
-                default -> getString(R.string.animation_speed_normal_summary);
-            };
-            animationSpeedPref.setSummary(summary);
         }
     }
 }

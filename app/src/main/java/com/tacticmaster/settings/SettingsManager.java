@@ -18,12 +18,18 @@ public class SettingsManager {
     private static final String KEY_SOUND_ENABLED = "sound_enabled";
     private static final String KEY_ANIMATIONS_ENABLED = "animations_enabled";
     private static final String KEY_ANIMATION_SPEED = "animation_speed";
+    private static final String KEY_SHOW_PUZZLE_RATING = "show_puzzle_rating";
+    private static final String KEY_SHOW_PUZZLE_ID = "show_puzzle_id";
+    private static final String KEY_SHOW_PUZZLES_COUNT = "show_puzzles_count";
 
     // Default values
     private static final boolean DEFAULT_AUTOPLAY = false;
     private static final boolean DEFAULT_SOUND_ENABLED = true;
     private static final boolean DEFAULT_ANIMATIONS_ENABLED = true;
     public static final int DEFAULT_ANIMATION_SPEED = 300; // milliseconds
+    private static final boolean DEFAULT_SHOW_PUZZLE_RATING = true;
+    private static final boolean DEFAULT_SHOW_PUZZLE_ID = true;
+    private static final boolean DEFAULT_SHOW_PUZZLES_COUNT = true;
 
     // Animation speed constants
     public static final int ANIMATION_SPEED_SLOW = 800;
@@ -110,5 +116,18 @@ public class SettingsManager {
         } else {
             return "normal";
         }
+    }
+
+    // Display settings
+    public boolean isShowPuzzleRating() {
+        return sharedPreferences.getBoolean(KEY_SHOW_PUZZLE_RATING, DEFAULT_SHOW_PUZZLE_RATING);
+    }
+
+    public boolean isShowPuzzleId() {
+        return sharedPreferences.getBoolean(KEY_SHOW_PUZZLE_ID, DEFAULT_SHOW_PUZZLE_ID);
+    }
+
+    public boolean isShowPuzzlesCount() {
+        return sharedPreferences.getBoolean(KEY_SHOW_PUZZLES_COUNT, DEFAULT_SHOW_PUZZLES_COUNT);
     }
 }
