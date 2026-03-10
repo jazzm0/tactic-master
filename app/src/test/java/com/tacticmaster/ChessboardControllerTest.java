@@ -60,7 +60,7 @@ public class ChessboardControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(databaseAccessor.getPlayerRating()).thenReturn(2333);
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
         when(settingsManager.isAutoplayEnabled()).thenReturn(false);
         String fen = "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29";
         String moves = "f8f7 c2h7 g8h7 g7g8q";
@@ -76,7 +76,7 @@ public class ChessboardControllerTest {
         this.puzzleGames.add(new PuzzleGame("3", "fen2", "moves2", 1600));
         this.puzzleRecords.add(new Puzzle("4", "fen3", "moves3", 1400));
         this.puzzleGames.add(new PuzzleGame("4", "fen3", "moves3", 1400));
-        chessboardController = new ChessboardController(databaseAccessor, settingsManager, new PuzzleManager(databaseAccessor), puzzleThemesDialogHelper, chessboardView, puzzleTextViews);
+        chessboardController = new ChessboardController(databaseAccessor, settingsManager, new PuzzleManager(databaseAccessor, 1600), puzzleThemesDialogHelper, chessboardView, puzzleTextViews);
         when(puzzleTextViews.getFilterDropdown()).thenReturn(mock(MaterialAutoCompleteTextView.class));
         when(puzzleTextViews.getFilterButton()).thenReturn(mock(MaterialButton.class));
 
@@ -86,7 +86,7 @@ public class ChessboardControllerTest {
     public void testLoadNextPuzzles() {
         when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
-        when(databaseAccessor.getPlayerRating()).thenReturn(2333);
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet())).thenReturn(new ArrayList<>()).thenReturn(new ArrayList<>()).thenReturn(puzzleRecords);
 
         chessboardController.loadNextPuzzle();
@@ -104,7 +104,7 @@ public class ChessboardControllerTest {
     public void testLoadNextPuzzlesNoUnsolvedLeft() {
         when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
-        when(databaseAccessor.getPlayerRating()).thenReturn(2333);
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet())).thenReturn(new ArrayList<>());
 
         chessboardController.loadNextPuzzle();
@@ -173,7 +173,7 @@ public class ChessboardControllerTest {
         chessboardController.onPuzzleSolved(puzzleGame);
 
         verify(databaseAccessor).setSolved(puzzleGame.getPuzzleId());
-        verify(databaseAccessor).storePlayerRating(anyInt());
+        verify(settingsManager).setPlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
 
         chessboardController.onAfterPuzzleFinished(puzzleGame);
@@ -196,7 +196,7 @@ public class ChessboardControllerTest {
 
         chessboardController.onPuzzleNotSolved(puzzleGame);
 
-        verify(databaseAccessor).storePlayerRating(anyInt());
+        verify(settingsManager).setPlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
         verify(puzzleThemesDialogHelper).prepareDialogContent(any(), any(), any(), any());
     }
@@ -348,7 +348,7 @@ public class ChessboardControllerTest {
         chessboardController.onPuzzleSolved(puzzleGame);
 
         verify(databaseAccessor, never()).setSolved(anyString());
-        verify(databaseAccessor, never()).storePlayerRating(anyInt());
+        verify(settingsManager, never()).setPlayerRating(anyInt());
     }
 
     @Test
@@ -357,7 +357,7 @@ public class ChessboardControllerTest {
 
         chessboardController.onPuzzleNotSolved(puzzleGame);
 
-        verify(databaseAccessor, never()).storePlayerRating(anyInt());
+        verify(settingsManager, never()).setPlayerRating(anyInt());
     }
 
     @Test
@@ -417,7 +417,7 @@ public class ChessboardControllerTest {
 
         chessboardController.onPuzzleSolved(puzzleGame);
 
-        verify(databaseAccessor).storePlayerRating(2359);
+        verify(settingsManager).setPlayerRating(2359);
         verify(puzzleTextViews).updatePlayerRating(2333, 2359);
     }
 }

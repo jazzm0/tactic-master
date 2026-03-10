@@ -62,14 +62,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.puzzleTextViews = puzzleTextViews;
         this.chessboardView.setPuzzleSolvedListener(this);
         this.settingsManager = settingsManager;
-        this.playerRating = databaseAccessor.getPlayerRating();
+        this.playerRating = settingsManager.getPlayerRating();
         this.autoplay = settingsManager.isAutoplayEnabled();
         Log.d(TAG, "ChessboardController initialized with player rating: " + playerRating);
     }
 
     private void updatePlayerRating(int opponentRating, double result) {
         var newRating = EloRatingCalculator.calculateNewRating(playerRating, opponentRating, result);
-        databaseAccessor.storePlayerRating(newRating);
+        settingsManager.setPlayerRating(newRating);
         puzzleTextViews.updatePlayerRating(playerRating, newRating);
         this.playerRating = newRating;
         puzzleManager.updateRating(newRating);

@@ -11,13 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -154,24 +151,6 @@ class DatabaseAccessorTest {
         when(mockCursor.moveToNext()).thenReturn(false); // 0 rows
 
         assertThrows(NoSuchElementException.class, () -> databaseAccessor.getPuzzleById("2"));
-    }
-
-    @Test
-    void testStorePlayerRating() {
-        int rating = 2000;
-        databaseAccessor.storePlayerRating(rating);
-
-        verify(mockDatabase).update(eq("player_table"), any(ContentValues.class), eq("PlayerId = 1"), isNull());
-    }
-
-    @Test
-    void testGetPlayerRating() {
-        when(mockDatabase.rawQuery("SELECT PlayerRating FROM player_table", null)).thenReturn(mockCursor);
-        when(mockCursor.moveToFirst()).thenReturn(true);
-        when(mockCursor.getInt(0)).thenReturn(1500);
-
-        int rating = databaseAccessor.getPlayerRating();
-        assertEquals(1500, rating);
     }
 
     @Test

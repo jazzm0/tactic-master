@@ -1,9 +1,5 @@
 package com.tacticmaster.db;
 
-import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_ID;
-import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
-import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
-import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
@@ -11,7 +7,6 @@ import static com.tacticmaster.db.PuzzleTable.COLUMN_THEMES;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static java.util.Objects.isNull;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -144,25 +139,6 @@ public class DatabaseAccessor {
             }
         }
         return puzzles;
-    }
-
-    public void storePlayerRating(int rating) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_PLAYER_RATING, rating);
-        db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
-        db.close();
-    }
-
-    public int getPlayerRating() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT " + COLUMN_PLAYER_RATING + " FROM " + PLAYER_TABLE_NAME, null)) {
-            if (cursor.moveToFirst()) {
-                return cursor.getInt(0);
-            }
-        }
-        db.close();
-        return DEFAULT_PLAYER_RATING;
     }
 
     public Set<String> getPuzzleThemes() {

@@ -21,6 +21,7 @@ public class SettingsManager {
     private static final String KEY_SHOW_PUZZLE_RATING = "show_puzzle_rating";
     private static final String KEY_SHOW_PUZZLE_ID = "show_puzzle_id";
     private static final String KEY_SHOW_PUZZLES_COUNT = "show_puzzles_count";
+    private static final String KEY_PLAYER_RATING = "player_rating";
 
     // Default values
     private static final boolean DEFAULT_AUTOPLAY = false;
@@ -30,6 +31,7 @@ public class SettingsManager {
     private static final boolean DEFAULT_SHOW_PUZZLE_RATING = true;
     private static final boolean DEFAULT_SHOW_PUZZLE_ID = true;
     private static final boolean DEFAULT_SHOW_PUZZLES_COUNT = true;
+    public static final int DEFAULT_PLAYER_RATING = 1600;
 
     // Animation speed constants
     public static final int ANIMATION_SPEED_SLOW = 800;
@@ -129,5 +131,14 @@ public class SettingsManager {
 
     public boolean isShowPuzzlesCount() {
         return sharedPreferences.getBoolean(KEY_SHOW_PUZZLES_COUNT, DEFAULT_SHOW_PUZZLES_COUNT);
+    }
+
+    // Player rating settings
+    public int getPlayerRating() {
+        return sharedPreferences.getInt(KEY_PLAYER_RATING, DEFAULT_PLAYER_RATING);
+    }
+
+    public void setPlayerRating(int rating) {
+        sharedPreferences.edit().putInt(KEY_PLAYER_RATING, rating).apply();
     }
 }

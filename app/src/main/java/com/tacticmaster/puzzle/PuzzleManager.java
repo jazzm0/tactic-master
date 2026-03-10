@@ -21,9 +21,9 @@ public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListe
     private int currentIndex = -1;
     private int rating = 0;
 
-    public PuzzleManager(DatabaseAccessor databaseAccessor) {
+    public PuzzleManager(DatabaseAccessor databaseAccessor, int initialRating) {
         this.databaseAccessor = databaseAccessor;
-        this.rating = databaseAccessor.getPlayerRating();
+        this.rating = initialRating;
     }
 
     public void updateRating(int rating) {

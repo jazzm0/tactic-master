@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
         chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
         chessboardView.setPuzzleHintView(findViewById(R.id.hint_path_view));
 
-        var puzzleManager = new PuzzleManager(databaseAccessor);
         settingsManager = SettingsManager.getInstance(this);
+        var puzzleManager = new PuzzleManager(databaseAccessor, settingsManager.getPlayerRating());
 
         chessboardController = new ChessboardController(
                 databaseAccessor,
