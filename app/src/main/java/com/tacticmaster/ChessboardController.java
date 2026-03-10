@@ -11,6 +11,7 @@ import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
 import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
 import com.tacticmaster.rating.EloRatingCalculator;
+import com.tacticmaster.settings.SettingsManager;
 import com.tacticmaster.sound.SoundPlayer;
 
 import java.util.NoSuchElementException;
@@ -25,12 +26,14 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     private final PuzzleTextViews puzzleTextViews;
     private final PuzzleManager puzzleManager;
     private final PuzzleThemesDialogHelper puzzleThemesDialogHelper;
+    private final SettingsManager settingsManager;
 
     private int playerRating;
     private boolean autoplay;
 
     public ChessboardController(
             DatabaseAccessor databaseAccessor,
+            SettingsManager settingsManager,
             PuzzleManager puzzleManager,
             PuzzleThemesDialogHelper puzzleThemesDialogHelper,
             ChessboardView chessboardView,
@@ -58,9 +61,9 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
         this.chessboardView.setPuzzleSolvedListener(this);
+        this.settingsManager = settingsManager;
         this.playerRating = databaseAccessor.getPlayerRating();
-        this.autoplay = databaseAccessor.getPlayerAutoplay();
-
+        this.autoplay = settingsManager.isAutoplayEnabled();
         Log.d(TAG, "ChessboardController initialized with player rating: " + playerRating);
     }
 
@@ -174,7 +177,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     public void setAutoplay(boolean isChecked) {
         this.autoplay = isChecked;
-        databaseAccessor.storePlayerAutoplay(isChecked);
+        settingsManager.setAutoplayEnabled(isChecked);
     }
 
     public boolean getAutoplay() {

@@ -60,6 +60,7 @@ android {
 dependencies {
     implementation libs.appcompat
     implementation libs.material
+    implementation libs.preference
     implementation libs.chesslib
     implementation libs.acra.core
     implementation libs.acra.mail

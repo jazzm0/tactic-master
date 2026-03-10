@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Animation Speed Options -->
+    <string-array name="animation_speed_entries">
+        <item>@string/animation_speed_slow</item>
+        <item>@string/animation_speed_normal</item>
+        <item>@string/animation_speed_fast</item>
+    </string-array>
+
+    <string-array name="animation_speed_values">
+        <item>slow</item>
+        <item>normal</item>
+        <item>fast</item>
+    </string-array>
+</resources>

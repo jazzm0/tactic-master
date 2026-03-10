@@ -209,16 +209,6 @@
             android:src="@drawable/ic_right" />
     </LinearLayout>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/toggle_autoplay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:theme="@style/CustomSwitchMaterial"
-        android:thumb="@drawable/autoplay"
-        app:layout_constraintBottom_toTopOf="@id/puzzle_reload"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <ImageButton
         android:id="@+id/puzzle_hint"
         android:layout_width="40dp"
@@ -230,5 +220,17 @@
         android:src="@drawable/ic_hint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/settings_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:background="@color/button_background_color"
+        android:contentDescription="@string/settings_title"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_settings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

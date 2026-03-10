@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Autoplay Section -->
+    <PreferenceCategory android:title="@string/autoplay_category_title">
+
+        <SwitchPreferenceCompat
+            android:key="autoplay"
+            android:title="@string/autoplay_title"
+            android:summary="@string/autoplay_summary"
+            android:defaultValue="false"
+            android:icon="@drawable/autoplay" />
+
+    </PreferenceCategory>
+
+    <!-- Sound Section -->
+    <PreferenceCategory android:title="@string/sound_category_title">
+
+        <SwitchPreferenceCompat
+            android:key="sound_enabled"
+            android:title="@string/sound_enabled_title"
+            android:summary="@string/sound_enabled_summary"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <!-- Animation Section -->
+    <PreferenceCategory android:title="@string/animation_category_title">
+
+        <SwitchPreferenceCompat
+            android:key="animations_enabled"
+            android:title="@string/animations_enabled_title"
+            android:summary="@string/animations_enabled_summary"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:key="animation_speed"
+            android:title="@string/animation_speed_title"
+            android:entries="@array/animation_speed_entries"
+            android:entryValues="@array/animation_speed_values"
+            android:defaultValue="normal"
+            android:dependency="animations_enabled" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

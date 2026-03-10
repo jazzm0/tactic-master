@@ -47,4 +47,29 @@
 
                                 Best regards,
                                 ]]></string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+
+    <!-- Autoplay Settings -->
+    <string name="autoplay_category_title">Autoplay</string>
+    <string name="autoplay_title">Enable Autoplay</string>
+    <string name="autoplay_summary">Automatically load next puzzle after solving</string>
+
+    <!-- Sound Settings -->
+    <string name="sound_category_title">Sound</string>
+    <string name="sound_enabled_title">Enable Sound</string>
+    <string name="sound_enabled_summary">Play sound effects for moves and captures</string>
+
+    <!-- Animation Settings -->
+    <string name="animation_category_title">Animations</string>
+    <string name="animations_enabled_title">Enable Animations</string>
+    <string name="animations_enabled_summary">Animate piece movements</string>
+    <string name="animation_speed_title">Animation Speed</string>
+    <string name="animation_speed_slow">Slow</string>
+    <string name="animation_speed_normal">Normal</string>
+    <string name="animation_speed_fast">Fast</string>
+    <string name="animation_speed_slow_summary">800ms - Slower animations for better visibility</string>
+    <string name="animation_speed_normal_summary">300ms - Default animation speed</string>
+    <string name="animation_speed_fast_summary">150ms - Faster animations for quick play</string>
 </resources>

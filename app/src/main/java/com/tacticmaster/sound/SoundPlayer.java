@@ -12,6 +12,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.tacticmaster.R;
+import com.tacticmaster.settings.SettingsManager;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -45,6 +46,11 @@ public final class SoundPlayer {
      * @param isCaptureMove true for capture sound, false for move sound
      */
     public void playMoveSound(Context context, boolean isCaptureMove) {
+        SettingsManager settingsManager = SettingsManager.getInstance(context);
+        if (!settingsManager.isSoundEnabled()) {
+            return;
+        }
+
         lock.lock();
         AssetFileDescriptor afd = null;
         try {

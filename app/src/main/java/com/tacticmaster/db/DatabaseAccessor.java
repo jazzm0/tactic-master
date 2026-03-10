@@ -1,6 +1,5 @@
 package com.tacticmaster.db;
 
-import static com.tacticmaster.db.PlayerTable.COLUMN_AUTOPLAY_ENABLED;
 import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_ID;
 import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
 import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
@@ -164,25 +163,6 @@ public class DatabaseAccessor {
         }
         db.close();
         return DEFAULT_PLAYER_RATING;
-    }
-
-    public void storePlayerAutoplay(boolean isChecked) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_AUTOPLAY_ENABLED, isChecked ? 1 : 0);
-        db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
-        db.close();
-    }
-
-    public boolean getPlayerAutoplay() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT " + COLUMN_AUTOPLAY_ENABLED + " FROM " + PLAYER_TABLE_NAME, null)) {
-            if (cursor.moveToFirst()) {
-                db.close();
-                return cursor.getInt(0) == 1;
-            }
-        }
-        return true;
     }
 
     public Set<String> getPuzzleThemes() {
