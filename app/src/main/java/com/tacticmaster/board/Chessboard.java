@@ -1,6 +1,7 @@
 package com.tacticmaster.board;
 
 import static com.tacticmaster.board.ChessboardView.BOARD_SIZE;
+import static java.util.Locale.ENGLISH;
 import static java.util.Objects.isNull;
 
 import com.github.bhlangonijr.chesslib.Board;
@@ -77,7 +78,7 @@ public class Chessboard {
             return false;
         }
         for (var legalMove : chessboard.legalMoves()) {
-            if (legalMove.toString().toLowerCase().startsWith(fenMove.toLowerCase())) {
+            if (legalMove.toString().toLowerCase(ENGLISH).startsWith(fenMove.toLowerCase(ENGLISH))) {
                 return true;
             }
         }
@@ -85,13 +86,13 @@ public class Chessboard {
     }
 
     public String getProposedMove(int fromRank, int fromFile, int toRank, int toFile) {
-        return new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile)).toString().toLowerCase();
+        return new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile)).toString().toLowerCase(ENGLISH);
     }
 
     public String getPromotionMove(int fromRank, int fromFile, int toRank, int toFile, char piece) {
         return new Move(squareAt(fromRank, fromFile), squareAt(toRank, toFile), Piece.fromFenSymbol(Character.toString(piece)))
                 .toString()
-                .toLowerCase();
+                .toLowerCase(ENGLISH);
     }
 
     public boolean isPlayerWhite() {
