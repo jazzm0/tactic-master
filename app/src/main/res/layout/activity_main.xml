@@ -118,13 +118,13 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/puzzle_id"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <EditText
                 android:id="@+id/puzzle_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
+                android:layout_marginStart="1dp"
                 android:autofillHints="name"
                 android:gravity="center"
                 android:hint="@string/puzzle_id_hint"
@@ -134,13 +134,13 @@
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
                 android:textIsSelectable="true"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <ImageButton
                 android:id="@+id/puzzle_id_link"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="4dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/puzzle_id_sharing"
                 android:scaleType="centerInside"
@@ -150,7 +150,7 @@
                 android:id="@+id/share_fen_button"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="4dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/share_fen"
                 android:scaleType="centerInside"
