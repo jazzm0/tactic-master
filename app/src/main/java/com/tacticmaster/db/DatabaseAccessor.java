@@ -72,24 +72,30 @@ public class DatabaseAccessor {
 
     public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, Set<String> excludedPuzzleIds, Set<String> themes) {
         try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            List<String> selectionArgs = new ArrayList<>();
+
             StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
                     " WHERE " + COLUMN_RATING + " >= " + lowestRating +
                     " AND " + COLUMN_RATING + " <= " + highestRating +
                     " AND " + COLUMN_SOLVED + " = 0");
 
             if (!excludedPuzzleIds.isEmpty()) {
-                queryBuilder.append(" AND ").append(COLUMN_PUZZLE_ID).append(" NOT IN (");
-                for (String id : excludedPuzzleIds) {
-                    queryBuilder.append("'").append(id).append("',");
+                StringBuilder placeholders = new StringBuilder();
+                for (int i = 0; i < excludedPuzzleIds.size(); i++) {
+                    if (i > 0) {
+                        placeholders.append(",");
+                    }
+                    placeholders.append("?");
                 }
-                queryBuilder.setLength(queryBuilder.length() - 1);
-                queryBuilder.append(")");
+                queryBuilder.append(" AND ").append(COLUMN_PUZZLE_ID).append(" NOT IN (").append(placeholders).append(")");
+                selectionArgs.addAll(excludedPuzzleIds);
             }
 
             if (!isNull(themes) && !themes.isEmpty()) {
                 queryBuilder.append(" AND (");
                 for (String theme : themes) {
-                    queryBuilder.append(COLUMN_THEMES).append(" LIKE '%").append(theme).append("%' OR ");
+                    queryBuilder.append(COLUMN_THEMES).append(" LIKE ? OR ");
+                    selectionArgs.add("%" + theme + "%");
                 }
                 queryBuilder.setLength(queryBuilder.length() - 4);
                 queryBuilder.append(")");
@@ -97,7 +103,7 @@ public class DatabaseAccessor {
 
             queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY RANDOM() LIMIT 5");
 
-            return executeQuery(db, queryBuilder.toString(), null);
+            return executeQuery(db, queryBuilder.toString(), selectionArgs.toArray(new String[0]));
         }
     }
 
