@@ -33,28 +33,27 @@ public class DatabaseAccessor {
     }
 
     public boolean wasNotSolved(String puzzleId) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        String query = "SELECT " + COLUMN_SOLVED + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_PUZZLE_ID + " = ?";
-        try (Cursor cursor = db.rawQuery(query, new String[]{puzzleId})) {
-            if (cursor.moveToFirst()) {
-                db.close();
-                return cursor.getInt(0) != 1;
+        try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            String query = "SELECT " + COLUMN_SOLVED + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_PUZZLE_ID + " = ?";
+            try (Cursor cursor = db.rawQuery(query, new String[]{puzzleId})) {
+                if (cursor.moveToFirst()) {
+                    return cursor.getInt(0) != 1;
+                }
             }
         }
         return true;
     }
 
     public void setSolved(String puzzleId) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET " + COLUMN_SOLVED + " = 1 WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
-        db.close();
+        try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET " + COLUMN_SOLVED + " = 1 WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
+        }
     }
 
     public int getSolvedPuzzleCount() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
+        try (SQLiteDatabase db = dbHelper.openDatabase();
+             Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
             if (cursor.moveToFirst()) {
-                db.close();
                 return cursor.getInt(0);
             }
         }
@@ -62,10 +61,9 @@ public class DatabaseAccessor {
     }
 
     public int getAllPuzzleCount() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME, null)) {
+        try (SQLiteDatabase db = dbHelper.openDatabase();
+             Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME, null)) {
             if (cursor.moveToFirst()) {
-                db.close();
                 return cursor.getInt(0);
             }
         }
@@ -73,47 +71,46 @@ public class DatabaseAccessor {
     }
 
     public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, Set<String> excludedPuzzleIds, Set<String> themes) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
-                " WHERE " + COLUMN_RATING + " >= " + lowestRating +
-                " AND " + COLUMN_RATING + " <= " + highestRating +
-                " AND " + COLUMN_SOLVED + " = 0");
+        try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
+                    " WHERE " + COLUMN_RATING + " >= " + lowestRating +
+                    " AND " + COLUMN_RATING + " <= " + highestRating +
+                    " AND " + COLUMN_SOLVED + " = 0");
 
-        if (!excludedPuzzleIds.isEmpty()) {
-            queryBuilder.append(" AND ").append(COLUMN_PUZZLE_ID).append(" NOT IN (");
-            for (String id : excludedPuzzleIds) {
-                queryBuilder.append("'").append(id).append("',");
+            if (!excludedPuzzleIds.isEmpty()) {
+                queryBuilder.append(" AND ").append(COLUMN_PUZZLE_ID).append(" NOT IN (");
+                for (String id : excludedPuzzleIds) {
+                    queryBuilder.append("'").append(id).append("',");
+                }
+                queryBuilder.setLength(queryBuilder.length() - 1);
+                queryBuilder.append(")");
             }
-            queryBuilder.setLength(queryBuilder.length() - 1);
-            queryBuilder.append(")");
-        }
 
-        if (!isNull(themes) && !themes.isEmpty()) {
-            queryBuilder.append(" AND (");
-            for (String theme : themes) {
-                queryBuilder.append(COLUMN_THEMES).append(" LIKE '%").append(theme).append("%' OR ");
+            if (!isNull(themes) && !themes.isEmpty()) {
+                queryBuilder.append(" AND (");
+                for (String theme : themes) {
+                    queryBuilder.append(COLUMN_THEMES).append(" LIKE '%").append(theme).append("%' OR ");
+                }
+                queryBuilder.setLength(queryBuilder.length() - 4);
+                queryBuilder.append(")");
             }
-            queryBuilder.setLength(queryBuilder.length() - 4);
-            queryBuilder.append(")");
+
+            queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY RANDOM() LIMIT 5");
+
+            return executeQuery(db, queryBuilder.toString(), null);
         }
-
-        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY RANDOM() LIMIT 5");
-
-        var result = executeQuery(db, queryBuilder.toString(), null);
-        db.close();
-        return result;
     }
 
     public Puzzle getPuzzleById(String puzzleId) throws NoSuchElementException {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        String query = "SELECT * FROM " + PUZZLE_TABLE_NAME +
-                " WHERE " + COLUMN_PUZZLE_ID + " = ?";
-        List<Puzzle> puzzles = executeQuery(db, query, new String[]{puzzleId});
-        db.close();
-        if (puzzles.isEmpty()) {
-            throw new NoSuchElementException("Puzzle ID  not found");
+        try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            String query = "SELECT * FROM " + PUZZLE_TABLE_NAME +
+                    " WHERE " + COLUMN_PUZZLE_ID + " = ?";
+            List<Puzzle> puzzles = executeQuery(db, query, new String[]{puzzleId});
+            if (puzzles.isEmpty()) {
+                throw new NoSuchElementException("Puzzle ID  not found");
+            }
+            return puzzles.get(0);
         }
-        return puzzles.get(0);
     }
 
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query, String[] selectionArgs) {
