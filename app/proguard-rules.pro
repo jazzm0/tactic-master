@@ -14,8 +14,25 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep ACRA crash reporting classes
+-keep class org.acra.** { *; }
+-keep interface org.acra.** { *; }
+-dontwarn org.acra.**
+
+# Keep chesslib
+-keep class com.github.bhlangonijr.chesslib.** { *; }
+-dontwarn com.github.bhlangonijr.chesslib.**
+
+# Keep puzzle classes (for database reflection)
+-keep class com.tacticmaster.puzzle.Puzzle { *; }
+-keep class com.tacticmaster.puzzle.PuzzleGame { *; }
+
+# Ignore annotation processing warnings
+-dontwarn javax.annotation.processing.**
+-dontwarn com.google.auto.service.**

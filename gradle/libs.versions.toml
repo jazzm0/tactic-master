@@ -11,7 +11,7 @@ espressoCore = "3.7.0"
 materialVersion = "1.13.0"
 chesslib = "1.3.6"
 acra = "5.13.1"
-mockitoCore = "5.22.0"
+mockitoCore = "5.23.0"
 runner = "1.7.0"
 
 [libraries]

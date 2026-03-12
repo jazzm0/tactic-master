@@ -114,20 +114,24 @@ public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListe
     }
 
     private String getPuzzleIdByIndex(int index) {
-        if (currentIndex < 0 || currentIndex >= puzzles.size()) {
-            return null;
+        synchronized (lock) {
+            if (index < 0 || index >= puzzles.size()) {
+                return null;
+            }
+            return puzzles.keySet().toArray(new String[0])[index];
         }
-        return puzzles.keySet().toArray(new String[0])[index];
     }
 
     private int getPuzzleIndexById(String puzzleId) {
-        var index = 0;
-        for (String id : puzzles.keySet()) {
-            if (id.equals(puzzleId)) {
-                return index;
+        synchronized (lock) {
+            var index = 0;
+            for (String id : puzzles.keySet()) {
+                if (id.equals(puzzleId)) {
+                    return index;
+                }
+                index++;
             }
-            index++;
+            return -1;
         }
-        return -1;
     }
 }
