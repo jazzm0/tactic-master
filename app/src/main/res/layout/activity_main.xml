@@ -221,6 +221,26 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <LinearLayout
+        android:id="@+id/hint_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/solved"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@string/is_solved"
+            android:src="@drawable/ic_solved"
+            android:visibility="gone" />
+    </LinearLayout>
+
+
     <ImageButton
         android:id="@+id/settings_button"
         android:layout_width="40dp"
@@ -232,5 +252,6 @@
         android:src="@drawable/ic_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
