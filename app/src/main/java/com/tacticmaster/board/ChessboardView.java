@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 
 import com.tacticmaster.R;
 import com.tacticmaster.puzzle.PuzzleGame;
+import com.tacticmaster.settings.SettingsManager;
 import com.tacticmaster.sound.SoundPlayer;
 
 public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener {
@@ -33,10 +34,10 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     public static final int BOARD_SIZE = 8;
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private static final int MOVE_DELAY = 1300;
-    private static final int PIECE_MOVE_DELAY = 300;
     private static final int STROKE_WIDTH = 8;
 
     private final ChessboardPieceManager bitmapManager;
+    private final SettingsManager settingsManager;
 
     private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, opponentSelectionPaint, textPaint;
 
@@ -58,6 +59,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.bitmapManager = new ChessboardPieceManager(context);
+        this.settingsManager = SettingsManager.getInstance(context);
     }
 
     private void initPaints() {
@@ -190,11 +192,34 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         char movingPiece = chessboard.getPiece(animFromRank, animFromFile);
         animPieceBitmap = bitmapManager.getPieceBitmap(movingPiece);
 
+        // Check if animations are enabled
+        boolean animationsEnabled = settingsManager.areAnimationsEnabled();
+        int animationDuration = animationsEnabled ? settingsManager.getAnimationSpeed() : 0;
+
+        if (!animationsEnabled || animationDuration == 0) {
+            // Skip animation - execute move immediately
+            var isCaptureMove = chessboard.isCaptureMove(nextMove);
+            chessboard.doMove(nextMove);
+            animPieceBitmap = null;
+            SoundPlayer.getInstance().playMoveSound(getContext(), isCaptureMove);
+
+            if (chessboard.isPlayersTurn()) {
+                int[] moveCoordinates = chessboard.transformFenMove(nextMove);
+                opponentFromRank = moveCoordinates[0];
+                opponentFromFile = moveCoordinates[1];
+                opponentToRank = moveCoordinates[2];
+                opponentToFile = moveCoordinates[3];
+            }
+
+            invalidate();
+            return;
+        }
+
         isAnimating = true;
         animProgress = 0f;
 
         android.animation.ValueAnimator animator = android.animation.ValueAnimator.ofFloat(0f, 1f);
-        animator.setDuration(PIECE_MOVE_DELAY);
+        animator.setDuration(animationDuration);
         animator.setInterpolator(new android.view.animation.LinearInterpolator());
         animator.addUpdateListener(a -> {
             animProgress = (float) a.getAnimatedValue();

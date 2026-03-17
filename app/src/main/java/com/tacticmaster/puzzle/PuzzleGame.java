@@ -1,5 +1,6 @@
 package com.tacticmaster.puzzle;
 
+import static java.util.Locale.ENGLISH;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
@@ -50,7 +51,7 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
         if (isNull(move) || currentMoveIndex >= this.moves.length) {
             return false;
         }
-        return this.moves[currentMoveIndex].toLowerCase().startsWith(move.toLowerCase());
+        return this.moves[currentMoveIndex].toLowerCase(ENGLISH).startsWith(move.toLowerCase(ENGLISH));
     }
 
     public String getNextMove() {

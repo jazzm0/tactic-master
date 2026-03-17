@@ -11,7 +11,9 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -51,6 +53,7 @@ public class PuzzleTextViews {
     private final TextView puzzleRatingTextView;
     private final TextView puzzlesSolvedTextView;
     private final TextView playerRatingTextView;
+    private final ImageView solvedIconView;
     private final Context context;
 
     // Animation management
@@ -80,6 +83,7 @@ public class PuzzleTextViews {
             this.puzzleRatingTextView = findViewById(R.id.puzzle_rating);
             this.puzzlesSolvedTextView = findViewById(R.id.puzzles_count);
             this.playerRatingTextView = findViewById(R.id.player_rating);
+            this.solvedIconView = findViewById(R.id.solved);
 
             validateViewReferences();
         } catch (Exception e) {
@@ -281,6 +285,10 @@ public class PuzzleTextViews {
             } else {
                 setUnsolvedState();
                 puzzleIdEditText.setContentDescription("Puzzle not solved");
+            }
+
+            if (!isNull(solvedIconView)) {
+                solvedIconView.setVisibility(solved ? View.VISIBLE : View.GONE);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error setting puzzle solved state", e);

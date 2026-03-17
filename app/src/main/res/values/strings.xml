@@ -13,6 +13,7 @@
     <string name="show_next_puzzle">Show next puzzle</string>
     <string name="player_rating">Player Rating: %d</string>
     <string name="player_turn">move</string>
+    <string name="is_solved">solved</string>
     <string name="puzzle_id_sharing">Share via link</string>
     <string name="no_more_puzzles">No more unsolved puzzles available</string>
     <string name="queen">Queen</string>
@@ -47,4 +48,33 @@
 
                                 Best regards,
                                 ]]></string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+
+    <!-- Autoplay Settings -->
+    <string name="autoplay_category_title">Autoplay</string>
+    <string name="autoplay_title">Enable Autoplay</string>
+    <string name="autoplay_summary">Automatically load next puzzle after solving</string>
+
+    <!-- Sound Settings -->
+    <string name="sound_category_title">Sound</string>
+    <string name="sound_enabled_title">Enable Sound</string>
+    <string name="sound_enabled_summary">Play sound effects for moves and captures</string>
+
+    <!-- Animation Settings -->
+    <string name="animation_category_title">Animations</string>
+    <string name="animations_enabled_title">Enable Animations</string>
+    <string name="animations_enabled_summary">Animate piece movements</string>
+    <string name="animation_speed_title">Animation Speed</string>
+    <string name="animation_speed_summary">Adjust animation duration (300–800ms)</string>
+
+    <!-- Display settings -->
+    <string name="display_category_title">Display</string>
+    <string name="show_puzzle_rating_title">Show Puzzle Rating</string>
+    <string name="show_puzzle_rating_summary">Display the puzzle difficulty rating</string>
+    <string name="show_puzzle_id_title">Show Puzzle ID</string>
+    <string name="show_puzzle_id_summary">Display the puzzle ID and sharing options</string>
+    <string name="show_puzzles_count_title">Show Puzzles Count</string>
+    <string name="show_puzzles_count_summary">Display the number of puzzles solved</string>
 </resources>

@@ -22,6 +22,7 @@ import com.tacticmaster.puzzle.Puzzle;
 import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.puzzle.PuzzleManager;
 import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
+import com.tacticmaster.settings.SettingsManager;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,9 @@ public class ChessboardControllerTest {
     private DatabaseAccessor databaseAccessor;
 
     @Mock
+    SettingsManager settingsManager;
+
+    @Mock
     private PuzzleThemesDialogHelper puzzleThemesDialogHelper;
 
     @Mock
@@ -45,7 +49,7 @@ public class ChessboardControllerTest {
 
     @Mock
     private PuzzleTextViews puzzleTextViews;
-    
+
     private ChessboardController chessboardController;
 
     private PuzzleGame puzzleGame;
@@ -56,8 +60,8 @@ public class ChessboardControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(databaseAccessor.getPlayerRating()).thenReturn(2333);
-        when(databaseAccessor.getPlayerAutoplay()).thenReturn(false);
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
+        when(settingsManager.isAutoplayEnabled()).thenReturn(false);
         String fen = "1rb2rk1/q5P1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 b - - 0 29";
         String moves = "f8f7 c2h7 g8h7 g7g8q";
         this.puzzleGame = new PuzzleGame("1", fen, moves, 1049);
@@ -72,7 +76,7 @@ public class ChessboardControllerTest {
         this.puzzleGames.add(new PuzzleGame("3", "fen2", "moves2", 1600));
         this.puzzleRecords.add(new Puzzle("4", "fen3", "moves3", 1400));
         this.puzzleGames.add(new PuzzleGame("4", "fen3", "moves3", 1400));
-        chessboardController = new ChessboardController(databaseAccessor, new PuzzleManager(databaseAccessor), puzzleThemesDialogHelper, chessboardView, puzzleTextViews);
+        chessboardController = new ChessboardController(databaseAccessor, settingsManager, new PuzzleManager(databaseAccessor, 1600), puzzleThemesDialogHelper, chessboardView, puzzleTextViews);
         when(puzzleTextViews.getFilterDropdown()).thenReturn(mock(MaterialAutoCompleteTextView.class));
         when(puzzleTextViews.getFilterButton()).thenReturn(mock(MaterialButton.class));
 
@@ -82,7 +86,7 @@ public class ChessboardControllerTest {
     public void testLoadNextPuzzles() {
         when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
-        when(databaseAccessor.getPlayerRating()).thenReturn(2333);
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet())).thenReturn(new ArrayList<>()).thenReturn(new ArrayList<>()).thenReturn(puzzleRecords);
 
         chessboardController.loadNextPuzzle();
@@ -100,7 +104,7 @@ public class ChessboardControllerTest {
     public void testLoadNextPuzzlesNoUnsolvedLeft() {
         when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
         when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
-        when(databaseAccessor.getPlayerRating()).thenReturn(2333);
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet())).thenReturn(new ArrayList<>());
 
         chessboardController.loadNextPuzzle();
@@ -169,7 +173,7 @@ public class ChessboardControllerTest {
         chessboardController.onPuzzleSolved(puzzleGame);
 
         verify(databaseAccessor).setSolved(puzzleGame.getPuzzleId());
-        verify(databaseAccessor).storePlayerRating(anyInt());
+        verify(settingsManager).setPlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
 
         chessboardController.onAfterPuzzleFinished(puzzleGame);
@@ -192,7 +196,7 @@ public class ChessboardControllerTest {
 
         chessboardController.onPuzzleNotSolved(puzzleGame);
 
-        verify(databaseAccessor).storePlayerRating(anyInt());
+        verify(settingsManager).setPlayerRating(anyInt());
         verify(puzzleTextViews, atLeastOnce()).setPlayerRating(anyInt());
         verify(puzzleThemesDialogHelper).prepareDialogContent(any(), any(), any(), any());
     }
@@ -239,28 +243,28 @@ public class ChessboardControllerTest {
     @Test
     void testConstructorWithNullDatabaseAccessorThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new ChessboardController(null, mock(PuzzleManager.class), mock(PuzzleThemesDialogHelper.class),
+                new ChessboardController(null, settingsManager, mock(PuzzleManager.class), mock(PuzzleThemesDialogHelper.class),
                         mock(ChessboardView.class), mock(PuzzleTextViews.class)));
     }
 
     @Test
     void testConstructorWithNullPuzzleManagerThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new ChessboardController(mock(DatabaseAccessor.class), null, mock(PuzzleThemesDialogHelper.class),
+                new ChessboardController(mock(DatabaseAccessor.class), settingsManager, null, mock(PuzzleThemesDialogHelper.class),
                         mock(ChessboardView.class), mock(PuzzleTextViews.class)));
     }
 
     @Test
     void testConstructorWithNullChessboardViewThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new ChessboardController(mock(DatabaseAccessor.class), mock(PuzzleManager.class),
+                new ChessboardController(mock(DatabaseAccessor.class), settingsManager, mock(PuzzleManager.class),
                         mock(PuzzleThemesDialogHelper.class), null, mock(PuzzleTextViews.class)));
     }
 
     @Test
     void testConstructorWithNullPuzzleTextViewsThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new ChessboardController(mock(DatabaseAccessor.class), mock(PuzzleManager.class),
+                new ChessboardController(mock(DatabaseAccessor.class), settingsManager, mock(PuzzleManager.class),
                         mock(PuzzleThemesDialogHelper.class), mock(ChessboardView.class), null));
     }
 
@@ -311,12 +315,12 @@ public class ChessboardControllerTest {
         chessboardController.setAutoplay(true);
 
         Assertions.assertTrue(chessboardController.getAutoplay());
-        verify(databaseAccessor).storePlayerAutoplay(true);
+        verify(settingsManager).setAutoplayEnabled(true);
 
         chessboardController.setAutoplay(false);
 
         Assertions.assertFalse(chessboardController.getAutoplay());
-        verify(databaseAccessor).storePlayerAutoplay(false);
+        verify(settingsManager).setAutoplayEnabled(false);
     }
 
     @Test
@@ -344,7 +348,7 @@ public class ChessboardControllerTest {
         chessboardController.onPuzzleSolved(puzzleGame);
 
         verify(databaseAccessor, never()).setSolved(anyString());
-        verify(databaseAccessor, never()).storePlayerRating(anyInt());
+        verify(settingsManager, never()).setPlayerRating(anyInt());
     }
 
     @Test
@@ -353,7 +357,7 @@ public class ChessboardControllerTest {
 
         chessboardController.onPuzzleNotSolved(puzzleGame);
 
-        verify(databaseAccessor, never()).storePlayerRating(anyInt());
+        verify(settingsManager, never()).setPlayerRating(anyInt());
     }
 
     @Test
@@ -413,7 +417,7 @@ public class ChessboardControllerTest {
 
         chessboardController.onPuzzleSolved(puzzleGame);
 
-        verify(databaseAccessor).storePlayerRating(2359);
+        verify(settingsManager).setPlayerRating(2359);
         verify(puzzleTextViews).updatePlayerRating(2333, 2359);
     }
 }

@@ -18,30 +18,56 @@ public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListe
     private final DatabaseAccessor databaseAccessor;
     private final Set<String> puzzleThemes = new TreeSet<>();
     private final Map<String, PuzzleGame> puzzles = new LinkedHashMap<>();
+    private final Object lock = new Object();
     private int currentIndex = -1;
-    private int rating = 0;
+    private int rating;
 
-    public PuzzleManager(DatabaseAccessor databaseAccessor) {
+    public PuzzleManager(DatabaseAccessor databaseAccessor, int initialRating) {
         this.databaseAccessor = databaseAccessor;
-        this.rating = databaseAccessor.getPlayerRating();
+        this.rating = initialRating;
     }
 
     public void updateRating(int rating) {
-        this.rating = rating;
+        synchronized (lock) {
+            this.rating = rating;
+        }
     }
 
     int getRating() {
-        return this.rating;
+        synchronized (lock) {
+            return this.rating;
+        }
     }
 
     public PuzzleGame getCurrentPuzzle() {
-        if (currentIndex < 0 || currentIndex >= puzzles.size()) {
-            throw new NoSuchElementException("Invalid puzzle index");
+        synchronized (lock) {
+            if (currentIndex < 0 || currentIndex >= puzzles.size()) {
+                throw new NoSuchElementException("Invalid puzzle index");
+            }
+            return puzzles.get(getPuzzleIdByIndex(currentIndex));
         }
-        return puzzles.get(getPuzzleIdByIndex(currentIndex));
     }
 
     public void moveToNextPuzzle() {
+        synchronized (lock) {
+            moveToNextPuzzleInternal();
+        }
+    }
+
+    @Override
+    public void onThemesUpdated(Set<String> themes) {
+        synchronized (lock) {
+            puzzleThemes.clear();
+            if (!isNull(themes) && !themes.isEmpty()) {
+                puzzleThemes.addAll(themes);
+            }
+            puzzles.clear();
+            currentIndex = -1;
+            moveToNextPuzzleInternal();
+        }
+    }
+
+    private void moveToNextPuzzleInternal() {
         currentIndex++;
         if (currentIndex >= puzzles.size()) {
             try {
@@ -53,29 +79,23 @@ public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListe
         }
     }
 
-    @Override
-    public void onThemesUpdated(Set<String> themes) {
-        puzzleThemes.clear();
-        if (!isNull(themes) && !themes.isEmpty()) {
-            puzzleThemes.addAll(themes);
-        }
-        currentIndex = puzzles.size();
-        moveToNextPuzzle();
-    }
-
     public void moveToPreviousPuzzle() {
-        if (puzzles.isEmpty()) {
-            loadNextPuzzles();
+        synchronized (lock) {
+            if (puzzles.isEmpty()) {
+                loadNextPuzzles();
+            }
+            currentIndex = (currentIndex - 1 + puzzles.size()) % puzzles.size();
         }
-        currentIndex = (currentIndex - 1 + puzzles.size()) % puzzles.size();
     }
 
     public void loadPuzzleById(String puzzleId) {
-        if (!puzzles.containsKey(puzzleId)) {
-            Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
-            puzzles.put(nextPuzzle.puzzleId(), new PuzzleGame(nextPuzzle));
+        synchronized (lock) {
+            if (!puzzles.containsKey(puzzleId)) {
+                Puzzle nextPuzzle = databaseAccessor.getPuzzleById(puzzleId);
+                puzzles.put(nextPuzzle.puzzleId(), new PuzzleGame(nextPuzzle));
+            }
+            currentIndex = getPuzzleIndexById(puzzleId);
         }
-        currentIndex = getPuzzleIndexById(puzzleId);
     }
 
     private void loadNextPuzzles() throws NoSuchElementException {
@@ -94,20 +114,24 @@ public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListe
     }
 
     private String getPuzzleIdByIndex(int index) {
-        if (currentIndex < 0 || currentIndex >= puzzles.size()) {
-            return null;
+        synchronized (lock) {
+            if (index < 0 || index >= puzzles.size()) {
+                return null;
+            }
+            return puzzles.keySet().toArray(new String[0])[index];
         }
-        return puzzles.keySet().toArray(new String[0])[index];
     }
 
     private int getPuzzleIndexById(String puzzleId) {
-        var index = 0;
-        for (String id : puzzles.keySet()) {
-            if (id.equals(puzzleId)) {
-                return index;
+        synchronized (lock) {
+            var index = 0;
+            for (String id : puzzles.keySet()) {
+                if (id.equals(puzzleId)) {
+                    return index;
+                }
+                index++;
             }
-            index++;
+            return -1;
         }
-        return -1;
     }
 }

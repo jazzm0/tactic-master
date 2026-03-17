@@ -1,10 +1,5 @@
 package com.tacticmaster.db;
 
-import static com.tacticmaster.db.PlayerTable.COLUMN_AUTOPLAY_ENABLED;
-import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_ID;
-import static com.tacticmaster.db.PlayerTable.COLUMN_PLAYER_RATING;
-import static com.tacticmaster.db.PlayerTable.DEFAULT_PLAYER_RATING;
-import static com.tacticmaster.db.PlayerTable.PLAYER_TABLE_NAME;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_PUZZLE_ID;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_RATING;
 import static com.tacticmaster.db.PuzzleTable.COLUMN_SOLVED;
@@ -12,7 +7,6 @@ import static com.tacticmaster.db.PuzzleTable.COLUMN_THEMES;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static java.util.Objects.isNull;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -39,28 +33,27 @@ public class DatabaseAccessor {
     }
 
     public boolean wasNotSolved(String puzzleId) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        String query = "SELECT " + COLUMN_SOLVED + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_PUZZLE_ID + " = ?";
-        try (Cursor cursor = db.rawQuery(query, new String[]{puzzleId})) {
-            if (cursor.moveToFirst()) {
-                db.close();
-                return cursor.getInt(0) != 1;
+        try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            String query = "SELECT " + COLUMN_SOLVED + " FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_PUZZLE_ID + " = ?";
+            try (Cursor cursor = db.rawQuery(query, new String[]{puzzleId})) {
+                if (cursor.moveToFirst()) {
+                    return cursor.getInt(0) != 1;
+                }
             }
         }
         return true;
     }
 
     public void setSolved(String puzzleId) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET " + COLUMN_SOLVED + " = 1 WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
-        db.close();
+        try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            db.execSQL("UPDATE " + PUZZLE_TABLE_NAME + " SET " + COLUMN_SOLVED + " = 1 WHERE " + COLUMN_PUZZLE_ID + " = ?", new String[]{puzzleId});
+        }
     }
 
     public int getSolvedPuzzleCount() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
+        try (SQLiteDatabase db = dbHelper.openDatabase();
+             Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME + " WHERE " + COLUMN_SOLVED + " = 1", null)) {
             if (cursor.moveToFirst()) {
-                db.close();
                 return cursor.getInt(0);
             }
         }
@@ -68,10 +61,9 @@ public class DatabaseAccessor {
     }
 
     public int getAllPuzzleCount() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME, null)) {
+        try (SQLiteDatabase db = dbHelper.openDatabase();
+             Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PUZZLE_TABLE_NAME, null)) {
             if (cursor.moveToFirst()) {
-                db.close();
                 return cursor.getInt(0);
             }
         }
@@ -79,47 +71,52 @@ public class DatabaseAccessor {
     }
 
     public List<Puzzle> getPuzzlesWithinRange(int lowestRating, int highestRating, Set<String> excludedPuzzleIds, Set<String> themes) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
-                " WHERE " + COLUMN_RATING + " >= " + lowestRating +
-                " AND " + COLUMN_RATING + " <= " + highestRating +
-                " AND " + COLUMN_SOLVED + " = 0");
+        try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            List<String> selectionArgs = new ArrayList<>();
 
-        if (!excludedPuzzleIds.isEmpty()) {
-            queryBuilder.append(" AND ").append(COLUMN_PUZZLE_ID).append(" NOT IN (");
-            for (String id : excludedPuzzleIds) {
-                queryBuilder.append("'").append(id).append("',");
+            StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
+                    " WHERE " + COLUMN_RATING + " >= " + lowestRating +
+                    " AND " + COLUMN_RATING + " <= " + highestRating +
+                    " AND " + COLUMN_SOLVED + " = 0");
+
+            if (!excludedPuzzleIds.isEmpty()) {
+                StringBuilder placeholders = new StringBuilder();
+                for (int i = 0; i < excludedPuzzleIds.size(); i++) {
+                    if (i > 0) {
+                        placeholders.append(",");
+                    }
+                    placeholders.append("?");
+                }
+                queryBuilder.append(" AND ").append(COLUMN_PUZZLE_ID).append(" NOT IN (").append(placeholders).append(")");
+                selectionArgs.addAll(excludedPuzzleIds);
             }
-            queryBuilder.setLength(queryBuilder.length() - 1);
-            queryBuilder.append(")");
-        }
 
-        if (!isNull(themes) && !themes.isEmpty()) {
-            queryBuilder.append(" AND (");
-            for (String theme : themes) {
-                queryBuilder.append(COLUMN_THEMES).append(" LIKE '%").append(theme).append("%' OR ");
+            if (!isNull(themes) && !themes.isEmpty()) {
+                queryBuilder.append(" AND (");
+                for (String theme : themes) {
+                    queryBuilder.append(COLUMN_THEMES).append(" LIKE ? OR ");
+                    selectionArgs.add("%" + theme + "%");
+                }
+                queryBuilder.setLength(queryBuilder.length() - 4);
+                queryBuilder.append(")");
             }
-            queryBuilder.setLength(queryBuilder.length() - 4);
-            queryBuilder.append(")");
+
+            queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY RANDOM() LIMIT 5");
+
+            return executeQuery(db, queryBuilder.toString(), selectionArgs.toArray(new String[0]));
         }
-
-        queryBuilder.append(" GROUP BY ").append(COLUMN_RATING).append(" ORDER BY RANDOM() LIMIT 5");
-
-        var result = executeQuery(db, queryBuilder.toString(), null);
-        db.close();
-        return result;
     }
 
     public Puzzle getPuzzleById(String puzzleId) throws NoSuchElementException {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        String query = "SELECT * FROM " + PUZZLE_TABLE_NAME +
-                " WHERE " + COLUMN_PUZZLE_ID + " = ?";
-        List<Puzzle> puzzles = executeQuery(db, query, new String[]{puzzleId});
-        db.close();
-        if (puzzles.isEmpty()) {
-            throw new NoSuchElementException("Puzzle ID  not found");
+        try (SQLiteDatabase db = dbHelper.openDatabase()) {
+            String query = "SELECT * FROM " + PUZZLE_TABLE_NAME +
+                    " WHERE " + COLUMN_PUZZLE_ID + " = ?";
+            List<Puzzle> puzzles = executeQuery(db, query, new String[]{puzzleId});
+            if (puzzles.isEmpty()) {
+                throw new NoSuchElementException("Puzzle ID  not found");
+            }
+            return puzzles.get(0);
         }
-        return puzzles.get(0);
     }
 
     private List<Puzzle> executeQuery(SQLiteDatabase db, String query, String[] selectionArgs) {
@@ -145,44 +142,6 @@ public class DatabaseAccessor {
             }
         }
         return puzzles;
-    }
-
-    public void storePlayerRating(int rating) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_PLAYER_RATING, rating);
-        db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
-        db.close();
-    }
-
-    public int getPlayerRating() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT " + COLUMN_PLAYER_RATING + " FROM " + PLAYER_TABLE_NAME, null)) {
-            if (cursor.moveToFirst()) {
-                return cursor.getInt(0);
-            }
-        }
-        db.close();
-        return DEFAULT_PLAYER_RATING;
-    }
-
-    public void storePlayerAutoplay(boolean isChecked) {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_AUTOPLAY_ENABLED, isChecked ? 1 : 0);
-        db.update(PLAYER_TABLE_NAME, values, COLUMN_PLAYER_ID + " = 1", null);
-        db.close();
-    }
-
-    public boolean getPlayerAutoplay() {
-        SQLiteDatabase db = dbHelper.openDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT " + COLUMN_AUTOPLAY_ENABLED + " FROM " + PLAYER_TABLE_NAME, null)) {
-            if (cursor.moveToFirst()) {
-                db.close();
-                return cursor.getInt(0) == 1;
-            }
-        }
-        return true;
     }
 
     public Set<String> getPuzzleThemes() {

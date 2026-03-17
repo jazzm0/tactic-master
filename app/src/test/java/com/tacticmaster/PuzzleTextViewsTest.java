@@ -16,7 +16,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
@@ -37,6 +39,7 @@ class PuzzleTextViewsTest {
     private TextView mockPlayerRatingTextView;
     private MaterialButton mockFilterButton;
     private MaterialAutoCompleteTextView mockFilterDropdown;
+    private ImageView mockSolvedIconView;
 
     @BeforeEach
     void setUp() {
@@ -49,6 +52,7 @@ class PuzzleTextViewsTest {
         mockPlayerRatingTextView = mock(TextView.class);
         mockFilterButton = mock(MaterialButton.class);
         mockFilterDropdown = mock(MaterialAutoCompleteTextView.class);
+        mockSolvedIconView = mock(ImageView.class);
 
         when(mockActivity.findViewById(R.id.puzzle_id_label)).thenReturn(mockPuzzleIdLabelTextView);
         when(mockActivity.findViewById(R.id.puzzle_id)).thenReturn(mockPuzzleIdEditText);
@@ -57,6 +61,7 @@ class PuzzleTextViewsTest {
         when(mockActivity.findViewById(R.id.player_rating)).thenReturn(mockPlayerRatingTextView);
         when(mockActivity.findViewById(R.id.filter_button)).thenReturn(mockFilterButton);
         when(mockActivity.findViewById(R.id.filter_dropdown)).thenReturn(mockFilterDropdown);
+        when(mockActivity.findViewById(R.id.solved)).thenReturn(mockSolvedIconView);
 
         when(mockActivity.getString(eq(R.string.rating), anyInt())).thenReturn("Rating: 1500");
         when(mockActivity.getString(eq(R.string.player_rating), anyInt())).thenReturn("Player: 1600");
@@ -171,6 +176,7 @@ class PuzzleTextViewsTest {
         verify(mockPuzzleIdEditText).setAlpha(0.7f);
         verify(mockPuzzleIdEditText).setTypeface(null, Typeface.BOLD);
         verify(mockPuzzleIdEditText).setContentDescription("Puzzle solved");
+        verify(mockSolvedIconView).setVisibility(View.VISIBLE);
     }
 
     @Test
@@ -182,6 +188,7 @@ class PuzzleTextViewsTest {
         verify(mockPuzzleIdEditText).setAlpha(1.0f);
         verify(mockPuzzleIdEditText).setTypeface(null, Typeface.BOLD);
         verify(mockPuzzleIdEditText).setContentDescription("Puzzle not solved");
+        verify(mockSolvedIconView).setVisibility(View.GONE);
     }
 
     @Test

@@ -3,7 +3,7 @@ package com.tacticmaster;
 import static java.util.Objects.isNull;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,20 +15,21 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
 import com.tacticmaster.puzzle.PuzzleManager;
 import com.tacticmaster.puzzle.PuzzleThemesDialogHelper;
+import com.tacticmaster.settings.SettingsActivity;
+import com.tacticmaster.settings.SettingsManager;
 
 public class MainActivity extends AppCompatActivity {
 
     private ChessboardController chessboardController;
+    private SettingsManager settingsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +53,12 @@ public class MainActivity extends AppCompatActivity {
         chessboardView.setPlayerTurnIcon(findViewById(R.id.player_turn_icon));
         chessboardView.setPuzzleHintView(findViewById(R.id.hint_path_view));
 
-        var puzzleManager = new PuzzleManager(databaseAccessor);
+        settingsManager = SettingsManager.getInstance(this);
+        var puzzleManager = new PuzzleManager(databaseAccessor, settingsManager.getPlayerRating());
+
         chessboardController = new ChessboardController(
                 databaseAccessor,
+                SettingsManager.getInstance(chessboardView.getContext()),
                 puzzleManager,
                 new PuzzleThemesDialogHelper(databaseAccessor, puzzleManager),
                 chessboardView,
@@ -67,27 +71,9 @@ public class MainActivity extends AppCompatActivity {
         ImageButton nextPuzzle = findViewById(R.id.next_puzzle);
         ImageButton hint = findViewById(R.id.puzzle_hint);
         ImageButton shareFenButton = findViewById(R.id.share_fen_button);
+        ImageButton settingsButton = findViewById(R.id.settings_button);
         EditText puzzleId = findViewById(R.id.puzzle_id);
         ImageButton puzzleIdLink = findViewById(R.id.puzzle_id_link);
-
-        SwitchMaterial autoplay = findViewById(R.id.toggle_autoplay);
-        autoplay.setChecked(chessboardController.getAutoplay());
-        autoplay.setOnCheckedChangeListener((buttonView, isChecked)
-                -> chessboardController.setAutoplay(isChecked));
-        autoplay.setThumbDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.autoplay, null));
-
-        ColorStateList trackTintList = new ColorStateList(
-                new int[][]{
-                        new int[]{android.R.attr.state_checked},
-                        new int[]{-android.R.attr.state_checked}
-                },
-                new int[]{
-                        getResources().getColor(R.color.switch_track_on_color, null),
-                        getResources().getColor(R.color.switch_track_off_color, null)
-                }
-        );
-
-        autoplay.setTrackTintList(trackTintList);
 
         reloadPuzzle.setOnClickListener(v -> onReloadPuzzleClicked());
         previousPuzzle.setOnClickListener(v -> onPreviousPuzzleClicked());
@@ -106,12 +92,25 @@ public class MainActivity extends AppCompatActivity {
         });
         puzzleIdLink.setOnClickListener(v -> onPuzzleIdLinkClicked());
         shareFenButton.setOnClickListener(v -> onShareFenClicked());
+        settingsButton.setOnClickListener(v -> onSettingsClicked());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         chessboardController.renderPuzzle();
+
+        applyDisplaySettings();
+    }
+
+    private void applyDisplaySettings() {
+        TextView puzzleRating = findViewById(R.id.puzzle_rating);
+        View puzzleIdContainer = findViewById(R.id.puzzle_id_container);
+        TextView puzzlesCount = findViewById(R.id.puzzles_count);
+
+        puzzleRating.setVisibility(settingsManager.isShowPuzzleRating() ? View.VISIBLE : View.GONE);
+        puzzleIdContainer.setVisibility(settingsManager.isShowPuzzleId() ? View.VISIBLE : View.GONE);
+        puzzlesCount.setVisibility(settingsManager.isShowPuzzlesCount() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -144,5 +143,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void onShareFenClicked() {
         chessboardController.shareFenClicked();
+    }
+
+    private void onSettingsClicked() {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 }

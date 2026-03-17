@@ -10,18 +10,19 @@ android {
         applicationId = "com.tacticmaster"
         minSdk = 24
         targetSdk = 36
-        versionCode = 28
-        versionName = "1.0.28"
+        versionCode = 29
+        versionName = "1.0.29"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
-        buildConfig true
+        buildConfig = true
     }
 
     buildTypes {
         release {
-            minifyEnabled = false
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -60,6 +61,7 @@ android {
 dependencies {
     implementation libs.appcompat
     implementation libs.material
+    implementation libs.preference
     implementation libs.chesslib
     implementation libs.acra.core
     implementation libs.acra.mail
