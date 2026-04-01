@@ -339,8 +339,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private void doNextMove(String nextMove) {
         if (isAnimating) return;
-
         var possibleNextMove = puzzleGame.getNextMove();
+        if (possibleNextMove.isEmpty()) return;
+
         if (isNull(nextMove) || nextMove.isEmpty()) {
             nextMove = possibleNextMove;
         }
