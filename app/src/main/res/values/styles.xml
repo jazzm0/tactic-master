@@ -4,6 +4,7 @@
         <item name="colorPrimary">@color/button_background_color</item>
         <item name="colorOnSurface">@android:color/white</item>
         <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@color/button_background_color</item>
         <item name="materialButtonStyle">@style/CustomSwitchMaterial</item>
     </style>
 
