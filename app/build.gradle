@@ -4,14 +4,14 @@ plugins {
 
 android {
     namespace = 'com.tacticmaster'
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.tacticmaster"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 30
-        versionName = "1.0.30"
+        targetSdk = 37
+        versionCode = 31
+        versionName = "1.0.31"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
