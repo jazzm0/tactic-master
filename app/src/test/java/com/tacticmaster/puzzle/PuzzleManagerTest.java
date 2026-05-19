@@ -108,7 +108,7 @@ class PuzzleManagerTest {
 
     @Test
     void testUpdateRatingChangesRating() {
-        puzzleManager.updateRating(1300);
+        puzzleManager.updateRating(1300, false);
         assertEquals(1300, puzzleManager.getRating());
     }
 }

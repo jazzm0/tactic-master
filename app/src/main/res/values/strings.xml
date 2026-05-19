@@ -52,6 +52,11 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
 
+    <!-- Puzzle Settings -->
+    <string name="puzzle_category_title">Puzzle</string>
+    <string name="puzzle_difficulty_title">Puzzle difficulty</string>
+    <string name="puzzle_difficulty_summary">Adjusts automatically as you solve puzzles.</string>
+
     <!-- Autoplay Settings -->
     <string name="autoplay_category_title">Autoplay</string>
     <string name="autoplay_title">Enable Autoplay</string>

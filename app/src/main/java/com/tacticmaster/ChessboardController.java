@@ -72,7 +72,18 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         settingsManager.setPlayerRating(newRating);
         puzzleTextViews.updatePlayerRating(playerRating, newRating);
         this.playerRating = newRating;
-        puzzleManager.updateRating(newRating);
+        puzzleManager.updateRating(newRating, false);
+    }
+
+    public void refreshPlayerRating() {
+        int storedRating = settingsManager.getPlayerRating();
+        if (storedRating == playerRating) {
+            return;
+        }
+        this.playerRating = storedRating;
+        puzzleTextViews.setPlayerRating(storedRating);
+        puzzleManager.updateRating(storedRating, true);
+        loadNextPuzzle();
     }
 
 

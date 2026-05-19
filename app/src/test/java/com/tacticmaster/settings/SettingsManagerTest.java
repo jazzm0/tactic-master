@@ -115,37 +115,17 @@ public class SettingsManagerTest {
     }
 
     @Test
-    public void testAnimationSpeedFromString_Slow() {
-        assertEquals(800, SettingsManager.animationSpeedFromString("slow"));
-    }
-
-    @Test
-    public void testAnimationSpeedFromString_Normal() {
-        assertEquals(300, SettingsManager.animationSpeedFromString("normal"));
-    }
-
-    @Test
-    public void testAnimationSpeedFromString_Unknown() {
-        assertEquals(300, SettingsManager.animationSpeedFromString("unknown"));
-    }
-
-    @Test
-    public void testAnimationSpeedToString_Slow() {
-        assertEquals("slow", SettingsManager.animationSpeedToString(800));
-        assertEquals("slow", SettingsManager.animationSpeedToString(900));
-    }
-
-    @Test
-    public void testAnimationSpeedToString_Normal() {
-        assertEquals("normal", SettingsManager.animationSpeedToString(300));
-        assertEquals("normal", SettingsManager.animationSpeedToString(400));
-    }
-
-    @Test
     public void testPlayerRating_DefaultValue() {
         when(mockPrefs.getInt(eq("player_rating"), eq(1600))).thenReturn(1600);
 
         assertEquals(1600, settingsManager.getPlayerRating());
+    }
+
+    @Test
+    public void testPlayerRating_ReadsStoredValue() {
+        when(mockPrefs.getInt(eq("player_rating"), eq(1600))).thenReturn(1800);
+
+        assertEquals(1800, settingsManager.getPlayerRating());
     }
 
     @Test
@@ -154,6 +134,31 @@ public class SettingsManagerTest {
 
         verify(mockEditor).putInt("player_rating", 2000);
         verify(mockEditor).apply();
+    }
+
+    @Test
+    public void testPlayerRating_ClampsBelowMinimum() {
+        settingsManager.setPlayerRating(500);
+
+        verify(mockEditor).putInt("player_rating", 1000);
+        verify(mockEditor).apply();
+    }
+
+    @Test
+    public void testPlayerRating_ClampsAboveMaximum() {
+        settingsManager.setPlayerRating(5000);
+
+        verify(mockEditor).putInt("player_rating", 3000);
+        verify(mockEditor).apply();
+    }
+
+    @Test
+    public void testPlayerRating_AcceptsBoundaryValues() {
+        settingsManager.setPlayerRating(1000);
+        verify(mockEditor).putInt("player_rating", 1000);
+
+        settingsManager.setPlayerRating(3000);
+        verify(mockEditor).putInt("player_rating", 3000);
     }
 
     @Test

@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Puzzle Section -->
+    <PreferenceCategory android:title="@string/puzzle_category_title">
+
+        <SeekBarPreference
+            android:defaultValue="1600"
+            android:key="player_rating"
+            android:max="3000"
+            android:summary="@string/puzzle_difficulty_summary"
+            android:title="@string/puzzle_difficulty_title" />
+
+    </PreferenceCategory>
+
     <!-- Autoplay Section -->
     <PreferenceCategory android:title="@string/autoplay_category_title">
 

@@ -27,9 +27,13 @@ public class PuzzleManager implements PuzzleThemesDialogHelper.PuzzleThemesListe
         this.rating = initialRating;
     }
 
-    public void updateRating(int rating) {
+    public void updateRating(int rating, boolean clearPuzzles) {
         synchronized (lock) {
             this.rating = rating;
+            if (clearPuzzles) {
+                puzzles.clear();
+                currentIndex = -1;
+            }
         }
     }
 

@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        chessboardController.refreshPlayerRating();
         chessboardController.renderPuzzle();
 
         applyDisplaySettings();
