@@ -14,6 +14,8 @@ public class SettingsManager {
     private static final String PREFS_NAME = "TacticMasterSettings";
 
     // Keys
+    private static final String SLOW = "slow";
+    private static final String NORMAL = "normal";
     private static final String KEY_AUTOPLAY = "autoplay";
     private static final String KEY_SOUND_ENABLED = "sound_enabled";
     private static final String KEY_ANIMATIONS_ENABLED = "animations_enabled";
@@ -36,7 +38,6 @@ public class SettingsManager {
     // Animation speed constants
     public static final int ANIMATION_SPEED_SLOW = 800;
     public static final int ANIMATION_SPEED_NORMAL = 300;
-    public static final int ANIMATION_SPEED_FAST = 150;
 
     private final SharedPreferences sharedPreferences;
     private static SettingsManager instance;
@@ -96,15 +97,10 @@ public class SettingsManager {
      * Converts animation speed value string to milliseconds.
      */
     public static int animationSpeedFromString(String value) {
-        switch (value) {
-            case "slow":
-                return ANIMATION_SPEED_SLOW;
-            case "fast":
-                return ANIMATION_SPEED_FAST;
-            case "normal":
-            default:
-                return ANIMATION_SPEED_NORMAL;
+        if (SLOW.equals(value)) {
+            return ANIMATION_SPEED_SLOW;
         }
+        return ANIMATION_SPEED_NORMAL;
     }
 
     /**
@@ -112,12 +108,9 @@ public class SettingsManager {
      */
     public static String animationSpeedToString(int speed) {
         if (speed >= ANIMATION_SPEED_SLOW) {
-            return "slow";
-        } else if (speed <= ANIMATION_SPEED_FAST) {
-            return "fast";
-        } else {
-            return "normal";
+            return SLOW;
         }
+        return NORMAL;
     }
 
     // Display settings
@@ -125,12 +118,24 @@ public class SettingsManager {
         return sharedPreferences.getBoolean(KEY_SHOW_PUZZLE_RATING, DEFAULT_SHOW_PUZZLE_RATING);
     }
 
+    public void setShowPuzzleRating(boolean enabled) {
+        sharedPreferences.edit().putBoolean(KEY_SHOW_PUZZLE_RATING, enabled).apply();
+    }
+
     public boolean isShowPuzzleId() {
         return sharedPreferences.getBoolean(KEY_SHOW_PUZZLE_ID, DEFAULT_SHOW_PUZZLE_ID);
     }
 
+    public void setShowPuzzleId(boolean enabled) {
+        sharedPreferences.edit().putBoolean(KEY_SHOW_PUZZLE_ID, enabled).apply();
+    }
+
     public boolean isShowPuzzlesCount() {
         return sharedPreferences.getBoolean(KEY_SHOW_PUZZLES_COUNT, DEFAULT_SHOW_PUZZLES_COUNT);
+    }
+
+    public void setShowPuzzlesCount(boolean enabled) {
+        sharedPreferences.edit().putBoolean(KEY_SHOW_PUZZLES_COUNT, enabled).apply();
     }
 
     // Player rating settings

@@ -17,7 +17,6 @@ import com.tacticmaster.R;
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     private SettingsManager settingsManager;
-    private SeekBarPreference animationSpeedPref;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -29,13 +28,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         settingsManager = SettingsManager.getInstance(requireContext());
 
-        // Initialize preferences
         SwitchPreferenceCompat autoplayPref = findPreference("autoplay");
         SwitchPreferenceCompat soundPref = findPreference("sound_enabled");
         SwitchPreferenceCompat animationsPref = findPreference("animations_enabled");
-        animationSpeedPref = findPreference("animation_speed");
+        SeekBarPreference animationSpeedPref = findPreference("animation_speed");
+        SwitchPreferenceCompat showPuzzleRatingPref = findPreference("show_puzzle_rating");
+        SwitchPreferenceCompat showPuzzleIdPref = findPreference("show_puzzle_id");
+        SwitchPreferenceCompat showPuzzlesCountPref = findPreference("show_puzzles_count");
 
-        // Load current values from SettingsManager
         if (!isNull(autoplayPref)) {
             autoplayPref.setChecked(settingsManager.isAutoplayEnabled());
             autoplayPref.setOnPreferenceChangeListener((preference, newValue) -> {
@@ -55,9 +55,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         if (!isNull(animationsPref)) {
             animationsPref.setChecked(settingsManager.areAnimationsEnabled());
             animationsPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean enabled = (Boolean) newValue;
-                settingsManager.setAnimationsEnabled(enabled);
-                updateAnimationSpeedVisibility(enabled);
+                settingsManager.setAnimationsEnabled((Boolean) newValue);
                 return true;
             });
         }
@@ -66,8 +64,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             int currentSpeed = ensureSpeedLimits(settingsManager.getAnimationSpeed());
             settingsManager.setAnimationSpeed(currentSpeed);
 
-            animationSpeedPref.setMin(300);
-            animationSpeedPref.setMax(800);
+            animationSpeedPref.setMin(SettingsManager.ANIMATION_SPEED_NORMAL);
+            animationSpeedPref.setMax(SettingsManager.ANIMATION_SPEED_SLOW);
             animationSpeedPref.setValue(currentSpeed);
             animationSpeedPref.setShowSeekBarValue(true);
 
@@ -76,24 +74,39 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 settingsManager.setAnimationSpeed(speedMs);
                 return true;
             });
+        }
 
-            // Set initial visibility
-            updateAnimationSpeedVisibility(settingsManager.areAnimationsEnabled());
+        if (!isNull(showPuzzleRatingPref)) {
+            showPuzzleRatingPref.setChecked(settingsManager.isShowPuzzleRating());
+            showPuzzleRatingPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                settingsManager.setShowPuzzleRating((Boolean) newValue);
+                return true;
+            });
+        }
+
+        if (!isNull(showPuzzleIdPref)) {
+            showPuzzleIdPref.setChecked(settingsManager.isShowPuzzleId());
+            showPuzzleIdPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                settingsManager.setShowPuzzleId((Boolean) newValue);
+                return true;
+            });
+        }
+
+        if (!isNull(showPuzzlesCountPref)) {
+            showPuzzlesCountPref.setChecked(settingsManager.isShowPuzzlesCount());
+            showPuzzlesCountPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                settingsManager.setShowPuzzlesCount((Boolean) newValue);
+                return true;
+            });
         }
     }
 
     private int ensureSpeedLimits(int speed) {
-        if (speed < 300) {
-            return 300;
-        } else if (speed > 800) {
-            return 800;
+        if (speed < SettingsManager.ANIMATION_SPEED_NORMAL) {
+            return SettingsManager.ANIMATION_SPEED_NORMAL;
+        } else if (speed > SettingsManager.ANIMATION_SPEED_SLOW) {
+            return SettingsManager.ANIMATION_SPEED_SLOW;
         }
         return speed;
-    }
-
-    private void updateAnimationSpeedVisibility(boolean animationsEnabled) {
-        if (!isNull(animationSpeedPref)) {
-            animationSpeedPref.setVisible(animationsEnabled);
-        }
     }
 }

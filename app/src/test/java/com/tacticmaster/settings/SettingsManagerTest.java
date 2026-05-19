@@ -125,11 +125,6 @@ public class SettingsManagerTest {
     }
 
     @Test
-    public void testAnimationSpeedFromString_Fast() {
-        assertEquals(150, SettingsManager.animationSpeedFromString("fast"));
-    }
-
-    @Test
     public void testAnimationSpeedFromString_Unknown() {
         assertEquals(300, SettingsManager.animationSpeedFromString("unknown"));
     }
@@ -144,12 +139,6 @@ public class SettingsManagerTest {
     public void testAnimationSpeedToString_Normal() {
         assertEquals("normal", SettingsManager.animationSpeedToString(300));
         assertEquals("normal", SettingsManager.animationSpeedToString(400));
-    }
-
-    @Test
-    public void testAnimationSpeedToString_Fast() {
-        assertEquals("fast", SettingsManager.animationSpeedToString(150));
-        assertEquals("fast", SettingsManager.animationSpeedToString(100));
     }
 
     @Test
@@ -175,6 +164,14 @@ public class SettingsManagerTest {
     }
 
     @Test
+    public void testShowPuzzleRating_SetAndGet() {
+        settingsManager.setShowPuzzleRating(false);
+
+        verify(mockEditor).putBoolean("show_puzzle_rating", false);
+        verify(mockEditor).apply();
+    }
+
+    @Test
     public void testShowPuzzleId_DefaultValue() {
         when(mockPrefs.getBoolean(eq("show_puzzle_id"), eq(true))).thenReturn(true);
 
@@ -182,9 +179,25 @@ public class SettingsManagerTest {
     }
 
     @Test
+    public void testShowPuzzleId_SetAndGet() {
+        settingsManager.setShowPuzzleId(false);
+
+        verify(mockEditor).putBoolean("show_puzzle_id", false);
+        verify(mockEditor).apply();
+    }
+
+    @Test
     public void testShowPuzzlesCount_DefaultValue() {
         when(mockPrefs.getBoolean(eq("show_puzzles_count"), eq(true))).thenReturn(true);
 
         assertTrue(settingsManager.isShowPuzzlesCount());
+    }
+
+    @Test
+    public void testShowPuzzlesCount_SetAndGet() {
+        settingsManager.setShowPuzzlesCount(false);
+
+        verify(mockEditor).putBoolean("show_puzzles_count", false);
+        verify(mockEditor).apply();
     }
 }
