@@ -75,15 +75,24 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         puzzleManager.updateRating(newRating, false);
     }
 
-    public void refreshPlayerRating() {
+    /**
+     * Re-syncs cached settings (player rating, autoplay) from {@link SettingsManager}.
+     * If the player rating changed, the puzzle cache is cleared and a fresh puzzle is
+     * loaded at the new band — in that case this method renders, and returns {@code true}
+     * so the caller skips a redundant render.
+     */
+    public boolean refreshFromSettings() {
+        this.autoplay = settingsManager.isAutoplayEnabled();
+
         int storedRating = settingsManager.getPlayerRating();
         if (storedRating == playerRating) {
-            return;
+            return false;
         }
         this.playerRating = storedRating;
         puzzleTextViews.setPlayerRating(storedRating);
         puzzleManager.updateRating(storedRating, true);
         loadNextPuzzle();
+        return true;
     }
 
 

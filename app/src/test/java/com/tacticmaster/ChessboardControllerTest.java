@@ -420,4 +420,58 @@ public class ChessboardControllerTest {
         verify(settingsManager).setPlayerRating(2359);
         verify(puzzleTextViews).updatePlayerRating(2333, 2359);
     }
+
+    @Test
+    public void testRefreshFromSettingsReturnsFalseWhenRatingUnchanged() {
+        // Constructor cached playerRating=2333 from setUp.
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
+        when(settingsManager.isAutoplayEnabled()).thenReturn(false);
+
+        Assertions.assertFalse(chessboardController.refreshFromSettings());
+
+        verify(databaseAccessor, never())
+                .getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet());
+        verify(puzzleTextViews, never()).setPlayerRating(anyInt());
+    }
+
+    @Test
+    public void testRefreshFromSettingsLoadsNewPuzzleWhenRatingChanged() {
+        when(databaseAccessor.getAllPuzzleCount()).thenReturn(256);
+        when(databaseAccessor.getSolvedPuzzleCount()).thenReturn(5);
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+        // Prime the manager so the cache has something to clear.
+        chessboardController.loadNextPuzzle();
+
+        when(settingsManager.getPlayerRating()).thenReturn(1800);
+
+        Assertions.assertTrue(chessboardController.refreshFromSettings());
+
+        verify(puzzleTextViews, atLeastOnce()).setPlayerRating(1800);
+        // After refresh, render uses the freshly loaded puzzle.
+        verify(chessboardView, atLeastOnce()).setPuzzle(any());
+    }
+
+    @Test
+    public void testRefreshFromSettingsDoesNotCrashWhenNoPuzzlesAvailable() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(new ArrayList<>());
+        when(settingsManager.getPlayerRating()).thenReturn(1800);
+
+        // Must not throw even though DB has no puzzles for the new band.
+        Assertions.assertTrue(chessboardController.refreshFromSettings());
+
+        verify(puzzleTextViews, atLeastOnce()).setPlayerRating(1800);
+    }
+
+    @Test
+    public void testRefreshFromSettingsRefreshesAutoplay() {
+        // Constructor cached autoplay=false from setUp.
+        when(settingsManager.isAutoplayEnabled()).thenReturn(true);
+        when(settingsManager.getPlayerRating()).thenReturn(2333); // unchanged
+
+        chessboardController.refreshFromSettings();
+
+        Assertions.assertTrue(chessboardController.getAutoplay());
+    }
 }
