@@ -5,95 +5,50 @@ import static java.util.Objects.isNull;
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
 import androidx.preference.SeekBarPreference;
-import androidx.preference.SwitchPreferenceCompat;
 
 import com.tacticmaster.R;
 
 /**
- * Fragment for displaying and managing application settings using PreferenceScreen.
+ * Settings UI. All persistence is delegated to {@link SettingsManager} via
+ * {@link SettingsPreferenceDataStore} — the framework no longer touches
+ * SharedPreferences directly.
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-    private SettingsManager settingsManager;
-    private SeekBarPreference animationSpeedPref;
+    private static final int PLAYER_RATING_STEP = 50;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        // Use the same SharedPreferences as SettingsManager
-        PreferenceManager prefManager = getPreferenceManager();
-        prefManager.setSharedPreferencesName("TacticMasterSettings");
+        SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
+
+        getPreferenceManager().setPreferenceDataStore(
+                new SettingsPreferenceDataStore(settingsManager));
 
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        settingsManager = SettingsManager.getInstance(requireContext());
-
-        // Initialize preferences
-        SwitchPreferenceCompat autoplayPref = findPreference("autoplay");
-        SwitchPreferenceCompat soundPref = findPreference("sound_enabled");
-        SwitchPreferenceCompat animationsPref = findPreference("animations_enabled");
-        animationSpeedPref = findPreference("animation_speed");
-
-        // Load current values from SettingsManager
-        if (!isNull(autoplayPref)) {
-            autoplayPref.setChecked(settingsManager.isAutoplayEnabled());
-            autoplayPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                settingsManager.setAutoplayEnabled((Boolean) newValue);
-                return true;
-            });
-        }
-
-        if (!isNull(soundPref)) {
-            soundPref.setChecked(settingsManager.isSoundEnabled());
-            soundPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                settingsManager.setSoundEnabled((Boolean) newValue);
-                return true;
-            });
-        }
-
-        if (!isNull(animationsPref)) {
-            animationsPref.setChecked(settingsManager.areAnimationsEnabled());
-            animationsPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean enabled = (Boolean) newValue;
-                settingsManager.setAnimationsEnabled(enabled);
-                updateAnimationSpeedVisibility(enabled);
-                return true;
-            });
-        }
-
-        if (!isNull(animationSpeedPref)) {
-            int currentSpeed = ensureSpeedLimits(settingsManager.getAnimationSpeed());
-            settingsManager.setAnimationSpeed(currentSpeed);
-
-            animationSpeedPref.setMin(300);
-            animationSpeedPref.setMax(800);
-            animationSpeedPref.setValue(currentSpeed);
-            animationSpeedPref.setShowSeekBarValue(true);
-
-            animationSpeedPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                int speedMs = ensureSpeedLimits((Integer) newValue);
-                settingsManager.setAnimationSpeed(speedMs);
-                return true;
-            });
-
-            // Set initial visibility
-            updateAnimationSpeedVisibility(settingsManager.areAnimationsEnabled());
-        }
+        configureAnimationSpeedPreference();
+        configurePlayerRatingPreference();
     }
 
-    private int ensureSpeedLimits(int speed) {
-        if (speed < 300) {
-            return 300;
-        } else if (speed > 800) {
-            return 800;
+    private void configureAnimationSpeedPreference() {
+        SeekBarPreference pref = findPreference(SettingKey.ANIMATION_SPEED.key);
+        if (isNull(pref)) {
+            return;
         }
-        return speed;
+        pref.setMin(SettingsManager.ANIMATION_SPEED_NORMAL);
+        pref.setMax(SettingsManager.ANIMATION_SPEED_SLOW);
+        pref.setShowSeekBarValue(true);
     }
 
-    private void updateAnimationSpeedVisibility(boolean animationsEnabled) {
-        if (!isNull(animationSpeedPref)) {
-            animationSpeedPref.setVisible(animationsEnabled);
+    private void configurePlayerRatingPreference() {
+        SeekBarPreference pref = findPreference(SettingKey.PLAYER_RATING.key);
+        if (isNull(pref)) {
+            return;
         }
+        pref.setMin(SettingsManager.MIN_PLAYER_RATING);
+        pref.setMax(SettingsManager.MAX_PLAYER_RATING);
+        pref.setSeekBarIncrement(PLAYER_RATING_STEP);
+        pref.setShowSeekBarValue(true);
     }
 }

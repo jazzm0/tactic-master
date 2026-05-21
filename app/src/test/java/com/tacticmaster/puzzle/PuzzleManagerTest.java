@@ -108,7 +108,33 @@ class PuzzleManagerTest {
 
     @Test
     void testUpdateRatingChangesRating() {
-        puzzleManager.updateRating(1300);
+        puzzleManager.updateRating(1300, false);
         assertEquals(1300, puzzleManager.getRating());
+    }
+
+    @Test
+    void testUpdateRatingWithoutClearKeepsCachedPuzzles() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(List.of(new Puzzle("1", "fen", "moves", 1000)));
+
+        puzzleManager.moveToNextPuzzle();
+        puzzleManager.updateRating(1700, false);
+
+        // Same puzzle is still current — no re-fetch.
+        assertEquals("1", puzzleManager.getCurrentPuzzle().getPuzzleId());
+        verify(databaseAccessor, times(1))
+                .getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet());
+    }
+
+    @Test
+    void testUpdateRatingWithClearDropsCachedPuzzles() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(List.of(new Puzzle("1", "fen", "moves", 1000)));
+
+        puzzleManager.moveToNextPuzzle();
+        puzzleManager.updateRating(1700, true);
+
+        // After clear, getCurrentPuzzle has no valid index until next fetch.
+        assertThrows(NoSuchElementException.class, puzzleManager::getCurrentPuzzle);
     }
 }
