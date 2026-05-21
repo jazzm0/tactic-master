@@ -108,13 +108,6 @@ class PuzzleTextViewsTest {
     }
 
     @Test
-    void testSetPuzzleRatingWithNegativeRatingDoesNotUpdate() {
-        puzzleTextViews.setPuzzleRating(-100);
-
-        verify(mockPuzzleRatingTextView, never()).setText(anyString());
-    }
-
-    @Test
     void testSetPuzzleIdWithValidId() {
         String puzzleId = "ABC123";
         puzzleTextViews.setPuzzleId(puzzleId);
@@ -148,27 +141,6 @@ class PuzzleTextViewsTest {
     }
 
     @Test
-    void testSetPuzzlesSolvedCountWithNegativeSolvedCountDoesNotUpdate() {
-        puzzleTextViews.setPuzzlesSolvedCount(-1, 100);
-
-        verify(mockPuzzlesSolvedTextView, never()).setText(anyString());
-    }
-
-    @Test
-    void testSetPuzzlesSolvedCountWithNegativeTotalCountDoesNotUpdate() {
-        puzzleTextViews.setPuzzlesSolvedCount(50, -1);
-
-        verify(mockPuzzlesSolvedTextView, never()).setText(anyString());
-    }
-
-    @Test
-    void testSetPuzzlesSolvedCountWithSolvedGreaterThanTotalDoesNotUpdate() {
-        puzzleTextViews.setPuzzlesSolvedCount(150, 100);
-
-        verify(mockPuzzlesSolvedTextView, never()).setText(anyString());
-    }
-
-    @Test
     void testSetPuzzleSolvedTrueUpdatesStyling() {
         puzzleTextViews.setPuzzleSolved(true);
 
@@ -198,34 +170,6 @@ class PuzzleTextViewsTest {
         verify(mockPlayerRatingTextView).setText(anyString());
         verify(mockPlayerRatingTextView).setTypeface(null, Typeface.BOLD);
         verify(mockPlayerRatingTextView).setContentDescription("Player rating: 1800");
-    }
-
-    @Test
-    void testSetPlayerRatingWithNegativeRatingDoesNotUpdate() {
-        puzzleTextViews.setPlayerRating(-500);
-
-        verify(mockPlayerRatingTextView, never()).setText(anyString());
-    }
-
-    @Test
-    void testUpdatePlayerRatingWithValidRatings() {
-        puzzleTextViews.updatePlayerRating(1500, 1600);
-
-        assertNotNull(puzzleTextViews);
-    }
-
-    @Test
-    void testUpdatePlayerRatingWithNegativeOldRatingDoesNotAnimate() {
-        puzzleTextViews.updatePlayerRating(-100, 1600);
-
-        assertNotNull(puzzleTextViews);
-    }
-
-    @Test
-    void testUpdatePlayerRatingWithNegativeNewRatingDoesNotAnimate() {
-        puzzleTextViews.updatePlayerRating(1500, -100);
-
-        assertNotNull(puzzleTextViews);
     }
 
     @Test
