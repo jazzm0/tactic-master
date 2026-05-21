@@ -1,8 +1,10 @@
 package com.tacticmaster;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -185,6 +187,28 @@ class PuzzleTextViewsTest {
         puzzleTextViews.cleanup();
 
         assertNotNull(puzzleTextViews);
+    }
+
+    @Test
+    void testCleanupMarksInstanceAsCleanedUp() {
+        // Regression: cleanup() must mark the instance so post-destroy callbacks
+        // (e.g. an Activity finishing while the alpha animator is still pending)
+        // don't reach back into the destroyed Activity via getString().
+        assertFalse(puzzleTextViews.isCleanedUp());
+        puzzleTextViews.cleanup();
+        assertTrue(puzzleTextViews.isCleanedUp());
+    }
+
+    @Test
+    void testUpdatePlayerRatingIsNoOpAfterCleanup() {
+        // Regression: updatePlayerRating used to start animations even after the
+        // Activity was destroyed, leading to crashes when the listener fired
+        // setPlayerRating -> activity.getString on a finished Activity.
+        puzzleTextViews.cleanup();
+        puzzleTextViews.updatePlayerRating(1500, 1600);
+
+        // No text update should be triggered post-cleanup.
+        verify(mockPlayerRatingTextView, never()).setText(anyString());
     }
 
     @Test

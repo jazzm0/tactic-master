@@ -22,6 +22,7 @@ import com.tacticmaster.puzzle.Puzzle;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -111,6 +112,57 @@ class DatabaseAccessorTest {
         assertEquals("puzzle1", puzzles.get(0).puzzleId());
         assertEquals("puzzle2", puzzles.get(1).puzzleId());
         assertEquals("puzzle3", puzzles.get(2).puzzleId());
+    }
+
+    @Test
+    public void testGetPuzzlesWithinRange_ratingsAreParameterizedNotInterpolated() {
+        when(mockDatabase.rawQuery(anyString(), any(String[].class))).thenReturn(mockCursor);
+        when(mockCursor.moveToNext()).thenReturn(false);
+
+        databaseAccessor.getPuzzlesWithinRange(1600, 1800, new HashSet<>(), new HashSet<>());
+
+        ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String[]> argsCaptor = ArgumentCaptor.forClass(String[].class);
+        verify(mockDatabase).rawQuery(queryCaptor.capture(), argsCaptor.capture());
+
+        String query = queryCaptor.getValue();
+        // Ratings must be bound parameters, not interpolated.
+        assertFalse(query.contains("1600"), "Lowest rating must not be interpolated into SQL: " + query);
+        assertFalse(query.contains("1800"), "Highest rating must not be interpolated into SQL: " + query);
+        assertTrue(query.contains(COLUMN_RATING + " >= ?"));
+        assertTrue(query.contains(COLUMN_RATING + " <= ?"));
+
+        String[] args = argsCaptor.getValue();
+        assertEquals("1600", args[0]);
+        assertEquals("1800", args[1]);
+    }
+
+    @Test
+    public void testGetPuzzlesWithinRange_themeFilterUsesWordBoundary() {
+        // Regression: LIKE '%mate%' incorrectly matched 'mateIn1', 'mateIn2', etc.
+        // Theme matching must be on whole tokens.
+        Set<String> themes = new HashSet<>();
+        themes.add("mate");
+
+        when(mockDatabase.rawQuery(anyString(), any(String[].class))).thenReturn(mockCursor);
+        when(mockCursor.moveToNext()).thenReturn(false);
+
+        databaseAccessor.getPuzzlesWithinRange(1000, 2000, new HashSet<>(), themes);
+
+        ArgumentCaptor<String[]> argsCaptor = ArgumentCaptor.forClass(String[].class);
+        verify(mockDatabase).rawQuery(anyString(), argsCaptor.capture());
+
+        String[] args = argsCaptor.getValue();
+        boolean foundBoundedMatch = false;
+        for (String arg : args) {
+            if ("% mate %".equals(arg)) {
+                foundBoundedMatch = true;
+                break;
+            }
+            assertFalse("%mate%".equals(arg),
+                    "Theme LIKE pattern must be word-bounded ('% mate %'), not substring ('%mate%')");
+        }
+        assertTrue(foundBoundedMatch, "Theme arg must be word-bounded; got: " + java.util.Arrays.toString(args));
     }
 
     @Test

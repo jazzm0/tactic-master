@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.tacticmaster.puzzle.Puzzle;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,8 +28,8 @@ public class DatabaseAccessor {
         this.dbHelper = dbHelper;
         try {
             dbHelper.createDatabase();
-        } catch (Error e) {
-            Log.e("The following error occurred: ", e.getMessage());
+        } catch (IOException e) {
+            Log.e("DatabaseAccessor", "Failed to create database", e);
         }
     }
 
@@ -75,9 +76,11 @@ public class DatabaseAccessor {
             List<String> selectionArgs = new ArrayList<>();
 
             StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + PUZZLE_TABLE_NAME +
-                    " WHERE " + COLUMN_RATING + " >= " + lowestRating +
-                    " AND " + COLUMN_RATING + " <= " + highestRating +
+                    " WHERE " + COLUMN_RATING + " >= ?" +
+                    " AND " + COLUMN_RATING + " <= ?" +
                     " AND " + COLUMN_SOLVED + " = 0");
+            selectionArgs.add(String.valueOf(lowestRating));
+            selectionArgs.add(String.valueOf(highestRating));
 
             if (!excludedPuzzleIds.isEmpty()) {
                 StringBuilder placeholders = new StringBuilder();
@@ -94,8 +97,8 @@ public class DatabaseAccessor {
             if (!isNull(themes) && !themes.isEmpty()) {
                 queryBuilder.append(" AND (");
                 for (String theme : themes) {
-                    queryBuilder.append(COLUMN_THEMES).append(" LIKE ? OR ");
-                    selectionArgs.add("%" + theme + "%");
+                    queryBuilder.append("(' ' || ").append(COLUMN_THEMES).append(" || ' ') LIKE ? OR ");
+                    selectionArgs.add("% " + theme + " %");
                 }
                 queryBuilder.setLength(queryBuilder.length() - 4);
                 queryBuilder.append(")");

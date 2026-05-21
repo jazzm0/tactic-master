@@ -107,7 +107,7 @@ public final class SoundPlayer {
         }
     }
 
-    private void applyAttributesAndStart(Context context) throws Exception {
+    private void applyAttributesAndStart(Context context) {
         AudioAttributes attrs = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -119,8 +119,10 @@ public final class SoundPlayer {
         if (!requestAudioFocus(context, attrs)) {
             Log.w(TAG, "Failed to gain audio focus, playing anyway");
         }
-        mediaPlayer.prepare();
-        mediaPlayer.start();
+        // prepareAsync + onPrepared keeps the UI thread free; prepare() is synchronous
+        // and can ANR on slow devices or when the data source is slow to open.
+        mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+        mediaPlayer.prepareAsync();
     }
 
     private boolean requestAudioFocus(Context context, AudioAttributes attrs) {

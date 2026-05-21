@@ -42,6 +42,7 @@ public class PuzzleTextViews {
 
     private ValueAnimator currentRatingAnimator;
     private ValueAnimator currentAlphaAnimator;
+    private boolean cleanedUp;
 
     public PuzzleTextViews(@NonNull Context context) {
         if (isNull(context)) {
@@ -118,6 +119,9 @@ public class PuzzleTextViews {
     }
 
     public void updatePlayerRating(int oldRating, int newRating) {
+        if (cleanedUp) {
+            return;
+        }
         cancelCurrentAnimations();
         startRatingAnimation(oldRating, newRating);
         startAlphaAnimation(newRating);
@@ -125,8 +129,24 @@ public class PuzzleTextViews {
 
     public void cleanup() {
         cancelCurrentAnimations();
+        // Drop animator update/listener callbacks — they capture the Activity-owned
+        // playerRatingTextView via the lambdas, leaking the Activity until the animators
+        // are GC'd otherwise.
+        if (currentRatingAnimator != null) {
+            currentRatingAnimator.removeAllUpdateListeners();
+            currentRatingAnimator.removeAllListeners();
+        }
+        if (currentAlphaAnimator != null) {
+            currentAlphaAnimator.removeAllUpdateListeners();
+            currentAlphaAnimator.removeAllListeners();
+        }
         currentRatingAnimator = null;
         currentAlphaAnimator = null;
+        cleanedUp = true;
+    }
+
+    public boolean isCleanedUp() {
+        return cleanedUp;
     }
 
     private void setUnsolvedState() {

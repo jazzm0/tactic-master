@@ -95,8 +95,9 @@ public class SoundPlayerTest {
             if (!mediaPlayerConstruction.constructed().isEmpty()) {
                 MediaPlayer mp = mediaPlayerConstruction.constructed().get(0);
                 verify(mp).setDataSource(mockFd, 0L, 1000L);
-                verify(mp).prepare();
-                verify(mp).start();
+                // prepareAsync(): synchronous prepare() blocks the main thread (ANR risk).
+                verify(mp).prepareAsync();
+                verify(mp, never()).prepare();
             }
         }
     }
@@ -118,8 +119,8 @@ public class SoundPlayerTest {
             if (!mediaPlayerConstruction.constructed().isEmpty()) {
                 MediaPlayer mp = mediaPlayerConstruction.constructed().get(0);
                 verify(mp).setDataSource(mockFd, 0L, 1000L);
-                verify(mp).prepare();
-                verify(mp).start();
+                verify(mp).prepareAsync();
+                verify(mp, never()).prepare();
             }
         }
     }
