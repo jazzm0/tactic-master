@@ -61,7 +61,7 @@ public class SettingsManager {
         return getBool(SettingKey.AUTOPLAY);
     }
 
-    public void setAutoplayEnabled(boolean v) {
+    public void setAutoplayEnabled(Boolean v) {
         setBool(SettingKey.AUTOPLAY, v);
     }
 
@@ -69,7 +69,7 @@ public class SettingsManager {
         return getBool(SettingKey.SOUND_ENABLED);
     }
 
-    public void setSoundEnabled(boolean v) {
+    public void setSoundEnabled(Boolean v) {
         setBool(SettingKey.SOUND_ENABLED, v);
     }
 
@@ -77,7 +77,7 @@ public class SettingsManager {
         return getBool(SettingKey.ANIMATIONS_ENABLED);
     }
 
-    public void setAnimationsEnabled(boolean v) {
+    public void setAnimationsEnabled(Boolean v) {
         setBool(SettingKey.ANIMATIONS_ENABLED, v);
     }
 
@@ -93,7 +93,7 @@ public class SettingsManager {
         return getBool(SettingKey.SHOW_PUZZLE_RATING);
     }
 
-    public void setShowPuzzleRating(boolean v) {
+    public void setShowPuzzleRating(Boolean v) {
         setBool(SettingKey.SHOW_PUZZLE_RATING, v);
     }
 
@@ -101,7 +101,7 @@ public class SettingsManager {
         return getBool(SettingKey.SHOW_PUZZLE_ID);
     }
 
-    public void setShowPuzzleId(boolean v) {
+    public void setShowPuzzleId(Boolean v) {
         setBool(SettingKey.SHOW_PUZZLE_ID, v);
     }
 
@@ -109,7 +109,7 @@ public class SettingsManager {
         return getBool(SettingKey.SHOW_PUZZLES_COUNT);
     }
 
-    public void setShowPuzzlesCount(boolean v) {
+    public void setShowPuzzlesCount(Boolean v) {
         setBool(SettingKey.SHOW_PUZZLES_COUNT, v);
     }
 
