@@ -9,7 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
@@ -43,6 +43,10 @@ public class PuzzleTextViews {
     private ValueAnimator currentRatingAnimator;
     private ValueAnimator currentAlphaAnimator;
     private boolean cleanedUp;
+
+    // Reused per-frame to avoid allocating a fresh SpannableString during the rating tween.
+    private final SpannableStringBuilder ratingTextBuffer = new SpannableStringBuilder();
+    private ForegroundColorSpan ratingColorSpan = new ForegroundColorSpan(Color.BLACK);
 
     public PuzzleTextViews(@NonNull Context context) {
         if (isNull(context)) {
@@ -162,19 +166,28 @@ public class PuzzleTextViews {
 
     private void startRatingAnimation(int oldRating, int newRating) {
         int color = ratingChangeColor(oldRating, newRating);
+        // Allocated once per animation, not per frame. ForegroundColorSpan's color is final,
+        // so we can only reuse the span when the color hasn't changed since the last run.
+        if (ratingColorSpan.getForegroundColor() != color) {
+            ratingColorSpan = new ForegroundColorSpan(color);
+        }
         currentRatingAnimator = ValueAnimator.ofInt(oldRating, newRating);
         currentRatingAnimator.setDuration(ANIMATION_DURATION);
         currentRatingAnimator.addUpdateListener(animation -> {
             int value = (int) animation.getAnimatedValue();
             String fullText = activity.getString(R.string.player_rating, value);
-            SpannableString spannable = new SpannableString(fullText);
-            String ratingString = String.valueOf(value);
+            String ratingString = Integer.toString(value);
+
+            ratingTextBuffer.clear();
+            ratingTextBuffer.clearSpans();
+            ratingTextBuffer.append(fullText);
+
             int start = fullText.indexOf(ratingString);
             if (start >= 0) {
                 int end = start + ratingString.length();
-                spannable.setSpan(new ForegroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ratingTextBuffer.setSpan(ratingColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
-            playerRatingTextView.setText(spannable);
+            playerRatingTextView.setText(ratingTextBuffer);
         });
         currentRatingAnimator.start();
     }
