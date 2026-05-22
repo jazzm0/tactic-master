@@ -2,6 +2,7 @@ package com.tacticmaster;
 
 import static java.util.Objects.isNull;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.util.Log;
 
@@ -116,15 +117,13 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void loadNextPuzzle() {
         try {
             puzzleManager.moveToNextPuzzle();
-            renderPuzzle();
-            Log.d(TAG, "Successfully loaded next puzzle");
         } catch (NoSuchElementException e) {
             chessboardView.makeText(R.string.no_more_puzzles);
             Log.w(TAG, "No more puzzles available", e);
-        } catch (Exception e) {
-            Log.e(TAG, "Error loading next puzzle", e);
-            chessboardView.makeText(R.string.no_more_puzzles);
+            return;
         }
+        renderPuzzle();
+        Log.d(TAG, "Successfully loaded next puzzle");
     }
 
     public void loadPuzzleById(String puzzleId) {
@@ -136,59 +135,59 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
         try {
             puzzleManager.loadPuzzleById(puzzleId);
-            renderPuzzle();
-            Log.d(TAG, "Successfully loaded puzzle by ID: " + puzzleId);
         } catch (NoSuchElementException e) {
             chessboardView.makeText(R.string.invalid_puzzle_id);
             Log.w(TAG, "Invalid puzzle ID: " + puzzleId, e);
-        } catch (Exception e) {
-            Log.e(TAG, "Error loading puzzle by ID: " + puzzleId, e);
-            chessboardView.makeText(R.string.invalid_puzzle_id);
+            return;
         }
+        renderPuzzle();
+        Log.d(TAG, "Successfully loaded puzzle by ID: " + puzzleId);
     }
 
     public void puzzleIdLinkClicked() {
-        try {
-            PuzzleGame currentPuzzle = puzzleManager.getCurrentPuzzle();
-            if (isNull(currentPuzzle)) {
-                Log.w(TAG, "No current puzzle available for sharing");
-                return;
-            }
-
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, LICHESS_TRAINING_URL + currentPuzzle.getPuzzleId());
-            sendIntent.setType("text/plain");
-
-            Intent shareIntent = Intent.createChooser(sendIntent, null);
-            chessboardView.getContext().startActivity(shareIntent);
-            Log.d(TAG, "Shared puzzle link: " + currentPuzzle.getPuzzleId());
-        } catch (Exception e) {
-            Log.e(TAG, "Error sharing puzzle link", e);
+        PuzzleGame currentPuzzle = puzzleManager.getCurrentPuzzle();
+        if (isNull(currentPuzzle)) {
+            Log.w(TAG, "No current puzzle available for sharing");
+            return;
         }
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, LICHESS_TRAINING_URL + currentPuzzle.getPuzzleId());
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        try {
+            chessboardView.getContext().startActivity(shareIntent);
+        } catch (ActivityNotFoundException e) {
+            Log.w(TAG, "No app available to handle share intent", e);
+            return;
+        }
+        Log.d(TAG, "Shared puzzle link: " + currentPuzzle.getPuzzleId());
     }
 
     public void shareFenClicked() {
-        try {
-            PuzzleGame currentPuzzle = puzzleManager.getCurrentPuzzle();
-            if (isNull(currentPuzzle)) {
-                Log.w(TAG, "No current puzzle available for sharing FEN");
-                return;
-            }
-
-            String fen = currentPuzzle.fen();
-
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, fen);
-            sendIntent.setType("text/plain");
-
-            Intent shareIntent = Intent.createChooser(sendIntent, "Share FEN");
-            chessboardView.getContext().startActivity(shareIntent);
-            Log.d(TAG, "Shared puzzle FEN: " + fen);
-        } catch (Exception e) {
-            Log.e(TAG, "Error sharing puzzle FEN", e);
+        PuzzleGame currentPuzzle = puzzleManager.getCurrentPuzzle();
+        if (isNull(currentPuzzle)) {
+            Log.w(TAG, "No current puzzle available for sharing FEN");
+            return;
         }
+
+        String fen = currentPuzzle.fen();
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, fen);
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, "Share FEN");
+        try {
+            chessboardView.getContext().startActivity(shareIntent);
+        } catch (ActivityNotFoundException e) {
+            Log.w(TAG, "No app available to handle share intent", e);
+            return;
+        }
+        Log.d(TAG, "Shared puzzle FEN: " + fen);
     }
 
     public void puzzleHintClicked() {
