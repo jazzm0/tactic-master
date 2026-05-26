@@ -1,6 +1,5 @@
 package com.tacticmaster.board;
 
-import static com.tacticmaster.board.ChessboardView.BOARD_SIZE;
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.isNull;
 
@@ -15,6 +14,7 @@ import java.util.Arrays;
 
 public class Chessboard {
 
+    public static final int BOARD_SIZE = 8;
     public final static char NONE_PIECE = Piece.NONE.getFenSymbol().charAt(0);
 
     private final Board chessboard;

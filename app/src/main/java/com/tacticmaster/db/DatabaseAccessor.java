@@ -132,7 +132,7 @@ public class DatabaseAccessor {
             int solvedIndex = cursor.getColumnIndex(COLUMN_SOLVED);
             int themesIndex = cursor.getColumnIndex(COLUMN_THEMES);
             while (cursor.moveToNext()) {
-                if (puzzleIdIndex >= 0 && fenIndex >= 0 && movesIndex >= 0 && ratingIndex >= 0 && solvedIndex >= 0) {
+                if (puzzleIdIndex >= 0 && fenIndex >= 0 && movesIndex >= 0 && ratingIndex >= 0 && solvedIndex >= 0 && themesIndex >= 0) {
                     puzzles.add(new Puzzle(
                             cursor.getString(puzzleIdIndex),
                             cursor.getString(fenIndex),

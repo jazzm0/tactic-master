@@ -1,5 +1,6 @@
 package com.tacticmaster.board;
 
+import static com.tacticmaster.board.Chessboard.BOARD_SIZE;
 import static java.util.Objects.isNull;
 
 import android.content.Context;
@@ -31,7 +32,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         void onAfterPuzzleFinished(PuzzleGame puzzle);
     }
 
-    public static final int BOARD_SIZE = 8;
+
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private static final int MOVE_DELAY = 1300;
     private static final int STROKE_WIDTH = 8;
