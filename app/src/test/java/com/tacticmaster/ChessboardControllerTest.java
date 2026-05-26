@@ -248,6 +248,13 @@ public class ChessboardControllerTest {
     }
 
     @Test
+    void testConstructorWithNullSettingsManagerThrowsException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new ChessboardController(mock(DatabaseAccessor.class), null, mock(PuzzleManager.class),
+                        mock(PuzzleThemesDialogHelper.class), mock(ChessboardView.class), mock(PuzzleTextViews.class)));
+    }
+
+    @Test
     void testConstructorWithNullPuzzleManagerThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 new ChessboardController(mock(DatabaseAccessor.class), settingsManager, null, mock(PuzzleThemesDialogHelper.class),

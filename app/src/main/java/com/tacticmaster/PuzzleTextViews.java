@@ -136,11 +136,11 @@ public class PuzzleTextViews {
         // Drop animator update/listener callbacks — they capture the Activity-owned
         // playerRatingTextView via the lambdas, leaking the Activity until the animators
         // are GC'd otherwise.
-        if (currentRatingAnimator != null) {
+        if (!isNull(currentRatingAnimator)) {
             currentRatingAnimator.removeAllUpdateListeners();
             currentRatingAnimator.removeAllListeners();
         }
-        if (currentAlphaAnimator != null) {
+        if (!isNull(currentAlphaAnimator)) {
             currentAlphaAnimator.removeAllUpdateListeners();
             currentAlphaAnimator.removeAllListeners();
         }
@@ -224,10 +224,10 @@ public class PuzzleTextViews {
     }
 
     private void cancelCurrentAnimations() {
-        if (currentRatingAnimator != null && currentRatingAnimator.isRunning()) {
+        if (!isNull(currentRatingAnimator) && currentRatingAnimator.isRunning()) {
             currentRatingAnimator.cancel();
         }
-        if (currentAlphaAnimator != null && currentAlphaAnimator.isRunning()) {
+        if (!isNull(currentAlphaAnimator) && currentAlphaAnimator.isRunning()) {
             currentAlphaAnimator.cancel();
         }
     }

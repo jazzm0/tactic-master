@@ -269,7 +269,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void scheduleAfterPuzzleFinished(PuzzleGame puzzle) {
-        if (pendingAfterPuzzleFinished != null) {
+        if (!isNull(pendingAfterPuzzleFinished)) {
             removeCallbacks(pendingAfterPuzzleFinished);
         }
         pendingAfterPuzzleFinished = () -> puzzleFinishedListener.onAfterPuzzleFinished(puzzle);
@@ -277,15 +277,15 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void cancelPendingCallbacks() {
-        if (pendingAfterPuzzleFinished != null) {
+        if (!isNull(pendingAfterPuzzleFinished)) {
             removeCallbacks(pendingAfterPuzzleFinished);
             pendingAfterPuzzleFinished = null;
         }
-        if (pendingNextMove != null) {
+        if (!isNull(pendingNextMove)) {
             removeCallbacks(pendingNextMove);
             pendingNextMove = null;
         }
-        if (pendingFirstMove != null) {
+        if (!isNull(pendingFirstMove)) {
             removeCallbacks(pendingFirstMove);
             pendingFirstMove = null;
         }
@@ -361,7 +361,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             if (puzzleGame.isSolutionFound()) {
                 onPuzzleSolved(puzzleGame);
             } else {
-                if (pendingNextMove != null) {
+                if (!isNull(pendingNextMove)) {
                     removeCallbacks(pendingNextMove);
                 }
                 pendingNextMove = () -> this.doNextMove(null);

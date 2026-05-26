@@ -43,6 +43,9 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         if (isNull(databaseAccessor)) {
             throw new IllegalArgumentException("DatabaseAccessor cannot be null");
         }
+        if (isNull(settingsManager)) {
+            throw new IllegalArgumentException("SettingsManager cannot be null");
+        }
         if (isNull(puzzleManager)) {
             throw new IllegalArgumentException("PuzzleManager cannot be null");
         }
@@ -232,7 +235,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
      * Should be called when the controller is no longer needed.
      */
     public void cleanup() {
-        if (puzzleTextViews != null) {
+        if (!isNull(puzzleTextViews)) {
             puzzleTextViews.cleanup();
         }
         // Release sound player resources
