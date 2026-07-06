@@ -4,7 +4,6 @@ import static java.util.Locale.ENGLISH;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class PuzzleGame implements Comparable<PuzzleGame> {
@@ -97,14 +96,15 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PuzzleGame that = (PuzzleGame) o;
-        return rating == that.rating && solved == that.solved && currentMoveIndex == that.currentMoveIndex && Objects.equals(puzzleId, that.puzzleId) && Objects.equals(fen, that.fen) && Objects.deepEquals(moves, that.moves);
+        return Objects.equals(puzzleId, that.puzzleId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(puzzleId, fen, Arrays.hashCode(moves), rating, solved, currentMoveIndex);
+        return Objects.hashCode(puzzleId);
     }
 
     @Override

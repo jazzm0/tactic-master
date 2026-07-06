@@ -6,6 +6,10 @@ import androidx.preference.PreferenceDataStore;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
 
 /**
  * Bridges the AndroidX Preference framework to {@link SettingsManager}, so that
@@ -21,30 +25,10 @@ import java.util.Map;
  */
 public class SettingsPreferenceDataStore extends PreferenceDataStore {
 
-    @FunctionalInterface
-    public interface BoolGetter {
-        boolean get();
-    }
-
-    @FunctionalInterface
-    public interface BoolSetter {
-        void set(boolean value);
-    }
-
-    @FunctionalInterface
-    public interface IntGetter {
-        int get();
-    }
-
-    @FunctionalInterface
-    public interface IntSetter {
-        void set(int value);
-    }
-
-    private final Map<SettingKey, BoolGetter> boolGetters;
-    private final Map<SettingKey, BoolSetter> boolSetters;
-    private final Map<SettingKey, IntGetter> intGetters;
-    private final Map<SettingKey, IntSetter> intSetters;
+    private final Map<SettingKey, BooleanSupplier> boolGetters;
+    private final Map<SettingKey, Consumer<Boolean>> boolSetters;
+    private final Map<SettingKey, IntSupplier> intGetters;
+    private final Map<SettingKey, IntConsumer> intSetters;
 
     public SettingsPreferenceDataStore(SettingsManager s) {
         boolGetters = new EnumMap<>(SettingKey.class);
@@ -74,29 +58,29 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
 
     @Override
     public boolean getBoolean(String key, boolean defValue) {
-        BoolGetter getter = boolGetters.get(SettingKey.fromKey(key));
-        return isNull(getter) ? defValue : getter.get();
+        BooleanSupplier getter = boolGetters.get(SettingKey.fromKey(key));
+        return isNull(getter) ? defValue : getter.getAsBoolean();
     }
 
     @Override
     public void putBoolean(String key, boolean value) {
-        BoolSetter setter = boolSetters.get(SettingKey.fromKey(key));
+        Consumer<Boolean> setter = boolSetters.get(SettingKey.fromKey(key));
         if (!isNull(setter)) {
-            setter.set(value);
+            setter.accept(value);
         }
     }
 
     @Override
     public int getInt(String key, int defValue) {
-        IntGetter getter = intGetters.get(SettingKey.fromKey(key));
-        return isNull(getter) ? defValue : getter.get();
+        IntSupplier getter = intGetters.get(SettingKey.fromKey(key));
+        return isNull(getter) ? defValue : getter.getAsInt();
     }
 
     @Override
     public void putInt(String key, int value) {
-        IntSetter setter = intSetters.get(SettingKey.fromKey(key));
+        IntConsumer setter = intSetters.get(SettingKey.fromKey(key));
         if (!isNull(setter)) {
-            setter.set(value);
+            setter.accept(value);
         }
     }
 
@@ -104,9 +88,9 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
     public String getString(String key, String defValue) {
         SettingKey k = SettingKey.fromKey(key);
         if (!isNull(k) && k.type == SettingKey.Type.INT) {
-            IntGetter getter = intGetters.get(k);
+            IntSupplier getter = intGetters.get(k);
             if (!isNull(getter)) {
-                return String.valueOf(getter.get());
+                return String.valueOf(getter.getAsInt());
             }
         }
         return defValue;
@@ -118,12 +102,12 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
         if (isNull(k) || k.type != SettingKey.Type.INT || isNull(value)) {
             return;
         }
-        IntSetter setter = intSetters.get(k);
+        IntConsumer setter = intSetters.get(k);
         if (isNull(setter)) {
             return;
         }
         try {
-            setter.set(Integer.parseInt(value.trim()));
+            setter.accept(Integer.parseInt(value.trim()));
         } catch (NumberFormatException ignored) {
             // Invalid input — silently ignore. The change listener in
             // SettingsFragment surfaces a Toast for user-facing feedback.

@@ -114,4 +114,33 @@ public class PuzzleGameTest {
         puzzleGame.getNextMove();
         assertFalse(puzzleGame.isSolutionFound());
     }
+
+    @Test
+    public void testEqualsAndHashCodeAreIdBasedOnly() {
+        // Regression: equals previously included currentMoveIndex/solved/etc, so identity
+        // changed as the user played — Sets and Map keys would silently break.
+        PuzzleGame original = new PuzzleGame("42", "fen", "m1 m2 m3", 1500);
+        PuzzleGame sameId = new PuzzleGame("42", "differentFen", "x1 x2", 9999, true);
+        PuzzleGame differentId = new PuzzleGame("43", "fen", "m1 m2 m3", 1500);
+
+        assertEquals(original, sameId);
+        assertEquals(original.hashCode(), sameId.hashCode());
+        assertFalse(original.equals(differentId));
+    }
+
+    @Test
+    public void testEqualityIsStableAcrossMoves() {
+        // Regression: playing a move must not change equality.
+        PuzzleGame a = new PuzzleGame("1", "fen", "m1 m2 m3", 1500);
+        PuzzleGame b = new PuzzleGame("1", "fen", "m1 m2 m3", 1500);
+
+        java.util.Set<PuzzleGame> set = new java.util.HashSet<>();
+        set.add(a);
+
+        a.getNextMove();
+        a.setSolved(true);
+
+        assertTrue(set.contains(b), "PuzzleGame should remain equal to its starting copy after moves and solving");
+        assertTrue(set.contains(a), "PuzzleGame should still match itself in a HashSet after state changes");
+    }
 }

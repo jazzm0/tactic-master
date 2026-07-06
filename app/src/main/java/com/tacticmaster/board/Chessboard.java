@@ -1,6 +1,5 @@
 package com.tacticmaster.board;
 
-import static com.tacticmaster.board.ChessboardView.BOARD_SIZE;
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.isNull;
 
@@ -15,13 +14,14 @@ import java.util.Arrays;
 
 public class Chessboard {
 
+    public static final int BOARD_SIZE = 8;
     public final static char NONE_PIECE = Piece.NONE.getFenSymbol().charAt(0);
 
     private final Board chessboard;
     private final boolean isPlayerWhite;
 
     public Chessboard(String fen) {
-        if (fen == null || fen.trim().isEmpty()) {
+        if (isNull(fen) || fen.trim().isEmpty()) {
             throw new IllegalArgumentException("FEN string cannot be null or empty");
         }
         this.chessboard = new Board();
@@ -46,7 +46,7 @@ public class Chessboard {
     }
 
     public int[] transformFenMove(String fenMove) {
-        if (fenMove == null || fenMove.length() < 4 || fenMove.length() > 5) {
+        if (isNull(fenMove) || fenMove.length() < 4 || fenMove.length() > 5) {
             throw new IllegalArgumentException("Invalid move: " + fenMove);
         }
         Move move = new Move(fenMove, chessboard.getSideToMove());

@@ -1,7 +1,9 @@
 package com.tacticmaster.db;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 class DatabaseHelperTest {
 
@@ -75,5 +80,19 @@ class DatabaseHelperTest {
     @Test
     void testDatabaseConstants() {
         assertEquals("puzzle.db", DatabaseHelper.DATABASE_NAME);
+    }
+
+    @Test
+    void testCreateDatabaseDeclaresIOExceptionNotError() throws Exception {
+        // Regression: createDatabase used to wrap IOException as java.lang.Error, which
+        // signals JVM-level unrecoverable failures and bypasses normal catch(Exception) handlers.
+        Method createDatabase = DatabaseHelper.class.getMethod("createDatabase");
+        Class<?>[] thrown = createDatabase.getExceptionTypes();
+        assertTrue(Arrays.asList(thrown).contains(IOException.class),
+                "createDatabase should declare IOException, found: " + Arrays.toString(thrown));
+        for (Class<?> t : thrown) {
+            assertFalse(Error.class.isAssignableFrom(t),
+                    "createDatabase must not declare java.lang.Error: " + t);
+        }
     }
 }

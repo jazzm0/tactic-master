@@ -1,5 +1,6 @@
 package com.tacticmaster.board;
 
+import static com.tacticmaster.board.Chessboard.BOARD_SIZE;
 import static java.util.Objects.isNull;
 
 import android.content.Context;
@@ -31,7 +32,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         void onAfterPuzzleFinished(PuzzleGame puzzle);
     }
 
-    public static final int BOARD_SIZE = 8;
+
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private static final int MOVE_DELAY = 1300;
     private static final int STROKE_WIDTH = 8;
@@ -55,6 +56,12 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private int selectedFromRank = -1, selectedFromFile = -1, selectedToRank = -1, selectedToFile = -1;
     private int opponentFromRank = -1, opponentFromFile = -1, opponentToRank = -1, opponentToFile = -1;
     private boolean puzzleFinished = false;
+
+    // Tracked so they can be cancelled when the puzzle changes or the view detaches —
+    // otherwise a delayed onAfterPuzzleFinished can fire against a stale puzzle and skip ahead.
+    private Runnable pendingAfterPuzzleFinished;
+    private Runnable pendingNextMove;
+    private Runnable pendingFirstMove;
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -259,7 +266,30 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         puzzleFinished = true;
         makeText(R.string.correct_solution);
         puzzleFinishedListener.onPuzzleSolved(solvedPuzzle);
-        postDelayed(() -> puzzleFinishedListener.onAfterPuzzleFinished(solvedPuzzle), NEXT_PUZZLE_DELAY);
+        scheduleAfterPuzzleFinished(solvedPuzzle);
+    }
+
+    private void scheduleAfterPuzzleFinished(PuzzleGame puzzle) {
+        if (!isNull(pendingAfterPuzzleFinished)) {
+            removeCallbacks(pendingAfterPuzzleFinished);
+        }
+        pendingAfterPuzzleFinished = () -> puzzleFinishedListener.onAfterPuzzleFinished(puzzle);
+        postDelayed(pendingAfterPuzzleFinished, NEXT_PUZZLE_DELAY);
+    }
+
+    private void cancelPendingCallbacks() {
+        if (!isNull(pendingAfterPuzzleFinished)) {
+            removeCallbacks(pendingAfterPuzzleFinished);
+            pendingAfterPuzzleFinished = null;
+        }
+        if (!isNull(pendingNextMove)) {
+            removeCallbacks(pendingNextMove);
+            pendingNextMove = null;
+        }
+        if (!isNull(pendingFirstMove)) {
+            removeCallbacks(pendingFirstMove);
+            pendingFirstMove = null;
+        }
     }
 
     private float getTileSize() {
@@ -322,7 +352,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         if (!chessboard.isMoveLeadingToMate(move) && !puzzleGame.isCorrectNextMove(move)) {
             makeText(R.string.wrong_solution);
             puzzleFinishedListener.onPuzzleNotSolved(puzzleGame);
-            postDelayed(() -> puzzleFinishedListener.onAfterPuzzleFinished(puzzleGame), NEXT_PUZZLE_DELAY);
+            scheduleAfterPuzzleFinished(puzzleGame);
         } else {
             if (chessboard.isMoveLeadingToMate(move)) {
                 doNextMove(move);
@@ -332,7 +362,11 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             if (puzzleGame.isSolutionFound()) {
                 onPuzzleSolved(puzzleGame);
             } else {
-                postDelayed(() -> this.doNextMove(null), MOVE_DELAY);
+                if (!isNull(pendingNextMove)) {
+                    removeCallbacks(pendingNextMove);
+                }
+                pendingNextMove = () -> this.doNextMove(null);
+                postDelayed(pendingNextMove, MOVE_DELAY);
             }
         }
     }
@@ -366,6 +400,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        cancelPendingCallbacks();
         bitmapManager.recycleBitmaps();
     }
 
@@ -399,6 +434,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     public void setPuzzle(PuzzleGame puzzle) {
+        cancelPendingCallbacks();
         puzzleFinished = false;
         this.puzzleGame = puzzle;
         puzzleGame.reset();
@@ -408,7 +444,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         removeSelection();
         puzzleHintView.resetHintFirstClick();
         invalidate();
-        postDelayed(this::doFirstMove, 2000);
+        pendingFirstMove = this::doFirstMove;
+        postDelayed(pendingFirstMove, 2000);
     }
 
     public void setPuzzleSolvedListener(PuzzleFinishedListener listener) {

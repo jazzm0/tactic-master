@@ -248,6 +248,13 @@ public class ChessboardControllerTest {
     }
 
     @Test
+    void testConstructorWithNullSettingsManagerThrowsException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new ChessboardController(mock(DatabaseAccessor.class), null, mock(PuzzleManager.class),
+                        mock(PuzzleThemesDialogHelper.class), mock(ChessboardView.class), mock(PuzzleTextViews.class)));
+    }
+
+    @Test
     void testConstructorWithNullPuzzleManagerThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 new ChessboardController(mock(DatabaseAccessor.class), settingsManager, null, mock(PuzzleThemesDialogHelper.class),
@@ -285,9 +292,35 @@ public class ChessboardControllerTest {
     }
 
     @Test
-    void testLoadNextPuzzleWithExceptionShowsMessage() {
+    void testLoadNextPuzzleWithUnexpectedExceptionPropagates() {
+        // Regression: loadNextPuzzle used to catch (Exception) and silently show
+        // "no more puzzles" for any failure, hiding programming errors. Only
+        // NoSuchElementException should be treated as "no more puzzles".
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
                 .thenThrow(new RuntimeException("Database error"));
+
+        Assertions.assertThrows(RuntimeException.class,
+                () -> chessboardController.loadNextPuzzle());
+        verify(chessboardView, never()).makeText(R.string.no_more_puzzles);
+    }
+
+    @Test
+    void testLoadPuzzleByIdWithUnexpectedExceptionPropagates() {
+        // Regression: loadPuzzleById used to catch (Exception) and silently show
+        // "invalid puzzle id" for any failure. Only NoSuchElementException should
+        // be treated as a missing puzzle.
+        when(databaseAccessor.getPuzzleById("invalid"))
+                .thenThrow(new RuntimeException("Database error"));
+
+        Assertions.assertThrows(RuntimeException.class,
+                () -> chessboardController.loadPuzzleById("invalid"));
+        verify(chessboardView, never()).makeText(R.string.invalid_puzzle_id);
+    }
+
+    @Test
+    void testLoadNextPuzzleShowsMessageOnNoSuchElement() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenThrow(new java.util.NoSuchElementException("none"));
 
         chessboardController.loadNextPuzzle();
 
@@ -295,10 +328,11 @@ public class ChessboardControllerTest {
     }
 
     @Test
-    void testLoadPuzzleByIdWithExceptionShowsMessage() {
-        when(databaseAccessor.getPuzzleById("invalid")).thenThrow(new RuntimeException("Database error"));
+    void testLoadPuzzleByIdShowsMessageOnNoSuchElement() {
+        when(databaseAccessor.getPuzzleById("missing"))
+                .thenThrow(new java.util.NoSuchElementException("none"));
 
-        chessboardController.loadPuzzleById("invalid");
+        chessboardController.loadPuzzleById("missing");
 
         verify(chessboardView).makeText(R.string.invalid_puzzle_id);
     }

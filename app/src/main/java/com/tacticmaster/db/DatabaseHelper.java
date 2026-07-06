@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 copyDatabase();
             } catch (IOException e) {
-                throw new Error("Error copying database during upgrade");
+                throw new RuntimeException("Error copying database during upgrade", e);
             }
 
             // Reopen database and apply schema changes
@@ -75,46 +76,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void createDatabase() throws Error {
+    public void createDatabase() throws IOException {
         boolean dbExist = checkDatabase();
         if (!dbExist) {
-            try {
-                copyDatabase();
-                SQLiteDatabase db = openDatabase();
-                db.execSQL("ALTER TABLE " + PUZZLE_TABLE_NAME + " ADD COLUMN " + COLUMN_SOLVED + " INTEGER DEFAULT 0");
-                db.close();
-            } catch (IOException e) {
-                throw new Error("Error copying database");
-            }
+            copyDatabase();
+            SQLiteDatabase db = openDatabase();
+            db.execSQL("ALTER TABLE " + PUZZLE_TABLE_NAME + " ADD COLUMN " + COLUMN_SOLVED + " INTEGER DEFAULT 0");
+            db.close();
         }
     }
 
     private boolean checkDatabase() {
-        SQLiteDatabase checkDB = null;
-        try {
-            checkDB = SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READONLY);
-        } catch (Exception e) {
-            Log.i("DatabaseHelper", "Database does not exist yet, creating one");
-        }
-        if (!isNull(checkDB)) {
-            checkDB.close();
+        if (!new File(databasePath).exists()) {
+            Log.i("DatabaseHelper", "Database does not exist yet, will create from assets");
+            return false;
         }
         SQLiteDatabase db = getWritableDatabase(); // open the bundled database once, to trigger onUpdate if needed
         db.close();
-        return !isNull(checkDB);
+        return true;
     }
 
     private void copyDatabase() throws IOException {
-        InputStream input = context.getAssets().open(DATABASE_NAME);
-        OutputStream output = new FileOutputStream(databasePath);
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = input.read(buffer)) > 0) {
-            output.write(buffer, 0, length);
+        try (InputStream input = context.getAssets().open(DATABASE_NAME);
+             OutputStream output = new FileOutputStream(databasePath)) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = input.read(buffer)) > 0) {
+                output.write(buffer, 0, length);
+            }
+            output.flush();
         }
-        output.flush();
-        output.close();
-        input.close();
     }
 
     public SQLiteDatabase openDatabase() {

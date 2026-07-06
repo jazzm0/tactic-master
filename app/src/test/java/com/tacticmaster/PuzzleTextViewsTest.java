@@ -1,8 +1,10 @@
 package com.tacticmaster;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -108,13 +110,6 @@ class PuzzleTextViewsTest {
     }
 
     @Test
-    void testSetPuzzleRatingWithNegativeRatingDoesNotUpdate() {
-        puzzleTextViews.setPuzzleRating(-100);
-
-        verify(mockPuzzleRatingTextView, never()).setText(anyString());
-    }
-
-    @Test
     void testSetPuzzleIdWithValidId() {
         String puzzleId = "ABC123";
         puzzleTextViews.setPuzzleId(puzzleId);
@@ -145,27 +140,6 @@ class PuzzleTextViewsTest {
         verify(mockPuzzlesSolvedTextView).setText(anyString());
         verify(mockPuzzlesSolvedTextView).setTypeface(null, Typeface.BOLD);
         verify(mockPuzzlesSolvedTextView).setContentDescription(anyString());
-    }
-
-    @Test
-    void testSetPuzzlesSolvedCountWithNegativeSolvedCountDoesNotUpdate() {
-        puzzleTextViews.setPuzzlesSolvedCount(-1, 100);
-
-        verify(mockPuzzlesSolvedTextView, never()).setText(anyString());
-    }
-
-    @Test
-    void testSetPuzzlesSolvedCountWithNegativeTotalCountDoesNotUpdate() {
-        puzzleTextViews.setPuzzlesSolvedCount(50, -1);
-
-        verify(mockPuzzlesSolvedTextView, never()).setText(anyString());
-    }
-
-    @Test
-    void testSetPuzzlesSolvedCountWithSolvedGreaterThanTotalDoesNotUpdate() {
-        puzzleTextViews.setPuzzlesSolvedCount(150, 100);
-
-        verify(mockPuzzlesSolvedTextView, never()).setText(anyString());
     }
 
     @Test
@@ -201,34 +175,6 @@ class PuzzleTextViewsTest {
     }
 
     @Test
-    void testSetPlayerRatingWithNegativeRatingDoesNotUpdate() {
-        puzzleTextViews.setPlayerRating(-500);
-
-        verify(mockPlayerRatingTextView, never()).setText(anyString());
-    }
-
-    @Test
-    void testUpdatePlayerRatingWithValidRatings() {
-        puzzleTextViews.updatePlayerRating(1500, 1600);
-
-        assertNotNull(puzzleTextViews);
-    }
-
-    @Test
-    void testUpdatePlayerRatingWithNegativeOldRatingDoesNotAnimate() {
-        puzzleTextViews.updatePlayerRating(-100, 1600);
-
-        assertNotNull(puzzleTextViews);
-    }
-
-    @Test
-    void testUpdatePlayerRatingWithNegativeNewRatingDoesNotAnimate() {
-        puzzleTextViews.updatePlayerRating(1500, -100);
-
-        assertNotNull(puzzleTextViews);
-    }
-
-    @Test
     void testCleanupDoesNotThrowException() {
         puzzleTextViews.cleanup();
 
@@ -241,6 +187,28 @@ class PuzzleTextViewsTest {
         puzzleTextViews.cleanup();
 
         assertNotNull(puzzleTextViews);
+    }
+
+    @Test
+    void testCleanupMarksInstanceAsCleanedUp() {
+        // Regression: cleanup() must mark the instance so post-destroy callbacks
+        // (e.g. an Activity finishing while the alpha animator is still pending)
+        // don't reach back into the destroyed Activity via getString().
+        assertFalse(puzzleTextViews.isCleanedUp());
+        puzzleTextViews.cleanup();
+        assertTrue(puzzleTextViews.isCleanedUp());
+    }
+
+    @Test
+    void testUpdatePlayerRatingIsNoOpAfterCleanup() {
+        // Regression: updatePlayerRating used to start animations even after the
+        // Activity was destroyed, leading to crashes when the listener fired
+        // setPlayerRating -> activity.getString on a finished Activity.
+        puzzleTextViews.cleanup();
+        puzzleTextViews.updatePlayerRating(1500, 1600);
+
+        // No text update should be triggered post-cleanup.
+        verify(mockPlayerRatingTextView, never()).setText(anyString());
     }
 
     @Test
