@@ -508,4 +508,58 @@ public class ChessboardControllerTest {
 
         Assertions.assertTrue(chessboardController.getAutoplay());
     }
+
+    @Test
+    void testRenderPuzzlePersistsCurrentPuzzleId() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+
+        chessboardController.loadNextPuzzle();
+
+        verify(settingsManager).setLastPuzzleId(puzzleGame.getPuzzleId());
+    }
+
+    @Test
+    void testRestoreLastPuzzleOrLoadNextWithNullFallsBackToLoadNext() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+
+        chessboardController.restoreLastPuzzleOrLoadNext(null);
+
+        verify(chessboardView).setPuzzle(puzzleGame);
+    }
+
+    @Test
+    void testRestoreLastPuzzleOrLoadNextWithEmptyFallsBackToLoadNext() {
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+
+        chessboardController.restoreLastPuzzleOrLoadNext("   ");
+
+        verify(chessboardView).setPuzzle(puzzleGame);
+    }
+
+    @Test
+    void testRestoreLastPuzzleOrLoadNextWithValidIdLoadsThatPuzzle() {
+        when(databaseAccessor.getPuzzleById("1")).thenReturn(puzzleRecord);
+
+        chessboardController.restoreLastPuzzleOrLoadNext("1");
+
+        verify(chessboardView).setPuzzle(puzzleGame);
+        verify(puzzleTextViews).setPuzzleId(puzzleGame.getPuzzleId());
+    }
+
+    @Test
+    void testRestoreLastPuzzleOrLoadNextWithUnknownIdFallsBackToLoadNext() {
+        when(databaseAccessor.getPuzzleById("gone"))
+                .thenThrow(new java.util.NoSuchElementException("missing"));
+        when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
+                .thenReturn(puzzleRecords);
+
+        chessboardController.restoreLastPuzzleOrLoadNext("gone");
+
+        // Falls back silently — no "invalid puzzle" toast, and the next puzzle is loaded.
+        verify(chessboardView, never()).makeText(R.string.invalid_puzzle_id);
+        verify(chessboardView).setPuzzle(puzzleGame);
+    }
 }

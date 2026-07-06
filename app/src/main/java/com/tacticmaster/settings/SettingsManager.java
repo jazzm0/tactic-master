@@ -55,6 +55,14 @@ public class SettingsManager {
         sharedPreferences.edit().putInt(k.key, value).apply();
     }
 
+    private String getString(SettingKey k) {
+        return sharedPreferences.getString(k.key, k.defaultString());
+    }
+
+    private void setString(SettingKey k, String value) {
+        sharedPreferences.edit().putString(k.key, value).apply();
+    }
+
     // ---- Public typed API (unchanged signatures) ----
 
     public boolean isAutoplayEnabled() {
@@ -119,6 +127,14 @@ public class SettingsManager {
 
     public void setPlayerRating(int rating) {
         setInt(SettingKey.PLAYER_RATING, clampRating(rating));
+    }
+
+    public String getLastPuzzleId() {
+        return getString(SettingKey.LAST_PUZZLE_ID);
+    }
+
+    public void setLastPuzzleId(String puzzleId) {
+        setString(SettingKey.LAST_PUZZLE_ID, puzzleId);
     }
 
     private static int clampRating(int rating) {
