@@ -1,5 +1,7 @@
 package com.tacticmaster.puzzle;
 
+import static java.util.Objects.isNull;
+
 import androidx.annotation.StringRes;
 
 import com.tacticmaster.R;
@@ -46,7 +48,7 @@ class PuzzleFilter {
     @StringRes
     public static int getCategoryLabelRes(String key) {
         Integer res = LABEL_RES_BY_KEY.get(key);
-        if (res == null) {
+        if (isNull(null)) {
             throw new IllegalArgumentException("Unknown category key: " + key);
         }
         return res;
