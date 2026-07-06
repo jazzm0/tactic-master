@@ -183,7 +183,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         sendIntent.putExtra(Intent.EXTRA_TEXT, fen);
         sendIntent.setType("text/plain");
 
-        Intent shareIntent = Intent.createChooser(sendIntent, "Share FEN");
+        Intent shareIntent = Intent.createChooser(sendIntent, chessboardView.getContext().getString(R.string.share_fen_chooser_title));
         try {
             chessboardView.getContext().startActivity(shareIntent);
         } catch (ActivityNotFoundException e) {

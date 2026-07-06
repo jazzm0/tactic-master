@@ -1,0 +1,112 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="rating">Nivel del puzle: %d</string>
+    <string name="puzzle_id">ID del puzle:</string>
+    <string name="puzzle_id_hint">Introduce el ID del puzle</string>
+    <string name="invalid_puzzle_id">ID de puzle no válido</string>
+    <string name="puzzles_solved" tools:ignore="PluralsCandidate">Resueltos %1$d de %2$d puzles</string>
+    <string name="show_previous_puzzle">Mostrar puzle anterior</string>
+    <string name="correct_solution">✅ ¡Solución correcta!</string>
+    <string name="wrong_solution">❌ Solución incorrecta</string>
+    <string name="hint">Pista</string>
+    <string name="reload">Recargar puzle</string>
+    <string name="show_next_puzzle">Mostrar puzle siguiente</string>
+    <string name="player_rating">Nivel del jugador: %d</string>
+    <string name="player_turn">mueve</string>
+    <string name="is_solved">resuelto</string>
+    <string name="puzzle_id_sharing">Compartir por enlace</string>
+    <string name="no_more_puzzles">No hay más puzles sin resolver disponibles</string>
+    <string name="queen">Dama</string>
+    <string name="rook">Torre</string>
+    <string name="bishop">Alfil</string>
+    <string name="knight">Caballo</string>
+    <string name="filter">Filtro</string>
+    <string name="share_fen">Compartir FEN</string>
+    <string name="acra_toast_text">¡Vaya! Algo ha salido mal. Por favor, envía un informe de error.</string>
+    <string name="mail_subject">Informe de error de tactics trainer</string>
+    <string name="mail_body"><![CDATA[
+                                ¡Vaya! Algo ha salido mal.\n\n
+
+                                Se adjunta el informe de error detallado.\n\n
+
+                                Por favor, ayúdame a entenderlo y corregirlo describiendo cómo reproducirlo:\n\n
+
+                                Pasos para reproducir:\n
+                                1.\n\n
+                                2.\n\n
+                                3.\n\n
+
+                                Lo que esperaba:\n\n
+                                Lo que ocurrió realmente:\n\n
+
+                                Información adicional (opcional):\n\n
+                                • Dispositivo:\n
+                                • Versión de Android:\n
+                                • Otras notas:\n\n
+
+                                ¡Muchas gracias por tomarte el tiempo de reportar esto!\n\n
+
+                                Un saludo,
+                                ]]></string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ajustes</string>
+
+    <!-- Puzzle Settings -->
+    <string name="puzzle_category_title">Puzle</string>
+    <string name="puzzle_difficulty_title">Dificultad del puzle</string>
+    <string name="puzzle_difficulty_summary">Se ajusta automáticamente a medida que resuelves puzles.</string>
+
+    <!-- Autoplay Settings -->
+    <string name="autoplay_category_title">Reproducción automática</string>
+    <string name="autoplay_title">Activar reproducción automática</string>
+    <string name="autoplay_summary">Cargar automáticamente el siguiente puzle tras resolverlo</string>
+
+    <!-- Sound Settings -->
+    <string name="sound_category_title">Sonido</string>
+    <string name="sound_enabled_title">Activar sonido</string>
+    <string name="sound_enabled_summary">Reproducir efectos de sonido para movimientos y capturas</string>
+
+    <!-- Animation Settings -->
+    <string name="animation_category_title">Animaciones</string>
+    <string name="animations_enabled_title">Activar animaciones</string>
+    <string name="animations_enabled_summary">Animar los movimientos de las piezas</string>
+    <string name="animation_speed_title">Velocidad de la animación</string>
+    <string name="animation_speed_summary">Ajustar la duración de la animación (300–800 ms)</string>
+
+    <!-- Display settings -->
+    <string name="display_category_title">Pantalla</string>
+    <string name="show_puzzle_rating_title">Mostrar nivel del puzle</string>
+    <string name="show_puzzle_rating_summary">Mostrar la puntuación de dificultad del puzle</string>
+    <string name="show_puzzle_id_title">Mostrar ID del puzle</string>
+    <string name="show_puzzle_id_summary">Mostrar el ID del puzle y las opciones para compartir</string>
+    <string name="show_puzzles_count_title">Mostrar contador de puzles</string>
+    <string name="show_puzzles_count_summary">Mostrar el número de puzles resueltos</string>
+
+    <!-- Dialog buttons -->
+    <string name="dialog_done">Listo</string>
+    <string name="dialog_clear_all">Borrar todo</string>
+    <string name="dialog_cancel">Cancelar</string>
+
+    <!-- Share -->
+    <string name="share_fen_chooser_title">Compartir FEN</string>
+
+    <!-- Accessibility content descriptions -->
+    <string name="content_desc_puzzle_rating" tools:ignore="PluralsCandidate">nivel %d</string>
+    <string name="content_desc_puzzle_id">ID del puzle: %1$s</string>
+    <string name="content_desc_puzzles_solved" tools:ignore="PluralsCandidate">%1$d de %2$d puzles resueltos</string>
+    <string name="content_desc_puzzle_solved">Puzle resuelto</string>
+    <string name="content_desc_puzzle_not_solved">Puzle no resuelto</string>
+    <string name="content_desc_player_rating">Nivel del jugador: %d</string>
+
+    <!-- Puzzle filter categories -->
+    <string name="filter_category_mate_patterns">Patrones de mate</string>
+    <string name="filter_category_tactical_motifs">Motivos tácticos</string>
+    <string name="filter_category_attacking_strategies">Estrategias de ataque</string>
+    <string name="filter_category_endgame_techniques">Técnicas de final</string>
+    <string name="filter_category_pawn_play">Juego de peones</string>
+    <string name="filter_category_positional_play">Conceptos posicionales y estratégicos</string>
+    <string name="filter_category_game_phases">Fases específicas de la partida</string>
+    <string name="filter_category_mate_in_x_moves">Mate en jugadas fijas</string>
+    <string name="filter_category_puzzle_complexity">Complejidad y nivel de habilidad</string>
+    <string name="filter_category_piece_exploitation">Explotación de piezas</string>
+</resources>
