@@ -103,6 +103,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     public void renderPuzzle() {
         var puzzle = puzzleManager.getCurrentPuzzle();
         chessboardView.setPuzzle(puzzle);
+        settingsManager.setLastPuzzleId(puzzle.getPuzzleId());
 
         puzzleTextViews.setPuzzleId(puzzle.getPuzzleId());
         puzzleTextViews.setPuzzleRating(puzzle.rating());
@@ -127,6 +128,22 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         }
         renderPuzzle();
         Log.d(TAG, "Successfully loaded next puzzle");
+    }
+
+    public void restoreLastPuzzleOrLoadNext(String lastPuzzleId) {
+        if (isNull(lastPuzzleId) || lastPuzzleId.trim().isEmpty()) {
+            loadNextPuzzle();
+            return;
+        }
+        try {
+            puzzleManager.loadPuzzleById(lastPuzzleId);
+        } catch (NoSuchElementException e) {
+            Log.w(TAG, "Saved puzzle ID no longer available, loading next: " + lastPuzzleId, e);
+            loadNextPuzzle();
+            return;
+        }
+        renderPuzzle();
+        Log.d(TAG, "Restored last puzzle: " + lastPuzzleId);
     }
 
     public void loadPuzzleById(String puzzleId) {
@@ -183,7 +200,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         sendIntent.putExtra(Intent.EXTRA_TEXT, fen);
         sendIntent.setType("text/plain");
 
-        Intent shareIntent = Intent.createChooser(sendIntent, "Share FEN");
+        Intent shareIntent = Intent.createChooser(sendIntent, chessboardView.getContext().getString(R.string.share_fen_chooser_title));
         try {
             chessboardView.getContext().startActivity(shareIntent);
         } catch (ActivityNotFoundException e) {

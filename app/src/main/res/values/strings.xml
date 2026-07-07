@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">TacticMaster</string>
+    <string name="app_name" translatable="false">TacticMaster</string>
     <string name="rating">Puzzle Rating: %d</string>
     <string name="puzzle_id">Puzzle ID:</string>
     <string name="puzzle_id_hint">Enter Puzzle ID</string>
@@ -82,4 +82,32 @@
     <string name="show_puzzle_id_summary">Display the puzzle ID and sharing options</string>
     <string name="show_puzzles_count_title">Show Puzzles Count</string>
     <string name="show_puzzles_count_summary">Display the number of puzzles solved</string>
+
+    <!-- Dialog buttons -->
+    <string name="dialog_done">Done</string>
+    <string name="dialog_clear_all">Clear All</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <!-- Share -->
+    <string name="share_fen_chooser_title">Share FEN</string>
+
+    <!-- Accessibility content descriptions -->
+    <string name="content_desc_puzzle_rating" tools:ignore="PluralsCandidate">%d rating</string>
+    <string name="content_desc_puzzle_id">Puzzle ID: %1$s</string>
+    <string name="content_desc_puzzles_solved" tools:ignore="PluralsCandidate">%1$d out of %2$d puzzles solved</string>
+    <string name="content_desc_puzzle_solved">Puzzle solved</string>
+    <string name="content_desc_puzzle_not_solved">Puzzle not solved</string>
+    <string name="content_desc_player_rating">Player rating: %d</string>
+
+    <!-- Puzzle filter categories -->
+    <string name="filter_category_mate_patterns">Mate Patterns</string>
+    <string name="filter_category_tactical_motifs">Tactical Motifs</string>
+    <string name="filter_category_attacking_strategies">Attacking Strategies</string>
+    <string name="filter_category_endgame_techniques">Endgame Techniques</string>
+    <string name="filter_category_pawn_play">Pawn Play</string>
+    <string name="filter_category_positional_play">Positional and Strategic Concepts</string>
+    <string name="filter_category_game_phases">Game Phase Specific</string>
+    <string name="filter_category_mate_in_x_moves">Mate in Fixed Moves</string>
+    <string name="filter_category_puzzle_complexity">Puzzle Complexity and Skill Level</string>
+    <string name="filter_category_piece_exploitation">Piece Exploitation</string>
 </resources>

@@ -1,5 +1,10 @@
 package com.tacticmaster.puzzle;
 
+import static java.util.Objects.isNull;
+
+import androidx.annotation.StringRes;
+
+import com.tacticmaster.R;
 import com.tacticmaster.db.DatabaseAccessor;
 
 import java.util.Arrays;
@@ -20,10 +25,33 @@ class PuzzleFilter {
     public static final String MATE_IN_X_MOVES = "Mate in Fixed Moves";
     public static final String SHORT_AND_LONG = "Puzzle Complexity and Skill Level";
     public static final String PIECE_EXPLOITATION = "Piece Exploitation";
+
+    private static final Map<String, Integer> LABEL_RES_BY_KEY = Map.ofEntries(
+            Map.entry(MATE_PATTERNS, R.string.filter_category_mate_patterns),
+            Map.entry(TACTICAL_MOTIFS, R.string.filter_category_tactical_motifs),
+            Map.entry(ATTACKING_STRATEGIES, R.string.filter_category_attacking_strategies),
+            Map.entry(ENDGAME_TECHNIQUES, R.string.filter_category_endgame_techniques),
+            Map.entry(PAWN_PLAY, R.string.filter_category_pawn_play),
+            Map.entry(POSITIONAL_PLAY, R.string.filter_category_positional_play),
+            Map.entry(GAME_PHASES, R.string.filter_category_game_phases),
+            Map.entry(MATE_IN_X_MOVES, R.string.filter_category_mate_in_x_moves),
+            Map.entry(SHORT_AND_LONG, R.string.filter_category_puzzle_complexity),
+            Map.entry(PIECE_EXPLOITATION, R.string.filter_category_piece_exploitation)
+    );
+
     private final DatabaseAccessor databaseAccessor;
 
     PuzzleFilter(DatabaseAccessor databaseAccessor) {
         this.databaseAccessor = databaseAccessor;
+    }
+
+    @StringRes
+    public static int getCategoryLabelRes(String key) {
+        Integer res = LABEL_RES_BY_KEY.get(key);
+        if (isNull(null)) {
+            throw new IllegalArgumentException("Unknown category key: " + key);
+        }
+        return res;
     }
 
     Map<String, Set<String>> getThemeGroups() {

@@ -68,6 +68,12 @@ class PuzzleTextViewsTest {
         when(mockActivity.getString(eq(R.string.rating), anyInt())).thenReturn("Rating: 1500");
         when(mockActivity.getString(eq(R.string.player_rating), anyInt())).thenReturn("Player: 1600");
         when(mockActivity.getString(eq(R.string.puzzles_solved), anyInt(), anyInt())).thenReturn("Solved: 25/100");
+        when(mockActivity.getString(eq(R.string.content_desc_puzzle_rating), anyInt())).thenReturn("1500 rating");
+        when(mockActivity.getString(eq(R.string.content_desc_puzzle_id), anyString())).thenAnswer(inv -> "Puzzle ID: " + inv.getArgument(1));
+        when(mockActivity.getString(eq(R.string.content_desc_puzzles_solved), anyInt(), anyInt())).thenReturn("50 out of 100 puzzles solved");
+        when(mockActivity.getString(R.string.content_desc_puzzle_solved)).thenReturn("Puzzle solved");
+        when(mockActivity.getString(R.string.content_desc_puzzle_not_solved)).thenReturn("Puzzle not solved");
+        when(mockActivity.getString(eq(R.string.content_desc_player_rating), anyInt())).thenReturn("Player rating: 1800");
 
         puzzleTextViews = new PuzzleTextViews(mockActivity);
     }

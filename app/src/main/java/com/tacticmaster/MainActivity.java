@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 chessboardView,
                 new PuzzleTextViews(this));
 
-        chessboardController.loadNextPuzzle();
+        chessboardController.restoreLastPuzzleOrLoadNext(settingsManager.getLastPuzzleId());
 
         ImageButton reloadPuzzle = findViewById(R.id.puzzle_reload);
         ImageButton previousPuzzle = findViewById(R.id.previous_puzzle);

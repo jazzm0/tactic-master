@@ -84,7 +84,7 @@ public class PuzzleTextViews {
         String text = activity.getString(R.string.rating, rating);
         puzzleRatingTextView.setText(text);
         puzzleRatingTextView.setTypeface(null, Typeface.BOLD);
-        puzzleRatingTextView.setContentDescription(text + " rating");
+        puzzleRatingTextView.setContentDescription(activity.getString(R.string.content_desc_puzzle_rating, rating));
     }
 
     public void setPuzzleId(@Nullable String puzzleId) {
@@ -93,23 +93,23 @@ public class PuzzleTextViews {
         }
         puzzleIdLabelTextView.setTypeface(null, Typeface.BOLD);
         puzzleIdEditText.setText(puzzleId);
-        puzzleIdEditText.setContentDescription("Puzzle ID: " + puzzleId);
+        puzzleIdEditText.setContentDescription(activity.getString(R.string.content_desc_puzzle_id, puzzleId));
         setUnsolvedState();
     }
 
     public void setPuzzlesSolvedCount(int solvedCount, int totalCount) {
         puzzlesSolvedTextView.setText(activity.getString(R.string.puzzles_solved, solvedCount, totalCount));
         puzzlesSolvedTextView.setTypeface(null, Typeface.BOLD);
-        puzzlesSolvedTextView.setContentDescription(solvedCount + " out of " + totalCount + " puzzles solved");
+        puzzlesSolvedTextView.setContentDescription(activity.getString(R.string.content_desc_puzzles_solved, solvedCount, totalCount));
     }
 
     public void setPuzzleSolved(boolean solved) {
         if (solved) {
             applyTextViewStyle(puzzleIdEditText, Color.GREEN, SOLVED_ALPHA);
-            puzzleIdEditText.setContentDescription("Puzzle solved");
+            puzzleIdEditText.setContentDescription(activity.getString(R.string.content_desc_puzzle_solved));
         } else {
             setUnsolvedState();
-            puzzleIdEditText.setContentDescription("Puzzle not solved");
+            puzzleIdEditText.setContentDescription(activity.getString(R.string.content_desc_puzzle_not_solved));
         }
         if (!isNull(solvedIconView)) {
             solvedIconView.setVisibility(solved ? View.VISIBLE : View.GONE);
@@ -119,7 +119,7 @@ public class PuzzleTextViews {
     public void setPlayerRating(int playerRating) {
         playerRatingTextView.setText(activity.getString(R.string.player_rating, playerRating));
         playerRatingTextView.setTypeface(null, Typeface.BOLD);
-        playerRatingTextView.setContentDescription("Player rating: " + playerRating);
+        playerRatingTextView.setContentDescription(activity.getString(R.string.content_desc_player_rating, playerRating));
     }
 
     public void updatePlayerRating(int oldRating, int newRating) {

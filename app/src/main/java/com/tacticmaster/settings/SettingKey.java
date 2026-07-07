@@ -18,9 +18,10 @@ public enum SettingKey {
     SHOW_PUZZLE_RATING("show_puzzle_rating", Type.BOOL, true),
     SHOW_PUZZLE_ID("show_puzzle_id", Type.BOOL, true),
     SHOW_PUZZLES_COUNT("show_puzzles_count", Type.BOOL, true),
-    PLAYER_RATING("player_rating", Type.INT, 1600);
+    PLAYER_RATING("player_rating", Type.INT, 1600),
+    LAST_PUZZLE_ID("last_puzzle_id", Type.STRING, null);
 
-    public enum Type {BOOL, INT}
+    public enum Type {BOOL, INT, STRING}
 
     public final String key;
     public final Type type;
@@ -38,6 +39,10 @@ public enum SettingKey {
 
     public int defaultInt() {
         return (Integer) defaultValue;
+    }
+
+    public String defaultString() {
+        return (String) defaultValue;
     }
 
     private static final Map<String, SettingKey> BY_KEY = buildIndex();

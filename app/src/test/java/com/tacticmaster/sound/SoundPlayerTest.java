@@ -8,6 +8,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import static java.util.Objects.isNull;
+
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
@@ -216,7 +218,7 @@ public class SoundPlayerTest {
                                 .map(inv -> (MediaPlayer.OnCompletionListener) inv.getArgument(0))
                                 .orElse(null);
 
-                if (listener != null) {
+                if (!isNull(listener)) {
                     listener.onCompletion(mp);
                     verify(mp).release();
                 }
@@ -249,7 +251,7 @@ public class SoundPlayerTest {
                                 .map(inv -> (MediaPlayer.OnErrorListener) inv.getArgument(0))
                                 .orElse(null);
 
-                if (listener != null) {
+                if (!isNull(listener)) {
                     listener.onError(mp, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
                     verify(mp).release();
                 }

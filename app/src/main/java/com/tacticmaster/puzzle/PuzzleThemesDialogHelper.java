@@ -10,10 +10,12 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.tacticmaster.R;
 import com.tacticmaster.db.DatabaseAccessor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class PuzzleThemesDialogHelper {
@@ -40,28 +42,33 @@ public class PuzzleThemesDialogHelper {
     }
 
     public void prepareDialogContent(Context context, MaterialButton filterButton, MaterialAutoCompleteTextView filterDropdown, Runnable callback) {
-        var themesList = new ArrayList<>(puzzleFilter.getThemeGroups().keySet());
-        var adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, themesList);
+        List<String> categoryKeys = new ArrayList<>(puzzleFilter.getThemeGroups().keySet());
+        String[] displayLabels = new String[categoryKeys.size()];
+        for (int i = 0; i < categoryKeys.size(); i++) {
+            displayLabels[i] = context.getString(PuzzleFilter.getCategoryLabelRes(categoryKeys.get(i)));
+        }
+
+        var adapter = new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, displayLabels);
 
         filterDropdown.setAdapter(adapter);
         filterDropdown.setDropDownHeight(0);
 
         filterButton.setOnClickListener(v -> {
-            boolean[] checkedItems = new boolean[themesList.size()];
+            boolean[] checkedItems = new boolean[categoryKeys.size()];
 
-            for (int i = 0; i < themesList.size(); i++) {
-                checkedItems[i] = selectedThemes.contains(themesList.get(i));
+            for (int i = 0; i < categoryKeys.size(); i++) {
+                checkedItems[i] = selectedThemes.contains(categoryKeys.get(i));
             }
 
-            var builder = new MaterialAlertDialogBuilder(context).setMultiChoiceItems(themesList.toArray(new String[0]), checkedItems, (dialog, which, checked) -> {
-                        String item = themesList.get(which);
+            var builder = new MaterialAlertDialogBuilder(context).setMultiChoiceItems(displayLabels, checkedItems, (dialog, which, checked) -> {
+                        String key = categoryKeys.get(which);
                         if (checked) {
-                            selectedThemes.add(item);
+                            selectedThemes.add(key);
                         } else {
-                            selectedThemes.remove(item);
+                            selectedThemes.remove(key);
                         }
                     })
-                    .setPositiveButton("Done", (dialog, which) -> {
+                    .setPositiveButton(R.string.dialog_done, (dialog, which) -> {
                         Set<String> allThemesInGroup = new HashSet<>();
                         selectedThemes.forEach(theme -> {
                             var themeGroup = puzzleFilter.getThemeGroups().get(theme);
@@ -73,13 +80,13 @@ public class PuzzleThemesDialogHelper {
                         puzzleThemesListener.onThemesUpdated(allThemesInGroup);
                         callback.run();
                     })
-                    .setNeutralButton("Clear All", (dialog, which) -> {
+                    .setNeutralButton(R.string.dialog_clear_all, (dialog, which) -> {
                         selectedThemes.clear();
                         filterButton.setText("");
                         puzzleThemesListener.onThemesUpdated(selectedThemes);
                         callback.run();
                     })
-                    .setNegativeButton("Cancel", null);
+                    .setNegativeButton(R.string.dialog_cancel, null);
 
             AlertDialog dialog = builder.create();
             dialog.setOnShowListener(d -> setDialogButtonColors(context, dialog));
