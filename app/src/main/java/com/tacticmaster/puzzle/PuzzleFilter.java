@@ -48,7 +48,7 @@ class PuzzleFilter {
     @StringRes
     public static int getCategoryLabelRes(String key) {
         Integer res = LABEL_RES_BY_KEY.get(key);
-        if (isNull(null)) {
+        if (isNull(res)) {
             throw new IllegalArgumentException("Unknown category key: " + key);
         }
         return res;
