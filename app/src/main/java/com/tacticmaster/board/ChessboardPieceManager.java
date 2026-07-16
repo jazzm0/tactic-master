@@ -84,10 +84,48 @@ public class ChessboardPieceManager {
      */
     public static Bitmap loadPiece(Context context, String pieceSet, String pieceName) {
         String dir = PIECES_ASSET_DIR + "/" + pieceSet;
-        if (assetExists(context, dir, pieceName + ".svg")) {
-            return loadSvgBitmap(context, dir + "/" + pieceName + ".svg");
+        Bitmap bitmap = assetExists(context, dir, pieceName + ".svg")
+                ? loadSvgBitmap(context, dir + "/" + pieceName + ".svg")
+                : loadPngBitmap(context, dir + "/" + pieceName + ".png");
+        return applyScaleFactor(bitmap, readScaleFactor(context, dir));
+    }
+
+    /**
+     * Optional per-set scale: if {@code pieces/<set>/scalefactor.txt} exists and
+     * holds a single positive number (e.g. {@code 0.8}), pieces of that set are
+     * shrunk by that factor and centered on a transparent bitmap of the original
+     * size. Missing/invalid file or non-positive value means no scaling (1.0).
+     */
+    private static float readScaleFactor(Context context, String dir) {
+        if (!assetExists(context, dir, "scalefactor.txt")) {
+            return 1f;
         }
-        return loadPngBitmap(context, dir + "/" + pieceName + ".png");
+        try (InputStream in = context.getAssets().open(dir + "/scalefactor.txt");
+             java.util.Scanner scanner = new java.util.Scanner(in)) {
+            float factor = Float.parseFloat(scanner.next().trim());
+            return factor > 0 ? factor : 1f;
+        } catch (IOException | java.util.NoSuchElementException | NumberFormatException e) {
+            return 1f;
+        }
+    }
+
+    /**
+     * Returns a copy of {@code source} shrunk by {@code scaleFactor} and centered
+     * on a transparent bitmap of the same dimensions, so the piece keeps its tile
+     * footprint. Returns {@code source} unchanged when the factor is 1.
+     */
+    private static Bitmap applyScaleFactor(Bitmap source, float scaleFactor) {
+        if (scaleFactor == 1f) {
+            return source;
+        }
+        int w = source.getWidth();
+        int h = source.getHeight();
+        Bitmap scaled = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(scaled);
+        canvas.translate(w * (1f - scaleFactor) / 2f, h * (1f - scaleFactor) / 2f);
+        canvas.scale(scaleFactor, scaleFactor);
+        canvas.drawBitmap(source, 0, 0, null);
+        return scaled;
     }
 
     private static boolean assetExists(Context context, String dir, String fileName) {
