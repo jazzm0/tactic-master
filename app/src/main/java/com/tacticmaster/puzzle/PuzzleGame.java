@@ -2,7 +2,6 @@ package com.tacticmaster.puzzle;
 
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
 
 import java.util.Objects;
 
@@ -25,7 +24,7 @@ public class PuzzleGame implements Comparable<PuzzleGame> {
     ) {
         this.puzzleId = puzzleId;
         this.fen = fen;
-        this.moves = moves.trim().isEmpty() ? new String[0] : requireNonNull(moves.split(" "), "Moves cannot be null");
+        this.moves = moves.trim().isEmpty() ? new String[0] : moves.split(" ");
         this.rating = rating;
         this.currentMoveIndex = 0;
         this.solved = solved;

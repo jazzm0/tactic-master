@@ -34,7 +34,7 @@ public class Chessboard {
     }
 
     private int transformFlippedCoordinate(int i) {
-        return !isPlayerWhite ? 7 - i : i;
+        return !isPlayerWhite ? BOARD_SIZE - 1 - i : i;
     }
 
     Piece getPiece(Square square) {
@@ -104,11 +104,11 @@ public class Chessboard {
         if (!isMoveLegal(move.toString())) {
             return false;
         }
-        if (chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN && move.getTo().getRank().equals(Rank.RANK_8)) {
-            return true;
-        } else {
-            return chessboard.getPiece(move.getFrom()) == Piece.BLACK_PAWN && move.getTo().getRank().equals(Rank.RANK_1);
-        }
+        boolean whitePromotion = chessboard.getPiece(move.getFrom()) == Piece.WHITE_PAWN
+                && move.getTo().getRank().equals(Rank.RANK_8);
+        boolean blackPromotion = chessboard.getPiece(move.getFrom()) == Piece.BLACK_PAWN
+                && move.getTo().getRank().equals(Rank.RANK_1);
+        return whitePromotion || blackPromotion;
     }
 
     public boolean isOwnPiece(char piece) {

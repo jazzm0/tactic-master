@@ -3,6 +3,9 @@ package com.tacticmaster.board;
 import static com.tacticmaster.board.Chessboard.BOARD_SIZE;
 import static java.util.Objects.isNull;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -35,6 +39,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private static final int MOVE_DELAY = 1300;
+    private static final int FIRST_MOVE_DELAY = 2000;
     private static final int STROKE_WIDTH = 8;
 
     private ChessboardPieceManager bitmapManager;
@@ -217,7 +222,6 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         char movingPiece = chessboard.getPiece(animFromRank, animFromFile);
         animPieceBitmap = bitmapManager.getPieceBitmap(movingPiece);
 
-        // Check if animations are enabled
         boolean animationsEnabled = settingsManager.areAnimationsEnabled();
         int animationDuration = animationsEnabled ? settingsManager.getAnimationSpeed() : 0;
 
@@ -230,16 +234,16 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         isAnimating = true;
         animProgress = 0f;
 
-        android.animation.ValueAnimator animator = android.animation.ValueAnimator.ofFloat(0f, 1f);
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
         animator.setDuration(animationDuration);
-        animator.setInterpolator(new android.view.animation.LinearInterpolator());
+        animator.setInterpolator(new LinearInterpolator());
         animator.addUpdateListener(a -> {
             animProgress = (float) a.getAnimatedValue();
             postInvalidateOnAnimation();
         });
-        animator.addListener(new android.animation.AnimatorListenerAdapter() {
+        animator.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(android.animation.Animator animation) {
+            public void onAnimationEnd(Animator animation) {
                 completeMove(nextMove);
             }
         });
@@ -457,7 +461,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         puzzleHintView.resetHintFirstClick();
         invalidate();
         pendingFirstMove = this::doFirstMove;
-        postDelayed(pendingFirstMove, 2000);
+        postDelayed(pendingFirstMove, FIRST_MOVE_DELAY);
     }
 
     public void setPuzzleSolvedListener(PuzzleFinishedListener listener) {
