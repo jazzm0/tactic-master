@@ -115,19 +115,27 @@ public class ChessboardPieceManager {
         try (InputStream inputStream = context.getAssets().open(assetPath)) {
             SVG svg = SVG.getFromInputStream(inputStream);
 
-            // Determine the artwork's intrinsic size. Prefer the viewBox, then the
-            // declared width/height; fall back to the render size as a last resort.
-            android.graphics.RectF viewBox = svg.getDocumentViewBox();
-            float intrinsicW = !isNull(viewBox) ? viewBox.width() : svg.getDocumentWidth();
-            float intrinsicH = !isNull(viewBox) ? viewBox.height() : svg.getDocumentHeight();
-            if (intrinsicW <= 0 || intrinsicH <= 0) {
-                intrinsicW = intrinsicH = SVG_RENDER_SIZE;
+            // Normalize every SVG to a single coordinate source before rendering.
+            // Sets declare their size differently — some with width/height only
+            // (e.g. 45x45, no viewBox), some with a viewBox only (e.g. 0 0 4096
+            // 4096, no width/height). Mixing those with the renderer's own mapping
+            // scaled one set correctly while shrinking the other. So: guarantee a
+            // viewBox (synthesized from width/height, or the render size as a last
+            // resort), then force the document width/height to the render size so
+            // the artwork always maps 1:1 onto the target bitmap.
+            if (isNull(svg.getDocumentViewBox())) {
+                float w = svg.getDocumentWidth();
+                float h = svg.getDocumentHeight();
+                if (w <= 0 || h <= 0) {
+                    w = h = SVG_RENDER_SIZE;
+                }
+                svg.setDocumentViewBox(0, 0, w, h);
             }
+            svg.setDocumentWidth(SVG_RENDER_SIZE);
+            svg.setDocumentHeight(SVG_RENDER_SIZE);
 
             Bitmap bitmap = Bitmap.createBitmap(SVG_RENDER_SIZE, SVG_RENDER_SIZE, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            // Scale the canvas so the intrinsic-sized artwork fills the whole bitmap.
-            canvas.scale(SVG_RENDER_SIZE / intrinsicW, SVG_RENDER_SIZE / intrinsicH);
             svg.renderToCanvas(canvas);
             return bitmap;
         } catch (IOException | SVGParseException e) {
