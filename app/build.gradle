@@ -63,6 +63,7 @@ dependencies {
     implementation libs.material
     implementation libs.preference
     implementation libs.chesslib
+    implementation libs.androidsvg
     implementation libs.acra.core
     implementation libs.acra.mail
     implementation libs.acra.toast
