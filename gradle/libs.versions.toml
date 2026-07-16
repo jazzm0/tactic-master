@@ -1,9 +1,8 @@
 [versions]
-agp = "9.2.1"
+agp = "9.3.0"
 appcompat = "1.7.1"
 core = "1.7.0"
-gradle = "9.2.1"
-junitJupiterApi = "6.1.1"
+junitJupiterApi = "6.1.2"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
@@ -17,7 +16,6 @@ androidsvg = "1.4"
 [libraries]
 androidx-core = { module = "androidx.test:core", version.ref = "core" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

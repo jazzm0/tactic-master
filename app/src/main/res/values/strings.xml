@@ -74,6 +74,10 @@
     <string name="animation_speed_title">Animation Speed</string>
     <string name="animation_speed_summary">Adjust animation duration (300–800ms)</string>
 
+    <!-- Pieces settings -->
+    <string name="pieces_category_title">Pieces</string>
+    <string name="piece_set_title">Piece Set</string>
+
     <!-- Display settings -->
     <string name="display_category_title">Display</string>
     <string name="show_puzzle_rating_title">Show Puzzle Rating</string>

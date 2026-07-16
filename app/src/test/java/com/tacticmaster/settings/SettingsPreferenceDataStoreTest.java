@@ -119,6 +119,27 @@ public class SettingsPreferenceDataStoreTest {
     }
 
     @Test
+    public void getString_pieceSetRoutesToSettingsManager() {
+        when(settingsManager.getPieceSet()).thenReturn("lichess");
+
+        assertEquals("lichess", dataStore.getString("piece_set", "classic"));
+    }
+
+    @Test
+    public void putString_pieceSetRoutesToSettingsManager() {
+        dataStore.putString("piece_set", "lichess");
+
+        verify(settingsManager).setPieceSet("lichess");
+    }
+
+    @Test
+    public void putString_pieceSetIgnoresNull() {
+        dataStore.putString("piece_set", null);
+
+        verify(settingsManager, never()).setPieceSet(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
     public void getString_boolKeyReturnsDefault() {
         // String overrides only translate INT-typed keys; bool keys must not match.
         assertEquals("fallback", dataStore.getString("autoplay", "fallback"));

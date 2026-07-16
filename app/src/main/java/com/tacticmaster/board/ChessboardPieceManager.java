@@ -19,13 +19,6 @@ import java.util.Map;
 
 public class ChessboardPieceManager {
 
-    /**
-     * The piece set used when none is specified. Corresponds to the folder
-     * {@code assets/pieces/classic/}.
-     */
-    public static final String DEFAULT_PIECE_SET = "classic";
-    public static final String LICHESS_PIECE_SET = "lichess";
-
     private static final String PIECES_ASSET_DIR = "pieces";
 
     /**
@@ -39,7 +32,7 @@ public class ChessboardPieceManager {
     private final Context context;
 
     public ChessboardPieceManager(Context context) {
-        this(context, LICHESS_PIECE_SET);
+        this(context, defaultPieceSet(context));
     }
 
     public ChessboardPieceManager(Context context, String pieceSet) {
@@ -47,30 +40,57 @@ public class ChessboardPieceManager {
         loadBitmaps(requireNonNull(pieceSet));
     }
 
+    /**
+     * Default piece set when none is stored: the first folder discovered under
+     * {@code assets/pieces/} (alphabetical). Empty string if none exist.
+     */
+    public static String defaultPieceSet(Context context) {
+        String[] sets = availablePieceSets(context);
+        return sets.length > 0 ? sets[0] : "";
+    }
+
     private void loadBitmaps(String pieceSet) {
-        bitmaps.put("whiteKing", loadBitmap(pieceSet, "wk"));
-        bitmaps.put("blackKing", loadBitmap(pieceSet, "bk"));
-        bitmaps.put("whiteQueen", loadBitmap(pieceSet, "wq"));
-        bitmaps.put("blackQueen", loadBitmap(pieceSet, "bq"));
-        bitmaps.put("whiteRook", loadBitmap(pieceSet, "wr"));
-        bitmaps.put("blackRook", loadBitmap(pieceSet, "br"));
-        bitmaps.put("whiteBishop", loadBitmap(pieceSet, "wb"));
-        bitmaps.put("blackBishop", loadBitmap(pieceSet, "bb"));
-        bitmaps.put("whiteKnight", loadBitmap(pieceSet, "wn"));
-        bitmaps.put("blackKnight", loadBitmap(pieceSet, "bn"));
-        bitmaps.put("whitePawn", loadBitmap(pieceSet, "wp"));
-        bitmaps.put("blackPawn", loadBitmap(pieceSet, "bp"));
+        bitmaps.put("whiteKing", loadPiece(context, pieceSet, "wk"));
+        bitmaps.put("blackKing", loadPiece(context, pieceSet, "bk"));
+        bitmaps.put("whiteQueen", loadPiece(context, pieceSet, "wq"));
+        bitmaps.put("blackQueen", loadPiece(context, pieceSet, "bq"));
+        bitmaps.put("whiteRook", loadPiece(context, pieceSet, "wr"));
+        bitmaps.put("blackRook", loadPiece(context, pieceSet, "br"));
+        bitmaps.put("whiteBishop", loadPiece(context, pieceSet, "wb"));
+        bitmaps.put("blackBishop", loadPiece(context, pieceSet, "bb"));
+        bitmaps.put("whiteKnight", loadPiece(context, pieceSet, "wn"));
+        bitmaps.put("blackKnight", loadPiece(context, pieceSet, "bn"));
+        bitmaps.put("whitePawn", loadPiece(context, pieceSet, "wp"));
+        bitmaps.put("blackPawn", loadPiece(context, pieceSet, "bp"));
     }
 
-    private Bitmap loadBitmap(String pieceSet, String pieceName) {
-        String dir = PIECES_ASSET_DIR + "/" + pieceSet;
-        if (assetExists(dir, pieceName + ".svg")) {
-            return loadSvgBitmap(dir + "/" + pieceName + ".svg");
+    /**
+     * Lists the piece sets bundled under {@code assets/pieces/} — one subfolder
+     * per set. Used by the settings UI to offer a choice.
+     */
+    public static String[] availablePieceSets(Context context) {
+        try {
+            String[] dirs = context.getAssets().list(PIECES_ASSET_DIR);
+            return dirs != null ? dirs : new String[0];
+        } catch (IOException e) {
+            return new String[0];
         }
-        return loadPngBitmap(dir + "/" + pieceName + ".png");
     }
 
-    private boolean assetExists(String dir, String fileName) {
+    /**
+     * Loads a single piece (e.g. {@code "bn"} for the black knight) from a set,
+     * rendering SVG or decoding PNG as appropriate. Shared with the settings
+     * preview so both paths use identical rendering.
+     */
+    public static Bitmap loadPiece(Context context, String pieceSet, String pieceName) {
+        String dir = PIECES_ASSET_DIR + "/" + pieceSet;
+        if (assetExists(context, dir, pieceName + ".svg")) {
+            return loadSvgBitmap(context, dir + "/" + pieceName + ".svg");
+        }
+        return loadPngBitmap(context, dir + "/" + pieceName + ".png");
+    }
+
+    private static boolean assetExists(Context context, String dir, String fileName) {
         try {
             String[] files = context.getAssets().list(dir);
             return files != null && Arrays.asList(files).contains(fileName);
@@ -79,7 +99,7 @@ public class ChessboardPieceManager {
         }
     }
 
-    private Bitmap loadPngBitmap(String assetPath) {
+    private static Bitmap loadPngBitmap(Context context, String assetPath) {
         try (InputStream inputStream = context.getAssets().open(assetPath)) {
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             if (isNull(bitmap)) {
@@ -91,7 +111,7 @@ public class ChessboardPieceManager {
         }
     }
 
-    private Bitmap loadSvgBitmap(String assetPath) {
+    private static Bitmap loadSvgBitmap(Context context, String assetPath) {
         try (InputStream inputStream = context.getAssets().open(assetPath)) {
             SVG svg = SVG.getFromInputStream(inputStream);
 
@@ -145,17 +165,17 @@ public class ChessboardPieceManager {
     }
 
     public void recycleBitmaps() {
-        for (Bitmap bitmap : bitmaps.values()) {
-            if (!isNull(bitmap) && !bitmap.isRecycled()) {
-                bitmap.recycle();
-            }
-        }
-        for (Bitmap bitmap : scaledBitmaps.values()) {
-            if (!isNull(bitmap) && !bitmap.isRecycled()) {
-                bitmap.recycle();
-            }
-        }
+        recycleAll(bitmaps.values());
+        recycleAll(scaledBitmaps.values());
         bitmaps.clear();
         scaledBitmaps.clear();
+    }
+
+    private static void recycleAll(java.util.Collection<Bitmap> toRecycle) {
+        for (Bitmap bitmap : toRecycle) {
+            if (!isNull(bitmap) && !bitmap.isRecycled()) {
+                bitmap.recycle();
+            }
+        }
     }
 }

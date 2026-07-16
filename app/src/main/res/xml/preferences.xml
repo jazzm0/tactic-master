@@ -55,6 +55,17 @@
 
     </PreferenceCategory>
 
+    <!-- Pieces Section -->
+    <PreferenceCategory android:title="@string/pieces_category_title">
+
+        <DropDownPreference
+            android:key="piece_set"
+            android:persistent="true"
+            android:summary="%s"
+            android:title="@string/piece_set_title" />
+
+    </PreferenceCategory>
+
     <!-- Display Section -->
     <PreferenceCategory android:title="@string/display_category_title">
 

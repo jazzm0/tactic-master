@@ -23,14 +23,10 @@ public class PromotionDialog {
         ImageView bishop = dialog.findViewById(R.id.bishop);
         ImageView knight = dialog.findViewById(R.id.knight);
 
-        queen.getLayoutParams().width = pieceSize;
-        queen.getLayoutParams().height = pieceSize;
-        rook.getLayoutParams().width = pieceSize;
-        rook.getLayoutParams().height = pieceSize;
-        bishop.getLayoutParams().width = pieceSize;
-        bishop.getLayoutParams().height = pieceSize;
-        knight.getLayoutParams().width = pieceSize;
-        knight.getLayoutParams().height = pieceSize;
+        for (ImageView piece : new ImageView[]{queen, rook, bishop, knight}) {
+            piece.getLayoutParams().width = pieceSize;
+            piece.getLayoutParams().height = pieceSize;
+        }
 
         queen.setImageBitmap(chessboardPieceManager.getPieceBitmap(isWhite ? 'Q' : 'q'));
         rook.setImageBitmap(chessboardPieceManager.getPieceBitmap(isWhite ? 'R' : 'r'));

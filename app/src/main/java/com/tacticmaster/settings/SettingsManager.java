@@ -5,6 +5,8 @@ import static java.util.Objects.isNull;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.tacticmaster.board.ChessboardPieceManager;
+
 /**
  * Centralized SharedPreferences access for the entire application.
  * Consolidates all preference CRUD operations into a single, typed, testable class.
@@ -23,10 +25,12 @@ public class SettingsManager {
     public static final int MAX_PLAYER_RATING = 3000;
 
     private final SharedPreferences sharedPreferences;
+    private final Context appContext;
     private static SettingsManager instance;
 
     private SettingsManager(Context context) {
-        this.sharedPreferences = context.getApplicationContext()
+        this.appContext = context.getApplicationContext();
+        this.sharedPreferences = appContext
                 .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
@@ -135,6 +139,18 @@ public class SettingsManager {
 
     public void setLastPuzzleId(String puzzleId) {
         setString(SettingKey.LAST_PUZZLE_ID, puzzleId);
+    }
+
+    public String getPieceSet() {
+        String stored = getString(SettingKey.PIECE_SET);
+        if (isNull(stored) || stored.isEmpty()) {
+            return ChessboardPieceManager.defaultPieceSet(appContext);
+        }
+        return stored;
+    }
+
+    public void setPieceSet(String pieceSet) {
+        setString(SettingKey.PIECE_SET, pieceSet);
     }
 
     private static int clampRating(int rating) {

@@ -19,6 +19,7 @@ public enum SettingKey {
     SHOW_PUZZLE_ID("show_puzzle_id", Type.BOOL, true),
     SHOW_PUZZLES_COUNT("show_puzzles_count", Type.BOOL, true),
     PLAYER_RATING("player_rating", Type.INT, 1600),
+    PIECE_SET("piece_set", Type.STRING, null),
     LAST_PUZZLE_ID("last_puzzle_id", Type.STRING, null);
 
     public enum Type {BOOL, INT, STRING}

@@ -153,25 +153,13 @@ public class PuzzleHintView extends View {
             invalidate();
         });
 
-        animator.addListener(new ValueAnimator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(@NonNull android.animation.Animator animation) {
-            }
-
+        animator.addListener(new android.animation.AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(@NonNull android.animation.Animator animation) {
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     isHintPathVisible = false;
                     invalidate();
                 }, 1500);
-            }
-
-            @Override
-            public void onAnimationCancel(@NonNull android.animation.Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(@NonNull android.animation.Animator animation) {
             }
         });
         animator.start();

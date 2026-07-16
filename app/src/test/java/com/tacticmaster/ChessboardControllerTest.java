@@ -510,6 +510,29 @@ public class ChessboardControllerTest {
     }
 
     @Test
+    public void testRefreshFromSettingsReloadsPiecesWhenSetChanged() {
+        // setUp left getPieceSet() unstubbed, so the constructor cached null.
+        when(settingsManager.getPieceSet()).thenReturn("lichess");
+        when(settingsManager.getPlayerRating()).thenReturn(2333); // unchanged
+
+        chessboardController.refreshFromSettings();
+
+        verify(chessboardView).reloadPieces("lichess");
+    }
+
+    @Test
+    public void testRefreshFromSettingsDoesNotReloadPiecesWhenSetUnchanged() {
+        // Prime the cached piece set, then refresh with the same value.
+        when(settingsManager.getPieceSet()).thenReturn("classic");
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
+        chessboardController.refreshFromSettings(); // caches "classic", reloads once
+
+        chessboardController.refreshFromSettings(); // same set — no further reload
+
+        verify(chessboardView, times(1)).reloadPieces("classic");
+    }
+
+    @Test
     void testRenderPuzzlePersistsCurrentPuzzleId() {
         when(databaseAccessor.getPuzzlesWithinRange(anyInt(), anyInt(), anySet(), anySet()))
                 .thenReturn(puzzleRecords);

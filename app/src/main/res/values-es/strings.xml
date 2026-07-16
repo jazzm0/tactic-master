@@ -73,6 +73,10 @@
     <string name="animation_speed_title">Velocidad de la animación</string>
     <string name="animation_speed_summary">Ajustar la duración de la animación (300–800 ms)</string>
 
+    <!-- Pieces settings -->
+    <string name="pieces_category_title">Piezas</string>
+    <string name="piece_set_title">Conjunto de piezas</string>
+
     <!-- Display settings -->
     <string name="display_category_title">Pantalla</string>
     <string name="show_puzzle_rating_title">Mostrar nivel del puzle</string>

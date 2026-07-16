@@ -37,7 +37,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private static final int MOVE_DELAY = 1300;
     private static final int STROKE_WIDTH = 8;
 
-    private final ChessboardPieceManager bitmapManager;
+    private ChessboardPieceManager bitmapManager;
     private final SettingsManager settingsManager;
 
     private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, opponentSelectionPaint, textPaint;
@@ -65,8 +65,26 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     public ChessboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.bitmapManager = new ChessboardPieceManager(context);
         this.settingsManager = SettingsManager.getInstance(context);
+        this.bitmapManager = new ChessboardPieceManager(context, settingsManager.getPieceSet());
+    }
+
+    /**
+     * Rebuilds the piece bitmaps from the given set and redraws. Called when the
+     * user changes the piece set in settings. Recycles the previous bitmaps and
+     * re-scales to the current tile size so the board updates immediately.
+     */
+    public void reloadPieces(String pieceSet) {
+        ChessboardPieceManager previous = bitmapManager;
+        bitmapManager = new ChessboardPieceManager(getContext(), pieceSet);
+        int tileSize = (int) getTileSize();
+        if (tileSize > 0) {
+            bitmapManager.onSizeChanged(tileSize);
+        }
+        if (!isNull(previous)) {
+            previous.recycleBitmaps();
+        }
+        invalidate();
     }
 
     private void initPaints() {
@@ -205,20 +223,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
         if (!animationsEnabled || animationDuration == 0) {
             // Skip animation - execute move immediately
-            var isCaptureMove = chessboard.isCaptureMove(nextMove);
-            chessboard.doMove(nextMove);
-            animPieceBitmap = null;
-            SoundPlayer.getInstance().playMoveSound(getContext(), isCaptureMove);
-
-            if (chessboard.isPlayersTurn()) {
-                int[] moveCoordinates = chessboard.transformFenMove(nextMove);
-                opponentFromRank = moveCoordinates[0];
-                opponentFromFile = moveCoordinates[1];
-                opponentToRank = moveCoordinates[2];
-                opponentToFile = moveCoordinates[3];
-            }
-
-            invalidate();
+            completeMove(nextMove);
             return;
         }
 
@@ -235,24 +240,34 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         animator.addListener(new android.animation.AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
-                var isCaptureMove = chessboard.isCaptureMove(nextMove);
-                chessboard.doMove(nextMove);
-                isAnimating = false;
-                animPieceBitmap = null;
-                SoundPlayer.getInstance().playMoveSound(getContext(), isCaptureMove);
-
-                if (chessboard.isPlayersTurn()) {
-                    int[] moveCoordinates = chessboard.transformFenMove(nextMove);
-                    opponentFromRank = moveCoordinates[0];
-                    opponentFromFile = moveCoordinates[1];
-                    opponentToRank = moveCoordinates[2];
-                    opponentToFile = moveCoordinates[3];
-                }
-
-                invalidate();
+                completeMove(nextMove);
             }
         });
         animator.start();
+    }
+
+    /**
+     * Applies {@code nextMove} to the board and refreshes state: plays the move
+     * sound, clears the in-flight animation, and — when it is now the player's
+     * turn — records the opponent's move as the highlighted selection. Shared by
+     * the animated and skip-animation paths in {@link #animateMove(String)}.
+     */
+    private void completeMove(String nextMove) {
+        boolean isCaptureMove = chessboard.isCaptureMove(nextMove);
+        chessboard.doMove(nextMove);
+        isAnimating = false;
+        animPieceBitmap = null;
+        SoundPlayer.getInstance().playMoveSound(getContext(), isCaptureMove);
+
+        if (chessboard.isPlayersTurn()) {
+            int[] coords = chessboard.transformFenMove(nextMove);
+            opponentFromRank = coords[0];
+            opponentFromFile = coords[1];
+            opponentToRank = coords[2];
+            opponentToFile = coords[3];
+        }
+
+        invalidate();
     }
 
 
@@ -349,16 +364,13 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             return;
         }
 
-        if (!chessboard.isMoveLeadingToMate(move) && !puzzleGame.isCorrectNextMove(move)) {
+        boolean leadsToMate = chessboard.isMoveLeadingToMate(move);
+        if (!leadsToMate && !puzzleGame.isCorrectNextMove(move)) {
             makeText(R.string.wrong_solution);
             puzzleFinishedListener.onPuzzleNotSolved(puzzleGame);
             scheduleAfterPuzzleFinished(puzzleGame);
         } else {
-            if (chessboard.isMoveLeadingToMate(move)) {
-                doNextMove(move);
-            } else {
-                doNextMove(null);
-            }
+            doNextMove(leadsToMate ? move : null);
             if (puzzleGame.isSolutionFound()) {
                 onPuzzleSolved(puzzleGame);
             } else {
