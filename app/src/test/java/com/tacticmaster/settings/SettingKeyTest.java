@@ -1,8 +1,10 @@
 package com.tacticmaster.settings;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +26,8 @@ public class SettingKeyTest {
     public void defaults_haveExpectedTypesAndValues() {
         assertEquals(1600, SettingKey.PLAYER_RATING.defaultInt());
         assertEquals(300, SettingKey.ANIMATION_SPEED.defaultInt());
-        assertEquals(false, SettingKey.AUTOPLAY.defaultBool());
-        assertEquals(true, SettingKey.SOUND_ENABLED.defaultBool());
+        assertFalse(SettingKey.AUTOPLAY.defaultBool());
+        assertTrue(SettingKey.SOUND_ENABLED.defaultBool());
         // PIECE_SET default is null — resolved to the first asset folder at read time.
         assertNull(SettingKey.PIECE_SET.defaultString());
     }
