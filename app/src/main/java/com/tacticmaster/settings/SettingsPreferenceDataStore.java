@@ -10,6 +10,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 /**
  * Bridges the AndroidX Preference framework to {@link SettingsManager}, so that
@@ -29,6 +30,8 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
     private final Map<SettingKey, Consumer<Boolean>> boolSetters;
     private final Map<SettingKey, IntSupplier> intGetters;
     private final Map<SettingKey, IntConsumer> intSetters;
+    private final Map<SettingKey, Supplier<String>> stringGetters;
+    private final Map<SettingKey, Consumer<String>> stringSetters;
 
     public SettingsPreferenceDataStore(SettingsManager s) {
         boolGetters = new EnumMap<>(SettingKey.class);
@@ -54,6 +57,12 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
         intSetters = new EnumMap<>(SettingKey.class);
         intSetters.put(SettingKey.ANIMATION_SPEED, s::setAnimationSpeed);
         intSetters.put(SettingKey.PLAYER_RATING, s::setPlayerRating);
+
+        stringGetters = new EnumMap<>(SettingKey.class);
+        stringGetters.put(SettingKey.PIECE_SET, s::getPieceSet);
+
+        stringSetters = new EnumMap<>(SettingKey.class);
+        stringSetters.put(SettingKey.PIECE_SET, s::setPieceSet);
     }
 
     @Override
@@ -87,7 +96,14 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
     @Override
     public String getString(String key, String defValue) {
         SettingKey k = SettingKey.fromKey(key);
-        if (!isNull(k) && k.type == SettingKey.Type.INT) {
+        if (isNull(k)) {
+            return defValue;
+        }
+        if (k.type == SettingKey.Type.STRING) {
+            Supplier<String> getter = stringGetters.get(k);
+            return isNull(getter) ? defValue : getter.get();
+        }
+        if (k.type == SettingKey.Type.INT) {
             IntSupplier getter = intGetters.get(k);
             if (!isNull(getter)) {
                 return String.valueOf(getter.getAsInt());
@@ -99,7 +115,17 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
     @Override
     public void putString(String key, String value) {
         SettingKey k = SettingKey.fromKey(key);
-        if (isNull(k) || k.type != SettingKey.Type.INT || isNull(value)) {
+        if (isNull(k) || isNull(value)) {
+            return;
+        }
+        if (k.type == SettingKey.Type.STRING) {
+            Consumer<String> setter = stringSetters.get(k);
+            if (!isNull(setter)) {
+                setter.accept(value);
+            }
+            return;
+        }
+        if (k.type != SettingKey.Type.INT) {
             return;
         }
         IntConsumer setter = intSetters.get(k);

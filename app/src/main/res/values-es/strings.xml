@@ -73,6 +73,14 @@
     <string name="animation_speed_title">Velocidad de la animación</string>
     <string name="animation_speed_summary">Ajustar la duración de la animación (300–800 ms)</string>
 
+    <!-- Pieces settings -->
+    <string name="pieces_category_title">Piezas</string>
+    <string name="piece_set_title">Conjunto de piezas</string>
+    <string name="piece_set_hint_title">Nuevo: Conjuntos de piezas</string>
+    <string name="piece_set_hint_message">Ahora puedes elegir entre diferentes diseños de piezas de ajedrez. Elige tu favorito en Ajustes.</string>
+    <string name="piece_set_hint_open_settings">Abrir ajustes</string>
+    <string name="piece_set_hint_dismiss">Entendido</string>
+
     <!-- Display settings -->
     <string name="display_category_title">Pantalla</string>
     <string name="show_puzzle_rating_title">Mostrar nivel del puzle</string>

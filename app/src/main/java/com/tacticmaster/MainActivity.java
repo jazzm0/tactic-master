@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tacticmaster.board.ChessboardView;
 import com.tacticmaster.db.DatabaseAccessor;
 import com.tacticmaster.db.DatabaseHelper;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         chessboardController = new ChessboardController(
                 databaseAccessor,
-                SettingsManager.getInstance(chessboardView.getContext()),
+                settingsManager,
                 puzzleManager,
                 new PuzzleThemesDialogHelper(databaseAccessor, puzzleManager),
                 chessboardView,
@@ -93,6 +94,21 @@ public class MainActivity extends AppCompatActivity {
         puzzleIdLink.setOnClickListener(v -> onPuzzleIdLinkClicked());
         shareFenButton.setOnClickListener(v -> onShareFenClicked());
         settingsButton.setOnClickListener(v -> onSettingsClicked());
+
+        maybeShowPieceSetHint();
+    }
+
+    private void maybeShowPieceSetHint() {
+        if (settingsManager.isPieceSetHintSeen()) {
+            return;
+        }
+        settingsManager.setPieceSetHintSeen(true);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.piece_set_hint_title)
+                .setMessage(R.string.piece_set_hint_message)
+                .setPositiveButton(R.string.piece_set_hint_open_settings, (d, w) -> onSettingsClicked())
+                .setNegativeButton(R.string.piece_set_hint_dismiss, null)
+                .show();
     }
 
     @Override

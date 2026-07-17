@@ -1,25 +1,25 @@
 package com.tacticmaster.settings;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 
-@RunWith(MockitoJUnitRunner.class)
 public class SettingsManagerTest {
 
     @Mock
@@ -33,14 +33,22 @@ public class SettingsManagerTest {
 
     private SettingsManager settingsManager;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+        // SettingsManager is a JVM-wide singleton; other test suites may have
+        // already created it with a different mock context. Reset it so this
+        // suite's mocks take effect.
+        java.lang.reflect.Field instanceField = SettingsManager.class.getDeclaredField("instance");
+        instanceField.setAccessible(true);
+        instanceField.set(null, null);
         when(mockContext.getApplicationContext()).thenReturn(mockContext);
         when(mockContext.getSharedPreferences(anyString(), anyInt())).thenReturn(mockPrefs);
         when(mockPrefs.edit()).thenReturn(mockEditor);
         when(mockEditor.putBoolean(anyString(), eq(true))).thenReturn(mockEditor);
         when(mockEditor.putBoolean(anyString(), eq(false))).thenReturn(mockEditor);
         when(mockEditor.putInt(anyString(), anyInt())).thenReturn(mockEditor);
+        when(mockEditor.putString(anyString(), anyString())).thenReturn(mockEditor);
 
         settingsManager = SettingsManager.getInstance(mockContext);
     }
@@ -204,5 +212,40 @@ public class SettingsManagerTest {
 
         verify(mockEditor).putBoolean("show_puzzles_count", false);
         verify(mockEditor).apply();
+    }
+
+    @Test
+    public void testPieceSet_ReturnsStoredValue() {
+        when(mockPrefs.getString(eq("piece_set"), eq(null))).thenReturn("lichess");
+
+        assertEquals("lichess", settingsManager.getPieceSet());
+    }
+
+    @Test
+    public void testPieceSet_SetAndGet() {
+        settingsManager.setPieceSet("sashite");
+
+        verify(mockEditor).putString("piece_set", "sashite");
+        verify(mockEditor).apply();
+    }
+
+    @Test
+    public void testPieceSet_NullStored_FallsBackToFirstAvailableSet() throws Exception {
+        when(mockPrefs.getString(eq("piece_set"), eq(null))).thenReturn(null);
+        AssetManager mockAssets = mock(AssetManager.class);
+        when(mockContext.getAssets()).thenReturn(mockAssets);
+        when(mockAssets.list("pieces")).thenReturn(new String[]{"classic", "lichess"});
+
+        assertEquals("classic", settingsManager.getPieceSet());
+    }
+
+    @Test
+    public void testPieceSet_EmptyStored_FallsBackToFirstAvailableSet() throws Exception {
+        when(mockPrefs.getString(eq("piece_set"), eq(null))).thenReturn("");
+        AssetManager mockAssets = mock(AssetManager.class);
+        when(mockContext.getAssets()).thenReturn(mockAssets);
+        when(mockAssets.list("pieces")).thenReturn(new String[]{"classic"});
+
+        assertEquals("classic", settingsManager.getPieceSet());
     }
 }

@@ -1,19 +1,17 @@
 package com.tacticmaster.settings;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 
-@RunWith(MockitoJUnitRunner.class)
 public class SettingsPreferenceDataStoreTest {
 
     @Mock
@@ -21,8 +19,9 @@ public class SettingsPreferenceDataStoreTest {
 
     private SettingsPreferenceDataStore dataStore;
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        MockitoAnnotations.openMocks(this);
         dataStore = new SettingsPreferenceDataStore(settingsManager);
     }
 
@@ -116,6 +115,27 @@ public class SettingsPreferenceDataStoreTest {
     @Test
     public void getString_unknownKeyReturnsDefault() {
         assertEquals("fallback", dataStore.getString("not_a_real_key", "fallback"));
+    }
+
+    @Test
+    public void getString_pieceSetRoutesToSettingsManager() {
+        when(settingsManager.getPieceSet()).thenReturn("lichess");
+
+        assertEquals("lichess", dataStore.getString("piece_set", "classic"));
+    }
+
+    @Test
+    public void putString_pieceSetRoutesToSettingsManager() {
+        dataStore.putString("piece_set", "lichess");
+
+        verify(settingsManager).setPieceSet("lichess");
+    }
+
+    @Test
+    public void putString_pieceSetIgnoresNull() {
+        dataStore.putString("piece_set", null);
+
+        verify(settingsManager, never()).setPieceSet(org.mockito.ArgumentMatchers.any());
     }
 
     @Test

@@ -4,10 +4,12 @@ import static java.util.Objects.isNull;
 
 import android.os.Bundle;
 
+import androidx.preference.DropDownPreference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SeekBarPreference;
 
 import com.tacticmaster.R;
+import com.tacticmaster.board.ChessboardPieceManager;
 
 /**
  * Settings UI. All persistence is delegated to {@link SettingsManager} via
@@ -27,28 +29,45 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        configureAnimationSpeedPreference();
-        configurePlayerRatingPreference();
+        configureSeekBar(SettingKey.ANIMATION_SPEED.key,
+                SettingsManager.ANIMATION_SPEED_NORMAL, SettingsManager.ANIMATION_SPEED_SLOW, 0);
+        configureSeekBar(SettingKey.PLAYER_RATING.key,
+                SettingsManager.MIN_PLAYER_RATING, SettingsManager.MAX_PLAYER_RATING, PLAYER_RATING_STEP);
+        configurePieceSetPreference();
     }
 
-    private void configureAnimationSpeedPreference() {
-        SeekBarPreference pref = findPreference(SettingKey.ANIMATION_SPEED.key);
+    private void configureSeekBar(String key, int min, int max, int increment) {
+        SeekBarPreference pref = findPreference(key);
         if (isNull(pref)) {
             return;
         }
-        pref.setMin(SettingsManager.ANIMATION_SPEED_NORMAL);
-        pref.setMax(SettingsManager.ANIMATION_SPEED_SLOW);
+        pref.setMin(min);
+        pref.setMax(max);
+        if (increment > 0) {
+            pref.setSeekBarIncrement(increment);
+        }
         pref.setShowSeekBarValue(true);
     }
 
-    private void configurePlayerRatingPreference() {
-        SeekBarPreference pref = findPreference(SettingKey.PLAYER_RATING.key);
+    private void configurePieceSetPreference() {
+        DropDownPreference pref = findPreference(SettingKey.PIECE_SET.key);
         if (isNull(pref)) {
             return;
         }
-        pref.setMin(SettingsManager.MIN_PLAYER_RATING);
-        pref.setMax(SettingsManager.MAX_PLAYER_RATING);
-        pref.setSeekBarIncrement(PLAYER_RATING_STEP);
-        pref.setShowSeekBarValue(true);
+        String[] sets = ChessboardPieceManager.availablePieceSets(requireContext());
+        CharSequence[] labels = new CharSequence[sets.length];
+        for (int i = 0; i < sets.length; i++) {
+            labels[i] = capitalize(sets[i]);
+        }
+        // Display the friendly label; store the raw folder name as the value.
+        pref.setEntries(labels);
+        pref.setEntryValues(sets);
+    }
+
+    private static String capitalize(String s) {
+        if (isNull(s) || s.isEmpty()) {
+            return s;
+        }
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 }

@@ -241,6 +241,55 @@ public class ChessboardControllerTest {
     }
 
     @Test
+    public void testShareFenClicked() {
+        String puzzleId = "12345";
+        when(databaseAccessor.getPuzzleById(puzzleId)).thenReturn(new Puzzle(puzzleId, "somefen", "moves", 1000));
+        Context context = mock(Context.class);
+        when(chessboardView.getContext()).thenReturn(context);
+        chessboardController.loadPuzzleById(puzzleId);
+
+        chessboardController.shareFenClicked();
+
+        Intent expectedIntent = new Intent(Intent.ACTION_SEND);
+        expectedIntent.putExtra(Intent.EXTRA_TEXT, "somefen");
+        expectedIntent.setType("text/plain");
+        verify(context).startActivity(Intent.createChooser(expectedIntent,
+                context.getString(R.string.share_fen_chooser_title)));
+    }
+
+    @Test
+    public void testPuzzleIdLinkClicked_NoHandlerActivity_DoesNotCrash() {
+        String puzzleId = "12345";
+        when(databaseAccessor.getPuzzleById(puzzleId)).thenReturn(new Puzzle(puzzleId, "fen", "moves", 1000));
+        Context context = mock(Context.class);
+        when(chessboardView.getContext()).thenReturn(context);
+        org.mockito.Mockito.doThrow(new android.content.ActivityNotFoundException())
+                .when(context).startActivity(any());
+        chessboardController.loadPuzzleById(puzzleId);
+
+        // Must swallow ActivityNotFoundException rather than propagate.
+        chessboardController.puzzleIdLinkClicked();
+
+        verify(context).startActivity(any());
+    }
+
+    @Test
+    public void testShareFenClicked_NoHandlerActivity_DoesNotCrash() {
+        String puzzleId = "12345";
+        when(databaseAccessor.getPuzzleById(puzzleId)).thenReturn(new Puzzle(puzzleId, "somefen", "moves", 1000));
+        Context context = mock(Context.class);
+        when(chessboardView.getContext()).thenReturn(context);
+        org.mockito.Mockito.doThrow(new android.content.ActivityNotFoundException())
+                .when(context).startActivity(any());
+        chessboardController.loadPuzzleById(puzzleId);
+
+        // Must swallow ActivityNotFoundException rather than propagate.
+        chessboardController.shareFenClicked();
+
+        verify(context).startActivity(any());
+    }
+
+    @Test
     void testConstructorWithNullDatabaseAccessorThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 new ChessboardController(null, settingsManager, mock(PuzzleManager.class), mock(PuzzleThemesDialogHelper.class),
@@ -507,6 +556,29 @@ public class ChessboardControllerTest {
         chessboardController.refreshFromSettings();
 
         Assertions.assertTrue(chessboardController.getAutoplay());
+    }
+
+    @Test
+    public void testRefreshFromSettingsReloadsPiecesWhenSetChanged() {
+        // setUp left getPieceSet() unstubbed, so the constructor cached null.
+        when(settingsManager.getPieceSet()).thenReturn("lichess");
+        when(settingsManager.getPlayerRating()).thenReturn(2333); // unchanged
+
+        chessboardController.refreshFromSettings();
+
+        verify(chessboardView).reloadPieces("lichess");
+    }
+
+    @Test
+    public void testRefreshFromSettingsDoesNotReloadPiecesWhenSetUnchanged() {
+        // Prime the cached piece set, then refresh with the same value.
+        when(settingsManager.getPieceSet()).thenReturn("classic");
+        when(settingsManager.getPlayerRating()).thenReturn(2333);
+        chessboardController.refreshFromSettings(); // caches "classic", reloads once
+
+        chessboardController.refreshFromSettings(); // same set — no further reload
+
+        verify(chessboardView, times(1)).reloadPieces("classic");
     }
 
     @Test

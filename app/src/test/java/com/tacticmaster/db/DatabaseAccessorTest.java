@@ -7,6 +7,7 @@ import static com.tacticmaster.db.PuzzleTable.COLUMN_THEMES;
 import static com.tacticmaster.db.PuzzleTable.PUZZLE_TABLE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -159,8 +160,7 @@ class DatabaseAccessorTest {
                 foundBoundedMatch = true;
                 break;
             }
-            assertFalse("%mate%".equals(arg),
-                    "Theme LIKE pattern must be word-bounded ('% mate %'), not substring ('%mate%')");
+            assertNotEquals("%mate%", arg, "Theme LIKE pattern must be word-bounded ('% mate %'), not substring ('%mate%')");
         }
         assertTrue(foundBoundedMatch, "Theme arg must be word-bounded; got: " + java.util.Arrays.toString(args));
     }

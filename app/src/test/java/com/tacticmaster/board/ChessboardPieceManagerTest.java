@@ -1,51 +1,70 @@
 package com.tacticmaster.board;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+/**
+ * Unit tests for the piece-loading logic. The class loads pieces from
+ * {@code assets/pieces/<set>/} via {@link AssetManager} and decodes PNGs with
+ * {@link BitmapFactory#decodeStream}; both are mocked here so the tests run on
+ * the JVM without a device. SVG rendering and real bitmap scaling are exercised
+ * by the instrumented test instead.
+ */
 public class ChessboardPieceManagerTest {
 
-    @Mock
+    private static final String[] PIECE_FILES = {
+            "wk.png", "bk.png", "wq.png", "bq.png", "wr.png", "br.png",
+            "wb.png", "bb.png", "wn.png", "bn.png", "wp.png", "bp.png"
+    };
+
     private Context mockContext;
-
-    @Mock
-    private Resources mockResources;
-
-    @Mock
+    private AssetManager mockAssets;
     private Bitmap mockBitmap;
-
+    private MockedStatic<BitmapFactory> bitmapFactory;
     private ChessboardPieceManager pieceManager;
 
-    @Before
-    public void setUp() {
-        when(mockContext.getResources()).thenReturn(mockResources);
+    @BeforeEach
+    public void setUp() throws IOException {
+        mockContext = mock(Context.class);
+        mockAssets = mock(AssetManager.class);
+        mockBitmap = mock(Bitmap.class);
 
-        try (MockedStatic<BitmapFactory> bitmapFactory = Mockito.mockStatic(BitmapFactory.class)) {
-            bitmapFactory.when(() -> BitmapFactory.decodeResource(mockResources, anyInt()))
-                    .thenReturn(mockBitmap);
+        when(mockContext.getAssets()).thenReturn(mockAssets);
+        // One set "classic" with 12 PNG pieces (no .svg -> PNG decode path).
+        when(mockAssets.list("pieces")).thenReturn(new String[]{"classic"});
+        when(mockAssets.list("pieces/classic")).thenReturn(PIECE_FILES);
+        when(mockAssets.open(any())).thenReturn(new ByteArrayInputStream(new byte[]{1}));
 
-            pieceManager = new ChessboardPieceManager(mockContext);
-        }
+        bitmapFactory = Mockito.mockStatic(BitmapFactory.class);
+        bitmapFactory.when(() -> BitmapFactory.decodeStream(any())).thenReturn(mockBitmap);
+
+        pieceManager = new ChessboardPieceManager(mockContext);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        bitmapFactory.close();
     }
 
     @Test
@@ -55,173 +74,24 @@ public class ChessboardPieceManagerTest {
     }
 
     @Test
-    public void testGetPieceBitmap_WhiteKing() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('K');
-
-        assertEquals(scaledBitmap, result);
+    public void testAvailablePieceSets_ReturnsAssetFolders() {
+        assertEquals("classic", ChessboardPieceManager.availablePieceSets(mockContext)[0]);
     }
 
     @Test
-    public void testGetPieceBitmap_BlackKing() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('k');
-
-        assertEquals(scaledBitmap, result);
+    public void testDefaultPieceSet_IsFirstFolder() {
+        assertEquals("classic", ChessboardPieceManager.defaultPieceSet(mockContext));
     }
 
     @Test
-    public void testGetPieceBitmap_WhiteQueen() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('Q');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_BlackQueen() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('q');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_WhiteRook() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('R');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_BlackRook() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('r');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_WhiteBishop() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('B');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_BlackBishop() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('b');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_WhiteKnight() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('N');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_BlackKnight() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('n');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_WhitePawn() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('P');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_BlackPawn() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 100, 100, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('p');
-
-        assertEquals(scaledBitmap, result);
-    }
-
-    @Test
-    public void testGetPieceBitmap_InvalidPiece() {
-        pieceManager.onSizeChanged(100);
-        Bitmap result = pieceManager.getPieceBitmap('X');
-
-        assertNull(result);
+    public void testDefaultPieceSet_EmptyWhenNoFolders() throws IOException {
+        when(mockAssets.list("pieces")).thenReturn(new String[0]);
+        assertEquals("", ChessboardPieceManager.defaultPieceSet(mockContext));
     }
 
     @Test
     public void testGetPieceBitmap_BeforeScaling_ReturnsNull() {
-        Bitmap result = pieceManager.getPieceBitmap('K');
-
-        assertNull(result);
-    }
-
-    @Test
-    public void testOnSizeChanged_ScalesAllBitmaps() {
-        Bitmap scaledBitmap = mock(Bitmap.class);
-        when(Bitmap.createScaledBitmap(mockBitmap, 150, 150, true)).thenReturn(scaledBitmap);
-
-        pieceManager.onSizeChanged(150);
-
-        // Verify that scaled bitmaps are available for all pieces
-        assertNotNull(pieceManager.getPieceBitmap('K'));
-        assertNotNull(pieceManager.getPieceBitmap('Q'));
-        assertNotNull(pieceManager.getPieceBitmap('R'));
-    }
-
-    @Test
-    public void testRecycleBitmaps_RecyclesAllBitmaps() {
-        when(mockBitmap.isRecycled()).thenReturn(false);
-
-        pieceManager.recycleBitmaps();
-
-        verify(mockBitmap, never()).recycle(); // Original bitmaps are not mocked properly for this test
-        assertEquals(0, pieceManager.getBitmaps().size());
+        assertNull(pieceManager.getPieceBitmap('K'));
     }
 
     @Test
@@ -231,15 +101,11 @@ public class ChessboardPieceManagerTest {
         pieceManager.recycleBitmaps();
 
         verify(mockBitmap, never()).recycle();
+        assertEquals(0, pieceManager.getBitmaps().size());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testConstructor_NullContext_ThrowsException() {
-        try (MockedStatic<BitmapFactory> bitmapFactory = Mockito.mockStatic(BitmapFactory.class)) {
-            bitmapFactory.when(() -> BitmapFactory.decodeResource(null, anyInt()))
-                    .thenReturn(mockBitmap);
-
-            new ChessboardPieceManager(null);
-        }
+    @Test
+    public void testConstructor_NullContext_Throws() {
+        assertThrows(NullPointerException.class, () -> new ChessboardPieceManager(null, "classic"));
     }
 }

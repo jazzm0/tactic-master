@@ -16,6 +16,7 @@ import com.tacticmaster.settings.SettingsManager;
 import com.tacticmaster.sound.SoundPlayer;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class ChessboardController implements ChessboardView.PuzzleFinishedListener {
 
@@ -31,6 +32,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
 
     private int playerRating;
     private boolean autoplay;
+    private String pieceSet;
 
     public ChessboardController(
             DatabaseAccessor databaseAccessor,
@@ -60,14 +62,16 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
         }
 
         this.databaseAccessor = databaseAccessor;
+        this.settingsManager = settingsManager;
         this.puzzleManager = puzzleManager;
         this.puzzleThemesDialogHelper = puzzleThemesDialogHelper;
         this.chessboardView = chessboardView;
         this.puzzleTextViews = puzzleTextViews;
+
         this.chessboardView.setPuzzleSolvedListener(this);
-        this.settingsManager = settingsManager;
         this.playerRating = settingsManager.getPlayerRating();
         this.autoplay = settingsManager.isAutoplayEnabled();
+        this.pieceSet = settingsManager.getPieceSet();
         Log.d(TAG, "ChessboardController initialized with player rating: " + playerRating);
     }
 
@@ -80,13 +84,20 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
     }
 
     /**
-     * Re-syncs cached settings (player rating, autoplay) from {@link SettingsManager}.
-     * If the player rating changed, the puzzle cache is cleared and a fresh puzzle is
-     * loaded at the new band — in that case this method renders, and returns {@code true}
-     * so the caller skips a redundant render.
+     * Re-syncs cached settings (player rating, autoplay, piece set) from
+     * {@link SettingsManager}. If the piece set changed, the board reloads its
+     * bitmaps. If the player rating changed, the puzzle cache is cleared and a
+     * fresh puzzle is loaded at the new band — in that case this method renders,
+     * and returns {@code true} so the caller skips a redundant render.
      */
     public boolean refreshFromSettings() {
         this.autoplay = settingsManager.isAutoplayEnabled();
+
+        String storedPieceSet = settingsManager.getPieceSet();
+        if (!Objects.equals(storedPieceSet, pieceSet)) {
+            this.pieceSet = storedPieceSet;
+            chessboardView.reloadPieces(storedPieceSet);
+        }
 
         int storedRating = settingsManager.getPlayerRating();
         if (storedRating == playerRating) {
@@ -170,20 +181,9 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             Log.w(TAG, "No current puzzle available for sharing");
             return;
         }
-
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, LICHESS_TRAINING_URL + currentPuzzle.getPuzzleId());
-        sendIntent.setType("text/plain");
-
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        try {
-            chessboardView.getContext().startActivity(shareIntent);
-        } catch (ActivityNotFoundException e) {
-            Log.w(TAG, "No app available to handle share intent", e);
-            return;
+        if (shareText(LICHESS_TRAINING_URL + currentPuzzle.getPuzzleId(), null)) {
+            Log.d(TAG, "Shared puzzle link: " + currentPuzzle.getPuzzleId());
         }
-        Log.d(TAG, "Shared puzzle link: " + currentPuzzle.getPuzzleId());
     }
 
     public void shareFenClicked() {
@@ -192,22 +192,31 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
             Log.w(TAG, "No current puzzle available for sharing FEN");
             return;
         }
-
         String fen = currentPuzzle.fen();
+        String chooserTitle = chessboardView.getContext().getString(R.string.share_fen_chooser_title);
+        if (shareText(fen, chooserTitle)) {
+            Log.d(TAG, "Shared puzzle FEN: " + fen);
+        }
+    }
 
+    /**
+     * Fires an ACTION_SEND chooser for the given text. Returns {@code true} if the
+     * chooser launched, {@code false} if no app could handle it.
+     */
+    private boolean shareText(String text, String chooserTitle) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, fen);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, text);
         sendIntent.setType("text/plain");
 
-        Intent shareIntent = Intent.createChooser(sendIntent, chessboardView.getContext().getString(R.string.share_fen_chooser_title));
+        Intent shareIntent = Intent.createChooser(sendIntent, chooserTitle);
         try {
             chessboardView.getContext().startActivity(shareIntent);
+            return true;
         } catch (ActivityNotFoundException e) {
             Log.w(TAG, "No app available to handle share intent", e);
-            return;
+            return false;
         }
-        Log.d(TAG, "Shared puzzle FEN: " + fen);
     }
 
     public void puzzleHintClicked() {
@@ -252,9 +261,7 @@ public class ChessboardController implements ChessboardView.PuzzleFinishedListen
      * Should be called when the controller is no longer needed.
      */
     public void cleanup() {
-        if (!isNull(puzzleTextViews)) {
-            puzzleTextViews.cleanup();
-        }
+        puzzleTextViews.cleanup();
         // Release sound player resources
         SoundPlayer.getInstance().release();
         Log.d(TAG, "ChessboardController cleanup completed");

@@ -17,7 +17,6 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.tacticmaster.MainActivity;
-import com.tacticmaster.R;
 import com.tacticmaster.puzzle.PuzzleGame;
 
 import org.junit.Before;
@@ -63,9 +62,14 @@ public class ChessboardViewInstrumentedTest {
     }
 
     @Test
-    public void testPieceBitmaps() {
-        Bitmap whiteKing = BitmapFactory.decodeResource(context.getResources(), R.drawable.wk);
-        Bitmap blackKing = BitmapFactory.decodeResource(context.getResources(), R.drawable.bk);
+    public void testPieceBitmaps() throws java.io.IOException {
+        Bitmap whiteKing;
+        Bitmap blackKing;
+        try (java.io.InputStream whiteKingStream = context.getAssets().open("pieces/classic/wk.png");
+             java.io.InputStream blackKingStream = context.getAssets().open("pieces/classic/bk.png")) {
+            whiteKing = BitmapFactory.decodeStream(whiteKingStream);
+            blackKing = BitmapFactory.decodeStream(blackKingStream);
+        }
         assertNotNull(whiteKing);
         assertNotNull(blackKing);
     }
