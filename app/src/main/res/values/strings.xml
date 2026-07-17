@@ -77,6 +77,10 @@
     <!-- Pieces settings -->
     <string name="pieces_category_title">Pieces</string>
     <string name="piece_set_title">Piece Set</string>
+    <string name="piece_set_hint_title">New: Piece Sets</string>
+    <string name="piece_set_hint_message">You can now choose between different chess piece designs. Pick your favorite in Settings.</string>
+    <string name="piece_set_hint_open_settings">Open Settings</string>
+    <string name="piece_set_hint_dismiss">Got it</string>
 
     <!-- Display settings -->
     <string name="display_category_title">Display</string>

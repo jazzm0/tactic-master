@@ -149,6 +149,14 @@ public class SettingsManager {
         return stored;
     }
 
+    public boolean isPieceSetHintSeen() {
+        return getBool(SettingKey.PIECE_SET_HINT_SEEN);
+    }
+
+    public void setPieceSetHintSeen(boolean seen) {
+        setBool(SettingKey.PIECE_SET_HINT_SEEN, seen);
+    }
+
     public void setPieceSet(String pieceSet) {
         setString(SettingKey.PIECE_SET, pieceSet);
     }
