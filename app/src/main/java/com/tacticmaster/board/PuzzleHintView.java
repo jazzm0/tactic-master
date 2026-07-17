@@ -2,6 +2,8 @@ package com.tacticmaster.board;
 
 import static java.util.Objects.isNull;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -66,9 +68,9 @@ public class PuzzleHintView extends View {
             notifyChildInvalidated();
         });
 
-        animator.addListener(new android.animation.AnimatorListenerAdapter() {
+        animator.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(android.animation.Animator animation) {
+            public void onAnimationEnd(Animator animation) {
                 shakeOffset = 0;
                 hintMoveRank = -1;
                 hintMoveFile = -1;
@@ -153,9 +155,9 @@ public class PuzzleHintView extends View {
             invalidate();
         });
 
-        animator.addListener(new android.animation.AnimatorListenerAdapter() {
+        animator.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(@NonNull android.animation.Animator animation) {
+            public void onAnimationEnd(@NonNull Animator animation) {
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     isHintPathVisible = false;
                     invalidate();

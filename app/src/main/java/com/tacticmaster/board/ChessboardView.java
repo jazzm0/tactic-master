@@ -41,6 +41,10 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private static final int MOVE_DELAY = 1300;
     private static final int FIRST_MOVE_DELAY = 2000;
     private static final int STROKE_WIDTH = 8;
+    private static final int LABEL_TEXT_SIZE = 30;
+    private static final int LABEL_EDGE_MARGIN = 10;
+    private static final float FILE_LABEL_CENTER_FACTOR = 1.9f;
+    private static final float RANK_LABEL_CENTER_FACTOR = .4f;
 
     private ChessboardPieceManager bitmapManager;
     private final SettingsManager settingsManager;
@@ -55,6 +59,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private boolean isAnimating = false;
     private float animProgress = 0f;
+    private float tileSize = 0f;
     private int animFromRank = -1, animFromFile = -1, animToRank = -1, animToFile = -1;
     private Bitmap animPieceBitmap = null;
 
@@ -130,7 +135,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private Paint createTextPaint() {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(30);
+        paint.setTextSize(LABEL_TEXT_SIZE);
         paint.setAntiAlias(true);
         return paint;
     }
@@ -172,8 +177,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             String fileLabel = !chessboard.isPlayerWhite() ? String.valueOf((char) ('h' - index)) : String.valueOf((char) ('a' + index));
             String rankLabel = !chessboard.isPlayerWhite() ? String.valueOf(index + 1) : String.valueOf(BOARD_SIZE - index);
 
-            canvas.drawText(fileLabel, index * tileSize + (tileSize / 2 - textPaint.measureText(fileLabel) / 2) * 1.9f, height - 10, textPaint);
-            canvas.drawText(rankLabel, 10, index * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * .4f, textPaint);
+            canvas.drawText(fileLabel, index * tileSize + (tileSize / 2 - textPaint.measureText(fileLabel) / 2) * FILE_LABEL_CENTER_FACTOR, height - LABEL_EDGE_MARGIN, textPaint);
+            canvas.drawText(rankLabel, LABEL_EDGE_MARGIN, index * tileSize + (tileSize / 2 + textPaint.getTextSize() / 2) * RANK_LABEL_CENTER_FACTOR, textPaint);
         }
     }
 
@@ -312,7 +317,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private float getTileSize() {
-        return Math.min(getWidth(), getHeight()) / (float) BOARD_SIZE;
+        return tileSize;
     }
 
     private void updatePlayerTurnIcon() {
@@ -402,7 +407,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
-        bitmapManager.onSizeChanged((int) getTileSize());
+        tileSize = Math.min(width, height) / (float) BOARD_SIZE;
+        bitmapManager.onSizeChanged((int) tileSize);
     }
 
     @Override

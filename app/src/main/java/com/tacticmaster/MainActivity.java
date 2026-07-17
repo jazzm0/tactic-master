@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         chessboardController = new ChessboardController(
                 databaseAccessor,
-                SettingsManager.getInstance(chessboardView.getContext()),
+                settingsManager,
                 puzzleManager,
                 new PuzzleThemesDialogHelper(databaseAccessor, puzzleManager),
                 chessboardView,

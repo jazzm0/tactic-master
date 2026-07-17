@@ -14,8 +14,11 @@ import com.caverock.androidsvg.SVGParseException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 public class ChessboardPieceManager {
 
@@ -29,6 +32,7 @@ public class ChessboardPieceManager {
 
     private final Map<String, Bitmap> bitmaps = new HashMap<>();
     private final Map<String, Bitmap> scaledBitmaps = new HashMap<>();
+    private int lastTileSize = -1;
     private final Context context;
 
     public ChessboardPieceManager(Context context) {
@@ -50,18 +54,21 @@ public class ChessboardPieceManager {
     }
 
     private void loadBitmaps(String pieceSet) {
-        bitmaps.put("whiteKing", loadPiece(context, pieceSet, "wk"));
-        bitmaps.put("blackKing", loadPiece(context, pieceSet, "bk"));
-        bitmaps.put("whiteQueen", loadPiece(context, pieceSet, "wq"));
-        bitmaps.put("blackQueen", loadPiece(context, pieceSet, "bq"));
-        bitmaps.put("whiteRook", loadPiece(context, pieceSet, "wr"));
-        bitmaps.put("blackRook", loadPiece(context, pieceSet, "br"));
-        bitmaps.put("whiteBishop", loadPiece(context, pieceSet, "wb"));
-        bitmaps.put("blackBishop", loadPiece(context, pieceSet, "bb"));
-        bitmaps.put("whiteKnight", loadPiece(context, pieceSet, "wn"));
-        bitmaps.put("blackKnight", loadPiece(context, pieceSet, "bn"));
-        bitmaps.put("whitePawn", loadPiece(context, pieceSet, "wp"));
-        bitmaps.put("blackPawn", loadPiece(context, pieceSet, "bp"));
+        // Resolve the set's directory and scale factor once, not per piece.
+        String dir = PIECES_ASSET_DIR + "/" + pieceSet;
+        float scaleFactor = readScaleFactor(context, dir);
+        bitmaps.put("whiteKing", loadPiece(context, dir, "wk", scaleFactor));
+        bitmaps.put("blackKing", loadPiece(context, dir, "bk", scaleFactor));
+        bitmaps.put("whiteQueen", loadPiece(context, dir, "wq", scaleFactor));
+        bitmaps.put("blackQueen", loadPiece(context, dir, "bq", scaleFactor));
+        bitmaps.put("whiteRook", loadPiece(context, dir, "wr", scaleFactor));
+        bitmaps.put("blackRook", loadPiece(context, dir, "br", scaleFactor));
+        bitmaps.put("whiteBishop", loadPiece(context, dir, "wb", scaleFactor));
+        bitmaps.put("blackBishop", loadPiece(context, dir, "bb", scaleFactor));
+        bitmaps.put("whiteKnight", loadPiece(context, dir, "wn", scaleFactor));
+        bitmaps.put("blackKnight", loadPiece(context, dir, "bn", scaleFactor));
+        bitmaps.put("whitePawn", loadPiece(context, dir, "wp", scaleFactor));
+        bitmaps.put("blackPawn", loadPiece(context, dir, "bp", scaleFactor));
     }
 
     /**
@@ -78,16 +85,15 @@ public class ChessboardPieceManager {
     }
 
     /**
-     * Loads a single piece (e.g. {@code "bn"} for the black knight) from a set,
-     * rendering SVG or decoding PNG as appropriate. Shared with the settings
-     * preview so both paths use identical rendering.
+     * Loads a single piece (e.g. {@code "bn"} for the black knight) from a set
+     * directory, rendering SVG or decoding PNG as appropriate, then applying the
+     * set's scale factor.
      */
-    public static Bitmap loadPiece(Context context, String pieceSet, String pieceName) {
-        String dir = PIECES_ASSET_DIR + "/" + pieceSet;
+    private static Bitmap loadPiece(Context context, String dir, String pieceName, float scaleFactor) {
         Bitmap bitmap = assetExists(context, dir, pieceName + ".svg")
                 ? loadSvgBitmap(context, dir + "/" + pieceName + ".svg")
                 : loadPngBitmap(context, dir + "/" + pieceName + ".png");
-        return applyScaleFactor(bitmap, readScaleFactor(context, dir));
+        return applyScaleFactor(bitmap, scaleFactor);
     }
 
     /**
@@ -101,10 +107,10 @@ public class ChessboardPieceManager {
             return 1f;
         }
         try (InputStream in = context.getAssets().open(dir + "/scalefactor.txt");
-             java.util.Scanner scanner = new java.util.Scanner(in)) {
+             Scanner scanner = new Scanner(in)) {
             float factor = Float.parseFloat(scanner.next().trim());
             return factor > 0 ? factor : 1f;
-        } catch (IOException | java.util.NoSuchElementException | NumberFormatException e) {
+        } catch (IOException | NoSuchElementException | NumberFormatException e) {
             return 1f;
         }
     }
@@ -125,6 +131,7 @@ public class ChessboardPieceManager {
         canvas.translate(w * (1f - scaleFactor) / 2f, h * (1f - scaleFactor) / 2f);
         canvas.scale(scaleFactor, scaleFactor);
         canvas.drawBitmap(source, 0, 0, null);
+        source.recycle();
         return scaled;
     }
 
@@ -204,6 +211,11 @@ public class ChessboardPieceManager {
     }
 
     public void onSizeChanged(int tileSize) {
+        if (tileSize == lastTileSize) {
+            return;
+        }
+        lastTileSize = tileSize;
+        recycleAll(scaledBitmaps.values());
         scaledBitmaps.clear();
         for (Map.Entry<String, Bitmap> entry : bitmaps.entrySet()) {
             scaledBitmaps.put(entry.getKey(), Bitmap.createScaledBitmap(entry.getValue(), tileSize, tileSize, true));
@@ -217,7 +229,7 @@ public class ChessboardPieceManager {
         scaledBitmaps.clear();
     }
 
-    private static void recycleAll(java.util.Collection<Bitmap> toRecycle) {
+    private static void recycleAll(Collection<Bitmap> toRecycle) {
         for (Bitmap bitmap : toRecycle) {
             if (!isNull(bitmap) && !bitmap.isRecycled()) {
                 bitmap.recycle();
