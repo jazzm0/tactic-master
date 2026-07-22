@@ -85,6 +85,19 @@ public class ChessboardPieceManager {
     }
 
     /**
+     * Renders a single piece of a given set for previewing in the settings UI
+     * (e.g. {@code "wn"} for the white knight of {@code "merida"}). Applies the
+     * set's scale factor just like the board does, so the preview matches how the
+     * piece actually looks in play. Reuses the same SVG/PNG loading path as the
+     * board — no image decoding is duplicated.
+     */
+    public static Bitmap loadPreviewPiece(Context context, String pieceSet, String pieceCode) {
+        String dir = PIECES_ASSET_DIR + "/" + requireNonNull(pieceSet);
+        float scaleFactor = readScaleFactor(context, dir);
+        return loadPiece(requireNonNull(context), dir, requireNonNull(pieceCode), scaleFactor);
+    }
+
+    /**
      * Loads a single piece (e.g. {@code "bn"} for the black knight) from a set
      * directory, rendering SVG or decoding PNG as appropriate, then applying the
      * set's scale factor.

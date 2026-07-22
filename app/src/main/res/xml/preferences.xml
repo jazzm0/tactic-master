@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Puzzle Section -->
     <PreferenceCategory android:title="@string/puzzle_category_title">
@@ -58,11 +59,11 @@
     <!-- Pieces Section -->
     <PreferenceCategory android:title="@string/pieces_category_title">
 
-        <DropDownPreference
+        <com.tacticmaster.settings.PieceSetPreference
             android:key="piece_set"
             android:persistent="true"
-            android:summary="%s"
-            android:title="@string/piece_set_title" />
+            android:title="@string/piece_set_title"
+            tools:ignore="Instantiatable" />
 
     </PreferenceCategory>
 

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -14,6 +15,9 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.RectF;
+
+import com.caverock.androidsvg.SVG;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -107,5 +111,64 @@ public class ChessboardPieceManagerTest {
     @Test
     public void testConstructor_NullContext_Throws() {
         assertThrows(NullPointerException.class, () -> new ChessboardPieceManager(null, "classic"));
+    }
+
+    @Test
+    public void testLoadPreviewPiece_ReturnsDecodedBitmap() {
+        Bitmap preview = ChessboardPieceManager.loadPreviewPiece(mockContext, "classic", "wn");
+
+        assertNotNull(preview);
+        assertEquals(mockBitmap, preview);
+    }
+
+    @Test
+    public void testLoadPreviewPiece_DecodesFromExpectedAsset() throws IOException {
+        // Ignore the asset reads the @BeforeEach constructor already performed.
+        Mockito.clearInvocations(mockAssets);
+
+        ChessboardPieceManager.loadPreviewPiece(mockContext, "classic", "wq");
+
+        // PNG path: no matching .svg present, so the .png asset is opened.
+        verify(mockAssets).open("pieces/classic/wq.png");
+    }
+
+    @Test
+    public void testLoadPreviewPiece_PrefersSvgWhenPresent() throws IOException {
+        // A set whose knight exists as SVG — the loader must pick the .svg asset.
+        when(mockAssets.list("pieces/lichess")).thenReturn(new String[]{"wn.svg"});
+
+        try (MockedStatic<SVG> svg = Mockito.mockStatic(SVG.class)) {
+            SVG mockSvg = mock(SVG.class);
+            Bitmap svgBitmap = mock(Bitmap.class);
+            svg.when(() -> SVG.getFromInputStream(any())).thenReturn(mockSvg);
+            when(mockSvg.getDocumentViewBox()).thenReturn(new RectF(0, 0, 45, 45));
+            try (MockedStatic<Bitmap> bitmapStatic = Mockito.mockStatic(Bitmap.class)) {
+                bitmapStatic.when(() -> Bitmap.createBitmap(anyInt(), anyInt(), any()))
+                        .thenReturn(svgBitmap);
+
+                Bitmap preview = ChessboardPieceManager.loadPreviewPiece(mockContext, "lichess", "wn");
+
+                assertNotNull(preview);
+                verify(mockAssets).open("pieces/lichess/wn.svg");
+            }
+        }
+    }
+
+    @Test
+    public void testLoadPreviewPiece_NullContext_Throws() {
+        assertThrows(NullPointerException.class,
+                () -> ChessboardPieceManager.loadPreviewPiece(null, "classic", "wn"));
+    }
+
+    @Test
+    public void testLoadPreviewPiece_NullSet_Throws() {
+        assertThrows(NullPointerException.class,
+                () -> ChessboardPieceManager.loadPreviewPiece(mockContext, null, "wn"));
+    }
+
+    @Test
+    public void testLoadPreviewPiece_NullCode_Throws() {
+        assertThrows(NullPointerException.class,
+                () -> ChessboardPieceManager.loadPreviewPiece(mockContext, "classic", null));
     }
 }
