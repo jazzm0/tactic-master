@@ -18,6 +18,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.tacticmaster.MainActivity;
 import com.tacticmaster.puzzle.PuzzleGame;
+import com.tacticmaster.settings.SettingsManager;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,6 +45,10 @@ public class ChessboardViewInstrumentedTest {
     @Before
     public void setUp() {
         context = ApplicationProvider.getApplicationContext();
+        // Disable move animations so doFirstMove() applies the opponent's move
+        // synchronously; otherwise the move completes on a later animation frame
+        // and the board hasn't advanced when the test asserts on it.
+        SettingsManager.getInstance(context).setAnimationsEnabled(false);
         puzzle = new PuzzleGame("1", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "e2e4 e7e5", 1049);
 
         activityScenarioRule.getScenario().onActivity(activity -> {

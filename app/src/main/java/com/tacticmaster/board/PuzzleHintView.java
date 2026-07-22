@@ -71,9 +71,10 @@ public class PuzzleHintView extends View {
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                // Only the visual offset needs clearing to stop the shake. The
+                // target square (hintMoveRank/File) is left as-is: getShakeOffset
+                // now returns 0 for it, and it is overwritten by the next shake.
                 shakeOffset = 0;
-                hintMoveRank = -1;
-                hintMoveFile = -1;
                 notifyChildInvalidated();
             }
         });
