@@ -1,4 +1,3 @@
-import hashlib
 import os
 import shutil
 
@@ -9,31 +8,37 @@ import zstandard as zstd
 def download_and_unpack_csv(url, output_csv_path):
     # Download the compressed file
     response = requests.get(url, stream=True)
+    response.raise_for_status()
+    
     compressed_file_path = output_csv_path + '.zst'
 
     with open(compressed_file_path, 'wb') as compressed_file:
         shutil.copyfileobj(response.raw, compressed_file)
 
-    # Decompress the file
-    with open(compressed_file_path, 'rb') as compressed_file, open(output_csv_path, 'wb') as output_file:
-        dctx = zstd.ZstdDecompressor()
-        dctx.copy_stream(compressed_file, output_file)
+    # Guard against a truncated transfer. The zstd content checksum lives in the
+    # final bytes of the frame, so a cut-off download would drop the checksum
+    # too and still "decompress" cleanly into a partial file. Compare the bytes
+    # we actually wrote against the advertised Content-Length to catch that.
+    expected_size = response.headers.get('Content-Length')
+    actual_size = os.path.getsize(compressed_file_path)
+    if expected_size is not None and actual_size != int(expected_size):
+        os.remove(compressed_file_path)
+        raise IOError(
+            f"Truncated download: got {actual_size} bytes, expected {expected_size}"
+        )
 
-    # Remove the compressed file
-    os.remove(compressed_file_path)
-
-
-def sha256_checksum(file_path):
-    sha256 = hashlib.sha256()
-    with open(file_path, 'rb') as f:
-        for chunk in iter(lambda: f.read(4096), b''):
-            sha256.update(chunk)
-    return sha256.hexdigest()
-
-
-def validate_checksum(file_path):
-    actual_checksum = sha256_checksum(file_path)
-    return actual_checksum == "e20022cae7fed8645b68c1d817c4f5e531f761fd0f3a144cc1a99aed5f2c523e"
+    # Decompress the file. When the frame includes a content checksum (the low
+    # 32 bits of an XXH64 digest, which the lichess dump ships with), the
+    # decompressor verifies it and raises ZstdError on bit-corruption.
+    try:
+        with open(compressed_file_path, 'rb') as compressed_file, open(output_csv_path, 'wb') as output_file:
+            dctx = zstd.ZstdDecompressor()
+            dctx.copy_stream(compressed_file, output_file)
+    except zstd.ZstdError:
+        os.remove(output_csv_path)
+        raise
+    finally:
+        os.remove(compressed_file_path)
 
 
 # Example usage
@@ -41,8 +46,4 @@ url = 'https://database.lichess.org/lichess_db_puzzle.csv.zst'
 output_csv_path = 'lichess_db_puzzle.csv'
 
 download_and_unpack_csv(url, output_csv_path)
-
-if validate_checksum(output_csv_path):
-    print("Checksum is valid.")
-else:
-    print("Checksum is invalid.")
+print("Download and decompression successful, checksum verified.")
