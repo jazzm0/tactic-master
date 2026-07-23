@@ -73,15 +73,8 @@ public class PieceSetPreferenceDialog extends DialogFragment {
         Context context = requireContext();
         String[] sets = ChessboardPieceManager.availablePieceSets(context);
 
-        // Map each set name to its position for O(1) lookup of the current selection.
-        Map<String, Integer> indexBySet = new HashMap<>();
-        for (int i = 0; i < sets.length; i++) {
-            indexBySet.put(sets[i], i);
-        }
-
         PieceSetPreference preference = requirePreference();
-        Integer index = indexBySet.get(preference.getValue());
-        int selectedIndex = isNull(index) ? -1 : index;
+        int selectedIndex = indexOf(sets, preference.getValue());
 
         PieceSetAdapter adapter = new PieceSetAdapter(context, sets);
         return new AlertDialog.Builder(context)
@@ -93,6 +86,18 @@ public class PieceSetPreferenceDialog extends DialogFragment {
                     dialog.dismiss();
                 })
                 .create();
+    }
+
+    /**
+     * Position of {@code value} in {@code sets}, or -1 if absent.
+     */
+    private static int indexOf(String[] sets, String value) {
+        for (int i = 0; i < sets.length; i++) {
+            if (sets[i].equals(value)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
