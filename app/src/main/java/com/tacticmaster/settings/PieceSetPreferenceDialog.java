@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,10 +26,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Dialog for {@link PieceSetPreference}: a single-choice list where each row shows
- * preview pieces (knight, rook, queen) rendered in that set's style alongside the
- * set label. Selecting a row persists the choice through the preference and closes
- * the dialog.
+ * Dialog for {@link PieceSetPreference}: a list where each row shows the set's
+ * label above a strip of preview pieces rendered in that set's style, with the
+ * currently-selected set highlighted. Tapping a row persists the choice through
+ * the preference and closes the dialog.
  *
  * <p>Unlike {@code PreferenceDialogFragmentCompat}, this resolves its preference
  * from the parent {@link androidx.preference.PreferenceFragmentCompat} by key,
@@ -93,12 +92,14 @@ public class PieceSetPreferenceDialog extends DialogFragment {
         PieceSetPreference preference = requirePreference();
         int selectedIndex = indexOf(sets, preference.getValue());
 
-        PieceSetAdapter adapter = new PieceSetAdapter(context, sets);
+        PieceSetAdapter adapter = new PieceSetAdapter(context, sets, selectedIndex);
         return new AlertDialog.Builder(context)
                 .setTitle(preference.getTitle())
                 .setNegativeButton(android.R.string.cancel, null)
-                // Selecting a row commits immediately, so no positive button.
-                .setSingleChoiceItems(adapter, selectedIndex, (dialog, which) -> {
+                // Tapping a row commits immediately, so no positive button. The
+                // selected set is shown via the adapter's row highlight rather than
+                // a single-choice check.
+                .setAdapter(adapter, (dialog, which) -> {
                     preference.setValue(sets[which]);
                     dialog.dismiss();
                 })
@@ -118,19 +119,31 @@ public class PieceSetPreferenceDialog extends DialogFragment {
     }
 
     /**
-     * Renders each set with its label and selection radio on top and a strip of
-     * preview pieces below. Preview bitmaps are loaded once per set+piece and
-     * cached so scrolling doesn't re-decode assets.
+     * Renders each set with its label on top and a strip of preview pieces below,
+     * and highlights the currently-selected row. Preview bitmaps are loaded once
+     * per set+piece and cached so scrolling doesn't re-decode assets.
      */
     private static final class PieceSetAdapter extends BaseAdapter {
 
         private final Context context;
         private final String[] sets;
+        private final int selectedPosition;
+        private final int highlightColor;
         private final Map<String, Bitmap> previewCache = new HashMap<>();
 
-        PieceSetAdapter(Context context, String[] sets) {
+        PieceSetAdapter(Context context, String[] sets, int selectedPosition) {
             this.context = context;
             this.sets = sets;
+            this.selectedPosition = selectedPosition;
+            this.highlightColor = resolveHighlightColor(context);
+        }
+
+        /** The theme's selected/pressed surface tint, used to highlight the current set. */
+        private static int resolveHighlightColor(Context context) {
+            android.util.TypedValue value = new android.util.TypedValue();
+            context.getTheme().resolveAttribute(
+                    androidx.appcompat.R.attr.colorControlHighlight, value, true);
+            return value.data;
         }
 
         @Override
@@ -158,7 +171,6 @@ public class PieceSetPreferenceDialog extends DialogFragment {
 
             String set = sets[position];
             TextView label = view.findViewById(R.id.piece_set_label);
-            RadioButton radio = view.findViewById(R.id.piece_set_radio);
 
             for (PreviewPiece piece : PreviewPiece.values()) {
                 ImageView imageView = view.findViewById(piece.imageViewId);
@@ -166,10 +178,11 @@ public class PieceSetPreferenceDialog extends DialogFragment {
             }
             label.setText(PieceSetPreference.capitalize(set));
 
-            // The list's own single-choice state drives the radio; reflect it here.
-            boolean checked = parent instanceof android.widget.ListView
-                    && ((android.widget.ListView) parent).isItemChecked(position);
-            radio.setChecked(checked);
+            // Highlight the currently-selected set. Cleared on other rows because
+            // convertView is recycled.
+            view.setBackgroundColor(position == selectedPosition
+                    ? highlightColor
+                    : android.graphics.Color.TRANSPARENT);
 
             return view;
         }

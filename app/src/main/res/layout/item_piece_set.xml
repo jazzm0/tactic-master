@@ -17,17 +17,9 @@
 
         <TextView
             android:id="@+id/piece_set_label"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <RadioButton
-            android:id="@+id/piece_set_radio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false" />
 
     </LinearLayout>
 
