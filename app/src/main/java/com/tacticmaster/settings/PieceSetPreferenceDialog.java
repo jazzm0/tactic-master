@@ -39,9 +39,26 @@ import java.util.Map;
 public class PieceSetPreferenceDialog extends DialogFragment {
 
     /**
-     * Representative pieces shown for each set — recognizable and distinctive.
+     * The pieces previewed for each set, paired with the row {@link ImageView}
+     * they render into. The codes are the color+piece asset names (e.g. {@code wn}
+     * = white knight) used by {@link ChessboardPieceManager#loadPreviewPiece}.
      */
-    private static final String[] PREVIEW_PIECE_CODES = {"wn", "wr", "wq"};
+    private enum PreviewPiece {
+        KING("wk", R.id.piece_set_preview_king),
+        QUEEN("wq", R.id.piece_set_preview_queen),
+        ROOK("wr", R.id.piece_set_preview_rook),
+        BISHOP("wb", R.id.piece_set_preview_bishop),
+        KNIGHT("wn", R.id.piece_set_preview_knight),
+        PAWN("wp", R.id.piece_set_preview_pawn);
+
+        final String code;
+        final int imageViewId;
+
+        PreviewPiece(String code, int imageViewId) {
+            this.code = code;
+            this.imageViewId = imageViewId;
+        }
+    }
 
     private static final String ARG_KEY = "key";
 
@@ -101,8 +118,9 @@ public class PieceSetPreferenceDialog extends DialogFragment {
     }
 
     /**
-     * Renders each set as [knight rook queen | label | radio]. Preview bitmaps are
-     * loaded once per set+piece and cached so scrolling doesn't re-decode assets.
+     * Renders each set with its label and selection radio on top and a strip of
+     * preview pieces below. Preview bitmaps are loaded once per set+piece and
+     * cached so scrolling doesn't re-decode assets.
      */
     private static final class PieceSetAdapter extends BaseAdapter {
 
@@ -142,9 +160,10 @@ public class PieceSetPreferenceDialog extends DialogFragment {
             TextView label = view.findViewById(R.id.piece_set_label);
             RadioButton radio = view.findViewById(R.id.piece_set_radio);
 
-            bindPreview(view, R.id.piece_set_preview_knight, set, PREVIEW_PIECE_CODES[0]);
-            bindPreview(view, R.id.piece_set_preview_rook, set, PREVIEW_PIECE_CODES[1]);
-            bindPreview(view, R.id.piece_set_preview_queen, set, PREVIEW_PIECE_CODES[2]);
+            for (PreviewPiece piece : PreviewPiece.values()) {
+                ImageView imageView = view.findViewById(piece.imageViewId);
+                imageView.setImageBitmap(previewFor(set, piece.code));
+            }
             label.setText(PieceSetPreference.capitalize(set));
 
             // The list's own single-choice state drives the radio; reflect it here.
@@ -153,11 +172,6 @@ public class PieceSetPreferenceDialog extends DialogFragment {
             radio.setChecked(checked);
 
             return view;
-        }
-
-        private void bindPreview(View row, int imageViewId, String set, String code) {
-            ImageView imageView = row.findViewById(imageViewId);
-            imageView.setImageBitmap(previewFor(set, code));
         }
 
         private Bitmap previewFor(String set, String code) {
