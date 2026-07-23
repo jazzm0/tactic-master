@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Dialog;
+import android.view.View;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -47,20 +48,52 @@ public class PieceSetPreferenceDialogInstrumentedTest {
     }
 
     @Test
-    public void testDialog_PreselectsCurrentSet() {
+    public void testDialog_HighlightsCurrentSet() {
         try (ActivityScenario<SettingsActivity> scenario =
                      ActivityScenario.launch(SettingsActivity.class)) {
             scenario.onActivity(activity -> preference(activity).setValue("lichess"));
             showDialog(scenario);
 
-            AlertDialog dialog = (AlertDialog) currentDialog(scenario);
-            ListView list = dialog.getListView();
-            int checked = list.getCheckedItemPosition();
-            assertTrue("A row should be pre-checked", checked >= 0);
-
             String[] sets = availableSets(scenario);
-            assertEquals("lichess", sets[checked]);
+            int selected = -1;
+            for (int i = 0; i < sets.length; i++) {
+                if ("lichess".equals(sets[i])) {
+                    selected = i;
+                    break;
+                }
+            }
+            assertTrue("Test fixture must contain the 'lichess' set", selected >= 0);
+
+            final int selectedPos = selected;
+            scenario.onActivity(activity -> {
+                AlertDialog dialog = (AlertDialog) currentDialogFragment(activity).getDialog();
+                ListView list = dialog.getListView();
+
+                // The selected row is highlighted (opaque background); a different
+                // row is not (transparent background).
+                int selectedBg = backgroundColorOf(list, selectedPos);
+                int otherBg = backgroundColorOf(list, selectedPos == 0 ? 1 : 0);
+
+                assertTrue("Selected row should be highlighted",
+                        android.graphics.Color.alpha(selectedBg) != 0);
+                assertEquals("Non-selected row should not be highlighted",
+                        android.graphics.Color.TRANSPARENT, otherBg);
+                assertTrue("Highlight should differ from a normal row",
+                        selectedBg != otherBg);
+            });
         }
+    }
+
+    /**
+     * Resolves the solid background color of an adapter row, or transparent.
+     */
+    private static int backgroundColorOf(ListView list, int position) {
+        View row = list.getAdapter().getView(position, null, list);
+        android.graphics.drawable.Drawable bg = row.getBackground();
+        if (bg instanceof android.graphics.drawable.ColorDrawable) {
+            return ((android.graphics.drawable.ColorDrawable) bg).getColor();
+        }
+        return android.graphics.Color.TRANSPARENT;
     }
 
     @Test
