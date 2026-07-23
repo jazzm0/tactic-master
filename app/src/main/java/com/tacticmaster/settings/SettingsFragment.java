@@ -4,12 +4,12 @@ import static java.util.Objects.isNull;
 
 import android.os.Bundle;
 
-import androidx.preference.DropDownPreference;
+import androidx.annotation.NonNull;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SeekBarPreference;
 
 import com.tacticmaster.R;
-import com.tacticmaster.board.ChessboardPieceManager;
 
 /**
  * Settings UI. All persistence is delegated to {@link SettingsManager} via
@@ -33,7 +33,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 SettingsManager.ANIMATION_SPEED_NORMAL, SettingsManager.ANIMATION_SPEED_SLOW, 0);
         configureSeekBar(SettingKey.PLAYER_RATING.key,
                 SettingsManager.MIN_PLAYER_RATING, SettingsManager.MAX_PLAYER_RATING, PLAYER_RATING_STEP);
-        configurePieceSetPreference();
     }
 
     private void configureSeekBar(String key, int min, int max, int increment) {
@@ -49,25 +48,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         pref.setShowSeekBarValue(true);
     }
 
-    private void configurePieceSetPreference() {
-        DropDownPreference pref = findPreference(SettingKey.PIECE_SET.key);
-        if (isNull(pref)) {
+    @Override
+    public void onDisplayPreferenceDialog(@NonNull Preference preference) {
+        if (preference instanceof PieceSetPreference) {
+            PieceSetPreferenceDialog dialog =
+                    PieceSetPreferenceDialog.newInstance(preference.getKey());
+            // Shown via the child fragment manager so the dialog can resolve its
+            // preference through getParentFragment() — no deprecated target fragment.
+            dialog.show(getChildFragmentManager(), "PieceSetPreferenceDialog");
             return;
         }
-        String[] sets = ChessboardPieceManager.availablePieceSets(requireContext());
-        CharSequence[] labels = new CharSequence[sets.length];
-        for (int i = 0; i < sets.length; i++) {
-            labels[i] = capitalize(sets[i]);
-        }
-        // Display the friendly label; store the raw folder name as the value.
-        pref.setEntries(labels);
-        pref.setEntryValues(sets);
-    }
-
-    private static String capitalize(String s) {
-        if (isNull(s) || s.isEmpty()) {
-            return s;
-        }
-        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+        super.onDisplayPreferenceDialog(preference);
     }
 }
