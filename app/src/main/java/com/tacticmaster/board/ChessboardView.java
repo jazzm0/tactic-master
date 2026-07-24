@@ -11,6 +11,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -19,7 +21,9 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import com.tacticmaster.R;
 import com.tacticmaster.puzzle.PuzzleGame;
@@ -46,10 +50,19 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private static final float FILE_LABEL_CENTER_FACTOR = 1.9f;
     private static final float RANK_LABEL_CENTER_FACTOR = .4f;
 
+    private static final int RESULT_ANIM_DURATION = 1600;
+    private static final float RESULT_FADE_IN_END = 0.18f;
+    private static final float RESULT_FADE_OUT_START = 0.75f;
+    private static final int RESULT_TINT_MAX_ALPHA = 90;
+    private static final int RESULT_ICON_MAX_ALPHA = 255;
+    private static final float RESULT_ICON_BOARD_FRACTION = 0.5f;
+    private static final int RESULT_SOLVED_COLOR = 0xFF4CAF50;
+    private static final int RESULT_UNSOLVED_COLOR = 0xFFE53935;
+
     private ChessboardPieceManager bitmapManager;
     private final SettingsManager settingsManager;
 
-    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, opponentSelectionPaint, textPaint;
+    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, opponentSelectionPaint, textPaint, solvedTintPaint, unsolvedTintPaint;
 
     private PuzzleGame puzzleGame;
     private Chessboard chessboard;
@@ -66,6 +79,14 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private int selectedFromRank = -1, selectedFromFile = -1, selectedToRank = -1, selectedToFile = -1;
     private int opponentFromRank = -1, opponentFromFile = -1, opponentToRank = -1, opponentToFile = -1;
     private boolean puzzleFinished = false;
+
+    private boolean resultShowing = false;
+    private boolean resultSolved = false;
+    private float resultAnimProgress = 0f;
+    private ValueAnimator resultAnimator;
+
+    private Bitmap solvedIconBitmap, unsolvedIconBitmap;
+    private int resultIconSize = -1;
 
     // Tracked so they can be cancelled when the puzzle changes or the view detaches —
     // otherwise a delayed onAfterPuzzleFinished can fire against a stale puzzle and skip ahead.
@@ -104,6 +125,15 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         selectionPaint = createSelectionPaint(false);
         opponentSelectionPaint = createSelectionPaint(true);
         textPaint = createTextPaint();
+        solvedTintPaint = createTintPaint(RESULT_SOLVED_COLOR);
+        unsolvedTintPaint = createTintPaint(RESULT_UNSOLVED_COLOR);
+    }
+
+    private Paint createTintPaint(int color) {
+        Paint paint = new Paint();
+        paint.setColor(color);
+        paint.setStyle(Paint.Style.FILL);
+        return paint;
     }
 
     private Paint createPaint(String color) {
@@ -280,15 +310,135 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
 
+    /**
+     * Shows a brief centered Toast for transient controller messages such as
+     * "no more puzzles" or "invalid puzzle id".
+     */
     public void makeText(int resourceId) {
         var toast = Toast.makeText(getContext(), resourceId, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
 
+    /**
+     * Plays the solved/unsolved feedback: a translucent board tint plus a
+     * centered check ({@code solved}) or X icon that fades in, holds, then fades
+     * out. Runs entirely within {@link #NEXT_PUZZLE_DELAY} so it clears before the
+     * next puzzle loads. Cancelled by {@link #cancelPendingCallbacks()} on puzzle
+     * change so a stale overlay never bleeds onto a new puzzle.
+     */
+    private void startResultAnimation(boolean solved) {
+        resultSolved = solved;
+        resultShowing = true;
+        resultAnimProgress = 0f;
+
+        if (!isNull(resultAnimator)) {
+            resultAnimator.cancel();
+        }
+        resultAnimator = ValueAnimator.ofFloat(0f, 1f);
+        resultAnimator.setDuration(RESULT_ANIM_DURATION);
+        resultAnimator.setInterpolator(new LinearInterpolator());
+        resultAnimator.addUpdateListener(a -> {
+            resultAnimProgress = (float) a.getAnimatedValue();
+            invalidate();
+        });
+        resultAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                resultShowing = false;
+                invalidate();
+            }
+        });
+        resultAnimator.start();
+    }
+
+    /**
+     * Maps the linear 0..1 progress to an alpha multiplier: ramps up over the
+     * fade-in window, holds at full, then ramps down over the fade-out window.
+     */
+    private float resultFadeFactor() {
+        if (resultAnimProgress < RESULT_FADE_IN_END) {
+            return resultAnimProgress / RESULT_FADE_IN_END;
+        }
+        if (resultAnimProgress > RESULT_FADE_OUT_START) {
+            return 1f - (resultAnimProgress - RESULT_FADE_OUT_START) / (1f - RESULT_FADE_OUT_START);
+        }
+        return 1f;
+    }
+
+    private void drawResultOverlay(Canvas canvas) {
+        if (!resultShowing) {
+            return;
+        }
+        float fade = resultFadeFactor();
+        float boardSize = getTileSize() * BOARD_SIZE;
+
+        Paint tintPaint = resultSolved ? solvedTintPaint : unsolvedTintPaint;
+        tintPaint.setAlpha((int) (RESULT_TINT_MAX_ALPHA * fade));
+        canvas.drawRect(0, 0, boardSize, boardSize, tintPaint);
+
+        Bitmap icon = getResultIcon((int) (boardSize * RESULT_ICON_BOARD_FRACTION));
+        if (!isNull(icon)) {
+            float left = (boardSize - icon.getWidth()) / 2f;
+            float top = (boardSize - icon.getHeight()) / 2f;
+            bitmapPaint.setAlpha((int) (RESULT_ICON_MAX_ALPHA * fade));
+            canvas.drawBitmap(icon, left, top, bitmapPaint);
+            bitmapPaint.setAlpha(255);
+        }
+    }
+
+    /**
+     * Lazily renders (and caches) the current result icon tinted to the
+     * solved/unsolved color at {@code size} px. Re-renders when the requested
+     * size changes (e.g. board resize/rotation).
+     */
+    private Bitmap getResultIcon(int size) {
+        if (size <= 0) {
+            return null;
+        }
+        if (size != resultIconSize) {
+            recycleResultIcons();
+            resultIconSize = size;
+        }
+        if (resultSolved) {
+            if (isNull(solvedIconBitmap)) {
+                solvedIconBitmap = renderIcon(R.drawable.ic_solved, RESULT_SOLVED_COLOR, size);
+            }
+            return solvedIconBitmap;
+        }
+        if (isNull(unsolvedIconBitmap)) {
+            unsolvedIconBitmap = renderIcon(R.drawable.ic_unsolved, RESULT_UNSOLVED_COLOR, size);
+        }
+        return unsolvedIconBitmap;
+    }
+
+    private Bitmap renderIcon(@DrawableRes int drawableRes, int tintColor, int size) {
+        Drawable drawable = AppCompatResources.getDrawable(getContext(), drawableRes);
+        if (isNull(drawable)) {
+            return null;
+        }
+        drawable = drawable.mutate();
+        drawable.setColorFilter(tintColor, PorterDuff.Mode.SRC_IN);
+        drawable.setBounds(0, 0, size, size);
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        drawable.draw(new Canvas(bitmap));
+        return bitmap;
+    }
+
+    private void recycleResultIcons() {
+        if (!isNull(solvedIconBitmap)) {
+            solvedIconBitmap.recycle();
+            solvedIconBitmap = null;
+        }
+        if (!isNull(unsolvedIconBitmap)) {
+            unsolvedIconBitmap.recycle();
+            unsolvedIconBitmap = null;
+        }
+    }
+
     private void onPuzzleSolved(PuzzleGame solvedPuzzle) {
         puzzleFinished = true;
-        makeText(R.string.correct_solution);
+        startResultAnimation(true);
         puzzleFinishedListener.onPuzzleSolved(solvedPuzzle);
         scheduleAfterPuzzleFinished(solvedPuzzle);
     }
@@ -314,6 +464,11 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             removeCallbacks(pendingFirstMove);
             pendingFirstMove = null;
         }
+        if (!isNull(resultAnimator)) {
+            resultAnimator.cancel();
+            resultAnimator = null;
+        }
+        resultShowing = false;
     }
 
     private float getTileSize() {
@@ -375,7 +530,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
         boolean leadsToMate = chessboard.isMoveLeadingToMate(move);
         if (!leadsToMate && !puzzleGame.isCorrectNextMove(move)) {
-            makeText(R.string.wrong_solution);
+            startResultAnimation(false);
             puzzleFinishedListener.onPuzzleNotSolved(puzzleGame);
             scheduleAfterPuzzleFinished(puzzleGame);
         } else {
@@ -409,6 +564,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         tileSize = Math.min(width, height) / (float) BOARD_SIZE;
         bitmapManager.onSizeChanged((int) tileSize);
+        // Drop cached result icons so they re-render at the new board size.
+        recycleResultIcons();
+        resultIconSize = -1;
     }
 
     @Override
@@ -417,6 +575,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         drawBoard(canvas);
         drawLabels(canvas);
         drawPieces(canvas);
+        drawResultOverlay(canvas);
     }
 
     @Override
@@ -424,6 +583,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         super.onDetachedFromWindow();
         cancelPendingCallbacks();
         bitmapManager.recycleBitmaps();
+        recycleResultIcons();
     }
 
     int getSelectedFromFile() {
