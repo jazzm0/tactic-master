@@ -67,6 +67,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private int opponentFromRank = -1, opponentFromFile = -1, opponentToRank = -1, opponentToFile = -1;
     private boolean puzzleFinished = false;
 
+    private final PuzzleResultOverlay resultOverlay;
+
     // Tracked so they can be cancelled when the puzzle changes or the view detaches —
     // otherwise a delayed onAfterPuzzleFinished can fire against a stale puzzle and skip ahead.
     private Runnable pendingAfterPuzzleFinished;
@@ -77,6 +79,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         super(context, attrs);
         this.settingsManager = SettingsManager.getInstance(context);
         this.bitmapManager = new ChessboardPieceManager(context, settingsManager.getPieceSet());
+        this.resultOverlay = new PuzzleResultOverlay(context, this::invalidate);
     }
 
     /**
@@ -280,6 +283,10 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
 
+    /**
+     * Shows a brief centered Toast for transient controller messages such as
+     * "no more puzzles" or "invalid puzzle id".
+     */
     public void makeText(int resourceId) {
         var toast = Toast.makeText(getContext(), resourceId, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
@@ -288,7 +295,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private void onPuzzleSolved(PuzzleGame solvedPuzzle) {
         puzzleFinished = true;
-        makeText(R.string.correct_solution);
+        resultOverlay.show(true);
         puzzleFinishedListener.onPuzzleSolved(solvedPuzzle);
         scheduleAfterPuzzleFinished(solvedPuzzle);
     }
@@ -314,6 +321,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             removeCallbacks(pendingFirstMove);
             pendingFirstMove = null;
         }
+        resultOverlay.cancel();
     }
 
     private float getTileSize() {
@@ -375,7 +383,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
         boolean leadsToMate = chessboard.isMoveLeadingToMate(move);
         if (!leadsToMate && !puzzleGame.isCorrectNextMove(move)) {
-            makeText(R.string.wrong_solution);
+            resultOverlay.show(false);
             puzzleFinishedListener.onPuzzleNotSolved(puzzleGame);
             scheduleAfterPuzzleFinished(puzzleGame);
         } else {
@@ -409,6 +417,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         tileSize = Math.min(width, height) / (float) BOARD_SIZE;
         bitmapManager.onSizeChanged((int) tileSize);
+        resultOverlay.onSizeChanged();
     }
 
     @Override
@@ -417,6 +426,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         drawBoard(canvas);
         drawLabels(canvas);
         drawPieces(canvas);
+        resultOverlay.draw(canvas, getTileSize() * BOARD_SIZE);
     }
 
     @Override
@@ -424,6 +434,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         super.onDetachedFromWindow();
         cancelPendingCallbacks();
         bitmapManager.recycleBitmaps();
+        resultOverlay.recycle();
     }
 
     int getSelectedFromFile() {
