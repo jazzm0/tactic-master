@@ -159,8 +159,9 @@ class PuzzleResultOverlay {
     /**
      * Maps the linear 0..1 progress to an alpha multiplier: ramps up over the
      * fade-in window, holds at full, then ramps down over the fade-out window.
+     * Package-private for unit testing.
      */
-    private float fadeFactor() {
+    float fadeFactor() {
         if (animProgress < FADE_IN_END) {
             return animProgress / FADE_IN_END;
         }

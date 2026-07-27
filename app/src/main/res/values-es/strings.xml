@@ -5,8 +5,6 @@
     <string name="invalid_puzzle_id">ID de puzle no válido</string>
     <string name="puzzles_solved" tools:ignore="PluralsCandidate">Resueltos %1$d de %2$d puzles</string>
     <string name="show_previous_puzzle">Mostrar puzle anterior</string>
-    <string name="correct_solution">✅ ¡Solución correcta!</string>
-    <string name="wrong_solution">❌ Solución incorrecta</string>
     <string name="hint">Pista</string>
     <string name="reload">Recargar puzle</string>
     <string name="show_next_puzzle">Mostrar puzle siguiente</string>
