@@ -8,6 +8,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -45,11 +46,14 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private static final int LABEL_EDGE_MARGIN = 10;
     private static final float FILE_LABEL_CENTER_FACTOR = 1.9f;
     private static final float RANK_LABEL_CENTER_FACTOR = .4f;
+    private static final float SHADOW_BLUR_RATIO = 0.06f;
+    private static final float SHADOW_OFFSET_RATIO = 0.03f;
 
     private ChessboardPieceManager bitmapManager;
     private final SettingsManager settingsManager;
 
-    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, selectionPaint, opponentSelectionPaint, textPaint;
+    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, shadowPaint, selectionPaint, opponentSelectionPaint, textPaint;
+    private float shadowOffset;
 
     private PuzzleGame puzzleGame;
     private Chessboard chessboard;
@@ -123,6 +127,15 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         return paint;
     }
 
+    private Paint createShadowPaint(float tileSize) {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setFilterBitmap(true);
+        paint.setAlpha(0x55);
+        paint.setMaskFilter(new BlurMaskFilter(tileSize * SHADOW_BLUR_RATIO, BlurMaskFilter.Blur.NORMAL));
+        return paint;
+    }
+
     private Paint createSelectionPaint(boolean isOpponent) {
         Paint paint = new Paint();
         if (chessboard.isPlayerWhite() && !isOpponent || !chessboard.isPlayerWhite() && isOpponent) {
@@ -185,6 +198,11 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         }
     }
 
+    private void drawPieceWithShadow(Canvas canvas, Bitmap bitmap, float left, float top) {
+        canvas.drawBitmap(bitmap, left + shadowOffset, top + shadowOffset, shadowPaint);
+        canvas.drawBitmap(bitmap, left, top, bitmapPaint);
+    }
+
     private void drawPieces(Canvas canvas) {
         float tileSize = getTileSize();
 
@@ -202,7 +220,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
                 float left = file * tileSize + puzzleHintView.getShakeOffset(rank, file);
                 float top = rank * tileSize;
-                canvas.drawBitmap(pieceBitmap, left, top, bitmapPaint);
+                drawPieceWithShadow(canvas, pieceBitmap, left, top);
             }
         }
 
@@ -216,7 +234,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             float curLeft = fromLeft + (toLeft - fromLeft) * animProgress;
             float curTop = fromTop + (toTop - fromTop) * animProgress;
 
-            canvas.drawBitmap(animPieceBitmap, curLeft, curTop, bitmapPaint);
+            drawPieceWithShadow(canvas, animPieceBitmap, curLeft, curTop);
         }
     }
 
@@ -416,6 +434,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         tileSize = Math.min(width, height) / (float) BOARD_SIZE;
+        shadowPaint = createShadowPaint(tileSize);
+        shadowOffset = tileSize * SHADOW_OFFSET_RATIO;
         bitmapManager.onSizeChanged((int) tileSize);
         resultOverlay.onSizeChanged();
     }
