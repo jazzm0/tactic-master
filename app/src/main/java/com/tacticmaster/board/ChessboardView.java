@@ -44,7 +44,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private ChessboardAnimator animator;
 
     private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, shadowPaint, selectionPaint, opponentSelectionPaint, textPaint;
+    private Paint bevelHighlightPaint, bevelShadowPaint;
     private float shadowOffset;
+    private float bevelStroke;
 
     private PuzzleGame puzzleGame;
     private Chessboard chessboard;
@@ -95,6 +97,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         lightBrownPaint = ChessboardPaintFactory.createSquarePaint("#D2B48C");
         darkBrownPaint = ChessboardPaintFactory.createSquarePaint("#8B4513");
         bitmapPaint = ChessboardPaintFactory.createBitmapPaint();
+        bevelHighlightPaint = ChessboardPaintFactory.createBevelHighlightPaint();
+        bevelShadowPaint = ChessboardPaintFactory.createBevelShadowPaint();
         selectionPaint = ChessboardPaintFactory.createSelectionPaint(chessboard.isPlayerWhite(), false);
         opponentSelectionPaint = ChessboardPaintFactory.createSelectionPaint(chessboard.isPlayerWhite(), true);
         textPaint = ChessboardPaintFactory.createTextPaint();
@@ -119,10 +123,23 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private void drawBoard(Canvas canvas) {
         float tileSize = getTileSize();
+        float h = bevelStroke / 2f;
         for (int rank = 0; rank < BOARD_SIZE; rank++) {
             for (int file = 0; file < BOARD_SIZE; file++) {
-                Paint paint = (rank + file) % 2 == 0 ? lightBrownPaint : darkBrownPaint;
-                canvas.drawRect(file * tileSize, rank * tileSize, (file + 1) * tileSize, (rank + 1) * tileSize, paint);
+                float l = file * tileSize;
+                float t = rank * tileSize;
+                float r = l + tileSize;
+                float b = t + tileSize;
+
+                Paint squarePaint = (rank + file) % 2 == 0 ? lightBrownPaint : darkBrownPaint;
+                canvas.drawRect(l, t, r, b, squarePaint);
+
+                // top and left edges — highlight
+                canvas.drawLine(l, t + h, r, t + h, bevelHighlightPaint);
+                canvas.drawLine(l + h, t, l + h, b, bevelHighlightPaint);
+                // bottom and right edges — shadow
+                canvas.drawLine(l, b - h, r, b - h, bevelShadowPaint);
+                canvas.drawLine(r - h, t, r - h, b, bevelShadowPaint);
             }
         }
 
@@ -335,6 +352,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         tileSize = Math.min(width, height) / (float) BOARD_SIZE;
         shadowPaint = ChessboardPaintFactory.createShadowPaint(tileSize);
         shadowOffset = tileSize * ChessboardPaintFactory.SHADOW_OFFSET_RATIO;
+        bevelStroke = tileSize * ChessboardPaintFactory.BEVEL_RATIO;
+        bevelHighlightPaint.setStrokeWidth(bevelStroke);
+        bevelShadowPaint.setStrokeWidth(bevelStroke);
         bitmapManager.onSizeChanged((int) tileSize);
         resultOverlay.onSizeChanged();
     }

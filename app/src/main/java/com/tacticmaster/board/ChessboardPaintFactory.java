@@ -10,10 +10,27 @@ class ChessboardPaintFactory {
     static final int LABEL_TEXT_SIZE = 30;
     static final float SHADOW_BLUR_RATIO = 0.06f;
     static final float SHADOW_OFFSET_RATIO = 0.03f;
+    static final float BEVEL_RATIO = 0.015f;
 
     static Paint createSquarePaint(String color) {
         Paint paint = new Paint();
         paint.setColor(Color.parseColor(color));
+        return paint;
+    }
+
+    static Paint createBevelHighlightPaint() {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(0x55FFFFFF);
+        paint.setStyle(Paint.Style.STROKE);
+        return paint;
+    }
+
+    static Paint createBevelShadowPaint() {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(0x55000000);
+        paint.setStyle(Paint.Style.STROKE);
         return paint;
     }
 
