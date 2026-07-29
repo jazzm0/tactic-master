@@ -3,9 +3,6 @@ package com.tacticmaster.board;
 import static com.tacticmaster.board.Chessboard.BOARD_SIZE;
 import static java.util.Objects.isNull;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,7 +11,6 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -25,7 +21,7 @@ import com.tacticmaster.puzzle.PuzzleGame;
 import com.tacticmaster.settings.SettingsManager;
 import com.tacticmaster.sound.SoundPlayer;
 
-public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener {
+public class ChessboardView extends View implements PuzzleHintView.ViewChangedListener, ChessboardAnimator.Callbacks {
 
     public interface PuzzleFinishedListener {
         void onPuzzleSolved(PuzzleGame puzzle);
@@ -45,6 +41,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
     private ChessboardPieceManager bitmapManager;
     private final SettingsManager settingsManager;
+    private ChessboardAnimator animator;
 
     private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, shadowPaint, selectionPaint, opponentSelectionPaint, textPaint;
     private float shadowOffset;
@@ -55,11 +52,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private PuzzleFinishedListener puzzleFinishedListener;
     private ImageView playerTurnIcon;
 
-    private boolean isAnimating = false;
-    private float animProgress = 0f;
     private float tileSize = 0f;
-    private int animFromRank = -1, animFromFile = -1, animToRank = -1, animToFile = -1;
-    private Bitmap animPieceBitmap = null;
 
     private int selectedFromRank = -1, selectedFromFile = -1, selectedToRank = -1, selectedToFile = -1;
     private int opponentFromRank = -1, opponentFromFile = -1, opponentToRank = -1, opponentToFile = -1;
@@ -162,7 +155,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
                 var currentPiece = chessboard.getPiece(rank, file);
                 if (Chessboard.NONE_PIECE == currentPiece) continue;
 
-                if (isAnimating && rank == animFromRank && file == animFromFile) {
+                if (animator.isAnimating() && rank == animator.getAnimFromRank() && file == animator.getAnimFromFile()) {
                     continue;
                 }
 
@@ -175,80 +168,35 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             }
         }
 
-        if (isAnimating && !isNull(animPieceBitmap)) {
+        if (animator.isAnimating() && !isNull(animator.getAnimPieceBitmap())) {
 
-            float fromLeft = animFromFile * tileSize + puzzleHintView.getShakeOffset(animFromRank, animFromFile);
-            float fromTop = animFromRank * tileSize;
-            float toLeft = animToFile * tileSize + puzzleHintView.getShakeOffset(animToRank, animToFile);
-            float toTop = animToRank * tileSize;
+            float fromLeft = animator.getAnimFromFile() * tileSize + puzzleHintView.getShakeOffset(animator.getAnimFromRank(), animator.getAnimFromFile());
+            float fromTop = animator.getAnimFromRank() * tileSize;
+            float toLeft = animator.getAnimToFile() * tileSize + puzzleHintView.getShakeOffset(animator.getAnimToRank(), animator.getAnimToFile());
+            float toTop = animator.getAnimToRank() * tileSize;
 
-            float curLeft = fromLeft + (toLeft - fromLeft) * animProgress;
-            float curTop = fromTop + (toTop - fromTop) * animProgress;
+            float curLeft = fromLeft + (toLeft - fromLeft) * animator.getAnimProgress();
+            float curTop = fromTop + (toTop - fromTop) * animator.getAnimProgress();
 
-            drawPieceWithShadow(canvas, animPieceBitmap, curLeft, curTop);
+            drawPieceWithShadow(canvas, animator.getAnimPieceBitmap(), curLeft, curTop);
         }
     }
 
-    private void animateMove(String nextMove) {
-        int[] coords = chessboard.transformFenMove(nextMove);
-        animFromRank = coords[0];
-        animFromFile = coords[1];
-        animToRank = coords[2];
-        animToFile = coords[3];
-
-        char movingPiece = chessboard.getPiece(animFromRank, animFromFile);
-        animPieceBitmap = bitmapManager.getPieceBitmap(movingPiece);
-
-        boolean animationsEnabled = settingsManager.areAnimationsEnabled();
-        int animationDuration = animationsEnabled ? settingsManager.getAnimationSpeed() : 0;
-
-        if (!animationsEnabled || animationDuration == 0) {
-            // Skip animation - execute move immediately
-            completeMove(nextMove);
-            return;
-        }
-
-        isAnimating = true;
-        animProgress = 0f;
-
-        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
-        animator.setDuration(animationDuration);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.addUpdateListener(a -> {
-            animProgress = (float) a.getAnimatedValue();
-            postInvalidateOnAnimation();
-        });
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                completeMove(nextMove);
-            }
-        });
-        animator.start();
-    }
-
-    /**
-     * Applies {@code nextMove} to the board and refreshes state: plays the move
-     * sound, clears the in-flight animation, and — when it is now the player's
-     * turn — records the opponent's move as the highlighted selection. Shared by
-     * the animated and skip-animation paths in {@link #animateMove(String)}.
-     */
-    private void completeMove(String nextMove) {
-        boolean isCaptureMove = chessboard.isCaptureMove(nextMove);
-        chessboard.doMove(nextMove);
-        isAnimating = false;
-        animPieceBitmap = null;
-        SoundPlayer.getInstance().playMoveSound(getContext(), isCaptureMove);
-
-        if (chessboard.isPlayersTurn()) {
-            int[] coords = chessboard.transformFenMove(nextMove);
+    @Override
+    public void onMoveCompleted(String move, boolean isCapture, boolean isPlayersTurn, int[] coords) {
+        SoundPlayer.getInstance().playMoveSound(getContext(), isCapture);
+        if (isPlayersTurn) {
             opponentFromRank = coords[0];
             opponentFromFile = coords[1];
             opponentToRank = coords[2];
             opponentToFile = coords[3];
         }
-
         invalidate();
+    }
+
+    @Override
+    public void onAnimationFrame() {
+        postInvalidateOnAnimation();
     }
 
 
@@ -370,14 +318,14 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void doNextMove(String nextMove) {
-        if (isAnimating) return;
+        if (animator.isAnimating()) return;
         var possibleNextMove = puzzleGame.getNextMove();
         if (possibleNextMove.isEmpty()) return;
 
         if (isNull(nextMove) || nextMove.isEmpty()) {
             nextMove = possibleNextMove;
         }
-        animateMove(nextMove);
+        animator.startMove(nextMove);
     }
 
 
@@ -444,6 +392,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         puzzleGame.reset();
         this.chessboard = new Chessboard(puzzleGame.fen());
         initPaints();
+        int duration = settingsManager.areAnimationsEnabled() ? settingsManager.getAnimationSpeed() : 0;
+        animator = new ChessboardAnimator(chessboard, bitmapManager, this, duration);
         updatePlayerTurnIcon();
         removeSelection();
         puzzleHintView.resetHintFirstClick();
