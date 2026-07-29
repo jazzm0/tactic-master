@@ -27,6 +27,7 @@ class ChessboardAnimator {
     private boolean isAnimating = false;
     private float animProgress = 0f;
     private int animFromRank = -1, animFromFile = -1, animToRank = -1, animToFile = -1;
+    private char animPiece = 0;
     private Bitmap animPieceBitmap = null;
 
     ChessboardAnimator(Chessboard chessboard, ChessboardPieceManager pieceManager,
@@ -53,6 +54,7 @@ class ChessboardAnimator {
         animToFile = coords[3];
 
         char movingPiece = chessboard.getPiece(animFromRank, animFromFile);
+        animPiece = movingPiece;
         animPieceBitmap = pieceManager.getPieceBitmap(movingPiece);
 
         if (animationDuration == 0) {
@@ -117,6 +119,10 @@ class ChessboardAnimator {
 
     int getAnimToFile() {
         return animToFile;
+    }
+
+    char getAnimPiece() {
+        return animPiece;
     }
 
     Bitmap getAnimPieceBitmap() {

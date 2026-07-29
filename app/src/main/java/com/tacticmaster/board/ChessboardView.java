@@ -43,10 +43,11 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private final SettingsManager settingsManager;
     private ChessboardAnimator animator;
 
-    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, shadowPaint, selectionPaint, opponentSelectionPaint, textPaint;
+    private Paint lightBrownPaint, darkBrownPaint, bitmapPaint, shadowPaint, extrusionPaint, selectionPaint, opponentSelectionPaint, textPaint;
     private Paint bevelHighlightPaint, bevelShadowPaint;
     private float shadowOffset;
     private float bevelStroke;
+    private float extrusionOffset;
 
     private PuzzleGame puzzleGame;
     private Chessboard chessboard;
@@ -97,6 +98,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         lightBrownPaint = ChessboardPaintFactory.createSquarePaint("#D2B48C");
         darkBrownPaint = ChessboardPaintFactory.createSquarePaint("#8B4513");
         bitmapPaint = ChessboardPaintFactory.createBitmapPaint();
+        extrusionPaint = ChessboardPaintFactory.createExtrusionPaint();
         bevelHighlightPaint = ChessboardPaintFactory.createBevelHighlightPaint();
         bevelShadowPaint = ChessboardPaintFactory.createBevelShadowPaint();
         selectionPaint = ChessboardPaintFactory.createSelectionPaint(chessboard.isPlayerWhite(), false);
@@ -159,7 +161,14 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         }
     }
 
-    private void drawPieceWithShadow(Canvas canvas, Bitmap bitmap, float left, float top) {
+    private void drawPieceWithShadow(Canvas canvas, char piece, Bitmap bitmap, float left, float top) {
+        Bitmap alpha = bitmapManager.getAlphaBitmap(piece);
+        if (!isNull(alpha)) {
+            for (int i = ChessboardPaintFactory.EXTRUSION_LAYERS; i >= 1; i--) {
+                float d = extrusionOffset * i;
+                canvas.drawBitmap(alpha, left + d * 0.5f, top + d, extrusionPaint);
+            }
+        }
         canvas.drawBitmap(bitmap, left + shadowOffset, top + shadowOffset, shadowPaint);
         canvas.drawBitmap(bitmap, left, top, bitmapPaint);
     }
@@ -181,7 +190,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
 
                 float left = file * tileSize + puzzleHintView.getShakeOffset(rank, file);
                 float top = rank * tileSize;
-                drawPieceWithShadow(canvas, pieceBitmap, left, top);
+                drawPieceWithShadow(canvas, currentPiece, pieceBitmap, left, top);
             }
         }
 
@@ -195,7 +204,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             float curLeft = fromLeft + (toLeft - fromLeft) * animator.getAnimProgress();
             float curTop = fromTop + (toTop - fromTop) * animator.getAnimProgress();
 
-            drawPieceWithShadow(canvas, animator.getAnimPieceBitmap(), curLeft, curTop);
+            drawPieceWithShadow(canvas, animator.getAnimPiece(), animator.getAnimPieceBitmap(), curLeft, curTop);
         }
     }
 
@@ -353,6 +362,7 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         shadowPaint = ChessboardPaintFactory.createShadowPaint(tileSize);
         shadowOffset = tileSize * ChessboardPaintFactory.SHADOW_OFFSET_RATIO;
         bevelStroke = tileSize * ChessboardPaintFactory.BEVEL_RATIO;
+        extrusionOffset = tileSize * ChessboardPaintFactory.EXTRUSION_OFFSET_RATIO;
         bevelHighlightPaint.setStrokeWidth(bevelStroke);
         bevelShadowPaint.setStrokeWidth(bevelStroke);
         bitmapManager.onSizeChanged((int) tileSize);

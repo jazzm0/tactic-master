@@ -30,8 +30,11 @@ public class ChessboardPieceManager {
      */
     private static final int SVG_RENDER_SIZE = 512;
 
+    private record ScaledPiece(Bitmap bitmap, Bitmap alpha) {
+    }
+
     private final Map<String, Bitmap> bitmaps = new HashMap<>();
-    private final Map<String, Bitmap> scaledBitmaps = new HashMap<>();
+    private final Map<String, ScaledPiece> scaledPieces = new HashMap<>();
     private int lastTileSize = -1;
     private final Context context;
 
@@ -206,19 +209,29 @@ public class ChessboardPieceManager {
     }
 
     public Bitmap getPieceBitmap(char piece) {
+        ScaledPiece p = scaledPieces.get(pieceKey(piece));
+        return p != null ? p.bitmap() : null;
+    }
+
+    public Bitmap getAlphaBitmap(char piece) {
+        ScaledPiece p = scaledPieces.get(pieceKey(piece));
+        return p != null ? p.alpha() : null;
+    }
+
+    private static String pieceKey(char piece) {
         return switch (piece) {
-            case 'K' -> scaledBitmaps.get("whiteKing");
-            case 'k' -> scaledBitmaps.get("blackKing");
-            case 'Q' -> scaledBitmaps.get("whiteQueen");
-            case 'q' -> scaledBitmaps.get("blackQueen");
-            case 'R' -> scaledBitmaps.get("whiteRook");
-            case 'r' -> scaledBitmaps.get("blackRook");
-            case 'B' -> scaledBitmaps.get("whiteBishop");
-            case 'b' -> scaledBitmaps.get("blackBishop");
-            case 'N' -> scaledBitmaps.get("whiteKnight");
-            case 'n' -> scaledBitmaps.get("blackKnight");
-            case 'P' -> scaledBitmaps.get("whitePawn");
-            case 'p' -> scaledBitmaps.get("blackPawn");
+            case 'K' -> "whiteKing";
+            case 'k' -> "blackKing";
+            case 'Q' -> "whiteQueen";
+            case 'q' -> "blackQueen";
+            case 'R' -> "whiteRook";
+            case 'r' -> "blackRook";
+            case 'B' -> "whiteBishop";
+            case 'b' -> "blackBishop";
+            case 'N' -> "whiteKnight";
+            case 'n' -> "blackKnight";
+            case 'P' -> "whitePawn";
+            case 'p' -> "blackPawn";
             default -> null;
         };
     }
@@ -228,18 +241,26 @@ public class ChessboardPieceManager {
             return;
         }
         lastTileSize = tileSize;
-        recycleAll(scaledBitmaps.values());
-        scaledBitmaps.clear();
+        recycleScaled();
+        scaledPieces.clear();
         for (Map.Entry<String, Bitmap> entry : bitmaps.entrySet()) {
-            scaledBitmaps.put(entry.getKey(), Bitmap.createScaledBitmap(entry.getValue(), tileSize, tileSize, true));
+            Bitmap scaled = Bitmap.createScaledBitmap(entry.getValue(), tileSize, tileSize, true);
+            scaledPieces.put(entry.getKey(), new ScaledPiece(scaled, scaled.extractAlpha()));
         }
     }
 
     public void recycleBitmaps() {
         recycleAll(bitmaps.values());
-        recycleAll(scaledBitmaps.values());
+        recycleScaled();
         bitmaps.clear();
-        scaledBitmaps.clear();
+        scaledPieces.clear();
+    }
+
+    private void recycleScaled() {
+        for (ScaledPiece p : scaledPieces.values()) {
+            if (!isNull(p.bitmap()) && !p.bitmap().isRecycled()) p.bitmap().recycle();
+            if (!isNull(p.alpha()) && !p.alpha().isRecycled()) p.alpha().recycle();
+        }
     }
 
     private static void recycleAll(Collection<Bitmap> toRecycle) {
