@@ -8,9 +8,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -41,13 +39,9 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     private static final int NEXT_PUZZLE_DELAY = 3000;
     private static final int MOVE_DELAY = 1300;
     private static final int FIRST_MOVE_DELAY = 2000;
-    private static final int STROKE_WIDTH = 8;
-    private static final int LABEL_TEXT_SIZE = 30;
     private static final int LABEL_EDGE_MARGIN = 10;
     private static final float FILE_LABEL_CENTER_FACTOR = 1.9f;
     private static final float RANK_LABEL_CENTER_FACTOR = .4f;
-    private static final float SHADOW_BLUR_RATIO = 0.06f;
-    private static final float SHADOW_OFFSET_RATIO = 0.03f;
 
     private ChessboardPieceManager bitmapManager;
     private final SettingsManager settingsManager;
@@ -105,55 +99,12 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void initPaints() {
-        lightBrownPaint = createPaint("#D2B48C");
-        darkBrownPaint = createPaint("#8B4513");
-        bitmapPaint = createBitmapPaint();
-        selectionPaint = createSelectionPaint(false);
-        opponentSelectionPaint = createSelectionPaint(true);
-        textPaint = createTextPaint();
-    }
-
-    private Paint createPaint(String color) {
-        Paint paint = new Paint();
-        paint.setColor(Color.parseColor(color));
-        return paint;
-    }
-
-    private Paint createBitmapPaint() {
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setFilterBitmap(true);
-        paint.setDither(true);
-        return paint;
-    }
-
-    private Paint createShadowPaint(float tileSize) {
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setFilterBitmap(true);
-        paint.setAlpha(0x55);
-        paint.setMaskFilter(new BlurMaskFilter(tileSize * SHADOW_BLUR_RATIO, BlurMaskFilter.Blur.NORMAL));
-        return paint;
-    }
-
-    private Paint createSelectionPaint(boolean isOpponent) {
-        Paint paint = new Paint();
-        if (chessboard.isPlayerWhite() && !isOpponent || !chessboard.isPlayerWhite() && isOpponent) {
-            paint.setColor(Color.WHITE);
-        } else {
-            paint.setColor(Color.BLACK);
-        }
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(STROKE_WIDTH);
-        return paint;
-    }
-
-    private Paint createTextPaint() {
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(LABEL_TEXT_SIZE);
-        paint.setAntiAlias(true);
-        return paint;
+        lightBrownPaint = ChessboardPaintFactory.createSquarePaint("#D2B48C");
+        darkBrownPaint = ChessboardPaintFactory.createSquarePaint("#8B4513");
+        bitmapPaint = ChessboardPaintFactory.createBitmapPaint();
+        selectionPaint = ChessboardPaintFactory.createSelectionPaint(chessboard.isPlayerWhite(), false);
+        opponentSelectionPaint = ChessboardPaintFactory.createSelectionPaint(chessboard.isPlayerWhite(), true);
+        textPaint = ChessboardPaintFactory.createTextPaint();
     }
 
     private void drawRectangle(Canvas canvas, int rank, int file, Paint paint) {
@@ -161,11 +112,11 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
             return;
         }
         float tileSize = getTileSize();
-        float halfStroke = STROKE_WIDTH / 2f;
+        float halfStroke = ChessboardPaintFactory.STROKE_WIDTH / 2f;
 
         float left = file * tileSize + halfStroke;
         float top = rank * tileSize + halfStroke;
-        canvas.drawRect(left, top, left + tileSize - STROKE_WIDTH, top + tileSize - STROKE_WIDTH, paint);
+        canvas.drawRect(left, top, left + tileSize - ChessboardPaintFactory.STROKE_WIDTH, top + tileSize - ChessboardPaintFactory.STROKE_WIDTH, paint);
     }
 
     private void drawSelection(int fromRank, int fromFile, int toRank, int toFile, Canvas canvas, Paint paint) {
@@ -434,8 +385,8 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         tileSize = Math.min(width, height) / (float) BOARD_SIZE;
-        shadowPaint = createShadowPaint(tileSize);
-        shadowOffset = tileSize * SHADOW_OFFSET_RATIO;
+        shadowPaint = ChessboardPaintFactory.createShadowPaint(tileSize);
+        shadowOffset = tileSize * ChessboardPaintFactory.SHADOW_OFFSET_RATIO;
         bitmapManager.onSizeChanged((int) tileSize);
         resultOverlay.onSizeChanged();
     }
