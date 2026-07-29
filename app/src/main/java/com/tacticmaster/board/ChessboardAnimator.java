@@ -10,6 +10,7 @@ class ChessboardAnimator {
 
     interface Callbacks {
         void onMoveCompleted(String move, boolean isCapture, boolean isPlayersTurn, int[] coords);
+
         void onAnimationFrame();
     }
 

@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link ChessboardAnimator}.
- *
+ * <p>
  * {@link android.animation.ValueAnimator} cannot run on the plain JVM, so
  * {@link ChessboardAnimator} accepts an {@link ChessboardAnimator.AnimatorStarter}
  * that tests replace with a controllable fake. Two fakes cover the two paths:
@@ -53,7 +53,8 @@ public class ChessboardAnimatorTest {
         when(mockPieceManager.getPieceBitmap(any(Character.class))).thenReturn(mockBitmap);
 
         immediateStarter = (duration, onFrame, onEnd) -> onEnd.run();
-        noopStarter = (duration, onFrame, onEnd) -> {};
+        noopStarter = (duration, onFrame, onEnd) -> {
+        };
     }
 
     private ChessboardAnimator animator(ChessboardAnimator.AnimatorStarter starter, int duration) {
