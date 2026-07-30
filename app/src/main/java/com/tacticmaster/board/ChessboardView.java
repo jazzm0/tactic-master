@@ -104,6 +104,16 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         selectionPaint = ChessboardPaintFactory.createSelectionPaint(chessboard.isPlayerWhite(), false);
         opponentSelectionPaint = ChessboardPaintFactory.createSelectionPaint(chessboard.isPlayerWhite(), true);
         textPaint = ChessboardPaintFactory.createTextPaint();
+
+        // The factory leaves the bevel paints at stroke width 0. onSizeChanged sets
+        // the real width, but setPuzzle re-runs initPaints on every puzzle without a
+        // resize, so reapply the current stroke here to keep the bevel from collapsing
+        // to a 1px hairline. Before the first layout bevelStroke is 0 and onSizeChanged
+        // will set it.
+        if (bevelStroke > 0) {
+            bevelHighlightPaint.setStrokeWidth(bevelStroke);
+            bevelShadowPaint.setStrokeWidth(bevelStroke);
+        }
     }
 
     private void drawRectangle(Canvas canvas, int rank, int file, Paint paint) {
