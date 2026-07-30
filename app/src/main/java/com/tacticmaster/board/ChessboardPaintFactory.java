@@ -8,8 +8,8 @@ class ChessboardPaintFactory {
 
     static final int STROKE_WIDTH = 8;
     static final int LABEL_TEXT_SIZE = 30;
-    static final float SHADOW_BLUR_RATIO = 0.06f;
-    static final float SHADOW_OFFSET_RATIO = 0.03f;
+    static final float SHADOW_BLUR_RATIO = 0.50f;
+    static final float SHADOW_OFFSET_RATIO = 0.04f;
     static final float BEVEL_RATIO = 0.015f;
     static final float EXTRUSION_OFFSET_RATIO = 0.025f;
     static final int EXTRUSION_LAYERS = 3;
