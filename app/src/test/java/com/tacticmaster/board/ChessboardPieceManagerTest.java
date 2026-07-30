@@ -47,6 +47,7 @@ public class ChessboardPieceManagerTest {
     private Bitmap mockBitmap;
     private MockedStatic<BitmapFactory> bitmapFactory;
     private MockedStatic<Bitmap> bitmapStatic;
+    private boolean bitmapStaticClosed;
     private ChessboardPieceManager pieceManager;
 
     @BeforeEach
@@ -70,6 +71,7 @@ public class ChessboardPieceManagerTest {
         bitmapFactory.when(() -> BitmapFactory.decodeStream(any())).thenReturn(mockBitmap);
 
         bitmapStatic = Mockito.mockStatic(Bitmap.class);
+        bitmapStaticClosed = false;
         bitmapStatic.when(() -> Bitmap.createScaledBitmap(any(), anyInt(), anyInt(), any(Boolean.class)))
                 .thenReturn(mockScaled);
 
@@ -79,7 +81,11 @@ public class ChessboardPieceManagerTest {
     @AfterEach
     public void tearDown() {
         bitmapFactory.close();
-        bitmapStatic.close();
+        // testLoadPreviewPiece_PrefersSvgWhenPresent closes bitmapStatic itself to
+        // swap in a local mock; guard against closing an already-resolved scoped mock.
+        if (!bitmapStaticClosed) {
+            bitmapStatic.close();
+        }
     }
 
     @Test
@@ -156,6 +162,7 @@ public class ChessboardPieceManagerTest {
 
             // Close the outer Bitmap static mock before opening a new one for this test.
             bitmapStatic.close();
+            bitmapStaticClosed = true;
             try (MockedStatic<Bitmap> localBitmapStatic = Mockito.mockStatic(Bitmap.class)) {
                 localBitmapStatic.when(() -> Bitmap.createBitmap(anyInt(), anyInt(), any()))
                         .thenReturn(svgBitmap);
