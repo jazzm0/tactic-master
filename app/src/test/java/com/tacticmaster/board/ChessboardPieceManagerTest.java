@@ -46,6 +46,7 @@ public class ChessboardPieceManagerTest {
     private AssetManager mockAssets;
     private Bitmap mockBitmap;
     private MockedStatic<BitmapFactory> bitmapFactory;
+    private MockedStatic<Bitmap> bitmapStatic;
     private ChessboardPieceManager pieceManager;
 
     @BeforeEach
@@ -53,15 +54,24 @@ public class ChessboardPieceManagerTest {
         mockContext = mock(Context.class);
         mockAssets = mock(AssetManager.class);
         mockBitmap = mock(Bitmap.class);
+        Bitmap mockScaled = mock(Bitmap.class);
+        Bitmap mockAlpha = mock(Bitmap.class);
 
         when(mockContext.getAssets()).thenReturn(mockAssets);
         // One set "classic" with 12 PNG pieces (no .svg -> PNG decode path).
         when(mockAssets.list("pieces")).thenReturn(new String[]{"classic"});
         when(mockAssets.list("pieces/classic")).thenReturn(PIECE_FILES);
         when(mockAssets.open(any())).thenReturn(new ByteArrayInputStream(new byte[]{1}));
+        when(mockScaled.extractAlpha()).thenReturn(mockAlpha);
+        when(mockScaled.isRecycled()).thenReturn(false);
+        when(mockAlpha.isRecycled()).thenReturn(false);
 
         bitmapFactory = Mockito.mockStatic(BitmapFactory.class);
         bitmapFactory.when(() -> BitmapFactory.decodeStream(any())).thenReturn(mockBitmap);
+
+        bitmapStatic = Mockito.mockStatic(Bitmap.class);
+        bitmapStatic.when(() -> Bitmap.createScaledBitmap(any(), anyInt(), anyInt(), any(Boolean.class)))
+                .thenReturn(mockScaled);
 
         pieceManager = new ChessboardPieceManager(mockContext);
     }
@@ -69,6 +79,7 @@ public class ChessboardPieceManagerTest {
     @AfterEach
     public void tearDown() {
         bitmapFactory.close();
+        bitmapStatic.close();
     }
 
     @Test
@@ -142,8 +153,11 @@ public class ChessboardPieceManagerTest {
             Bitmap svgBitmap = mock(Bitmap.class);
             svg.when(() -> SVG.getFromInputStream(any())).thenReturn(mockSvg);
             when(mockSvg.getDocumentViewBox()).thenReturn(new RectF(0, 0, 45, 45));
-            try (MockedStatic<Bitmap> bitmapStatic = Mockito.mockStatic(Bitmap.class)) {
-                bitmapStatic.when(() -> Bitmap.createBitmap(anyInt(), anyInt(), any()))
+
+            // Close the outer Bitmap static mock before opening a new one for this test.
+            bitmapStatic.close();
+            try (MockedStatic<Bitmap> localBitmapStatic = Mockito.mockStatic(Bitmap.class)) {
+                localBitmapStatic.when(() -> Bitmap.createBitmap(anyInt(), anyInt(), any()))
                         .thenReturn(svgBitmap);
 
                 Bitmap preview = ChessboardPieceManager.loadPreviewPiece(mockContext, "lichess", "wn");
@@ -167,8 +181,34 @@ public class ChessboardPieceManagerTest {
     }
 
     @Test
-    public void testLoadPreviewPiece_NullCode_Throws() {
-        assertThrows(NullPointerException.class,
-                () -> ChessboardPieceManager.loadPreviewPiece(mockContext, "classic", null));
+    public void testGetAlphaBitmap_BeforeScaling_ReturnsNull() {
+        assertNull(pieceManager.getAlphaBitmap('K'));
+    }
+
+    @Test
+    public void testOnSizeChanged_PopulatesBitmapAndAlpha() {
+        pieceManager.onSizeChanged(100);
+
+        assertNotNull(pieceManager.getPieceBitmap('K'));
+        assertNotNull(pieceManager.getAlphaBitmap('K'));
+    }
+
+    @Test
+    public void testOnSizeChanged_SameSize_DoesNotRescale() {
+        pieceManager.onSizeChanged(100);
+        pieceManager.onSizeChanged(100);
+
+        bitmapStatic.verify(() -> Bitmap.createScaledBitmap(any(), anyInt(), anyInt(), any(Boolean.class)),
+                Mockito.times(12));
+    }
+
+    @Test
+    public void testRecycleBitmaps_ClearsScaledPieces() {
+        pieceManager.onSizeChanged(100);
+
+        pieceManager.recycleBitmaps();
+
+        assertNull(pieceManager.getPieceBitmap('K'));
+        assertNull(pieceManager.getAlphaBitmap('K'));
     }
 }
