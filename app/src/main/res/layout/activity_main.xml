@@ -15,10 +15,10 @@
         android:orientation="horizontal"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
-        tools:ignore="UseCompoundDrawables"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UseCompoundDrawables">
 
         <TextView
             android:id="@+id/player_rating"
@@ -56,6 +56,7 @@
             android:background="@drawable/outlined_box_background"
             android:enabled="false"
             android:inputType="none"
+            android:maxWidth="480dp"
             android:text="" />
 
         <com.google.android.material.button.MaterialButton
@@ -72,6 +73,7 @@
         android:id="@+id/chessboard_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/info_container"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -139,8 +141,8 @@
 
             <ImageButton
                 android:id="@+id/puzzle_id_link"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="4dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/puzzle_id_sharing"
@@ -149,8 +151,8 @@
 
             <ImageButton
                 android:id="@+id/share_fen_button"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginStart="4dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/share_fen"
