@@ -30,8 +30,8 @@
 -dontwarn com.github.bhlangonijr.chesslib.**
 
 # Keep puzzle classes (for database reflection)
--keep class com.tacticmaster.puzzle.Puzzle { *; }
--keep class com.tacticmaster.puzzle.PuzzleGame { *; }
+-keepclassmembers class com.tacticmaster.puzzle.Puzzle { <fields>; }
+-keepclassmembers class com.tacticmaster.puzzle.PuzzleGame { <fields>; }
 
 # Ignore annotation processing warnings
 -dontwarn javax.annotation.processing.**
