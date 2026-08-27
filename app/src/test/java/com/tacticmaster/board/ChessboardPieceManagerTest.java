@@ -68,7 +68,7 @@ public class ChessboardPieceManagerTest {
         when(mockAlpha.isRecycled()).thenReturn(false);
 
         bitmapFactory = Mockito.mockStatic(BitmapFactory.class);
-        bitmapFactory.when(() -> BitmapFactory.decodeStream(any())).thenReturn(mockBitmap);
+        bitmapFactory.when(() -> BitmapFactory.decodeStream(any(), any(), any())).thenReturn(mockBitmap);
 
         bitmapStatic = Mockito.mockStatic(Bitmap.class);
         bitmapStaticClosed = false;

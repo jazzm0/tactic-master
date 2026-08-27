@@ -1,0 +1,18 @@
+-keepattributes SourceFile,LineNumberTable
+
+# Keep ACRA crash reporting classes
+-keep class org.acra.** { *; }
+-keep interface org.acra.** { *; }
+-dontwarn org.acra.**
+
+# Keep chesslib
+-keep class com.github.bhlangonijr.chesslib.** { *; }
+-dontwarn com.github.bhlangonijr.chesslib.**
+
+# Keep puzzle classes (for database reflection)
+-keepclassmembers class com.tacticmaster.puzzle.Puzzle { <fields>; }
+-keepclassmembers class com.tacticmaster.puzzle.PuzzleGame { <fields>; }
+
+# Ignore annotation processing warnings
+-dontwarn javax.annotation.processing.**
+-dontwarn com.google.auto.service.**
