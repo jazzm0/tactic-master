@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="promotion_piece_size">96dp</dimen>
+    <dimen name="piece_set_preview_size">64dp</dimen>
+</resources>
