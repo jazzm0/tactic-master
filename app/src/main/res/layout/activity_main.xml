@@ -47,7 +47,7 @@
         android:padding="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_container">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/filter_dropdown"
