@@ -162,7 +162,9 @@ public class ChessboardPieceManager {
 
     private static Bitmap loadPngBitmap(Context context, String assetPath) {
         try (InputStream inputStream = context.getAssets().open(assetPath)) {
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 1;
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
             if (isNull(bitmap)) {
                 throw new IllegalStateException("Failed to decode bitmap (asset: " + assetPath + ")");
             }
