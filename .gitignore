@@ -214,3 +214,5 @@ cython_debug/
 .idea
 *.db-journal
 !puzzle.db
+.serena
+.claude
