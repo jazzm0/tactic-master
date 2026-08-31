@@ -172,8 +172,15 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
     }
 
     private void drawPieceWithShadow(Canvas canvas, char piece, Bitmap bitmap, float left, float top) {
+        // A queued draw can outlive the bitmaps: on a fold/unfold config change the
+        // render thread may replay this view's display list after onDetachedFromWindow
+        // has already recycled the piece bitmaps. Drawing a recycled bitmap throws, so
+        // bail out defensively rather than crash.
+        if (isNull(bitmap) || bitmap.isRecycled()) {
+            return;
+        }
         Bitmap alpha = bitmapManager.getAlphaBitmap(piece);
-        if (!isNull(alpha)) {
+        if (!isNull(alpha) && !alpha.isRecycled()) {
             for (int i = ChessboardPaintFactory.EXTRUSION_LAYERS; i >= 1; i--) {
                 float d = extrusionOffset * i;
                 canvas.drawBitmap(alpha, left + d * 0.5f, top + d, extrusionPaint);
