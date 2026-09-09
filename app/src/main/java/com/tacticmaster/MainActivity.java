@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        WindowUtils.hideNavigationBar(getWindow());
+
         View rootView = findViewById(R.id.root_layout);
 
         ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
@@ -119,6 +121,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         applyDisplaySettings();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            WindowUtils.hideNavigationBar(getWindow());
+        }
     }
 
     private void applyDisplaySettings() {
