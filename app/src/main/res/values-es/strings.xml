@@ -78,6 +78,8 @@
     <string name="piece_set_hint_message">Ahora puedes elegir entre diferentes diseños de piezas de ajedrez. Elige tu favorito en Ajustes.</string>
     <string name="piece_set_hint_open_settings">Abrir ajustes</string>
     <string name="piece_set_hint_dismiss">Entendido</string>
+    <string name="piece_shadows_enabled_title">Sombras de las piezas</string>
+    <string name="piece_shadows_enabled_summary">Mostrar sombras debajo de las piezas</string>
 
     <!-- Display settings -->
     <string name="display_category_title">Pantalla</string>
