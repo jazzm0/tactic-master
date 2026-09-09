@@ -38,6 +38,7 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
         boolGetters.put(SettingKey.AUTOPLAY, s::isAutoplayEnabled);
         boolGetters.put(SettingKey.SOUND_ENABLED, s::isSoundEnabled);
         boolGetters.put(SettingKey.ANIMATIONS_ENABLED, s::areAnimationsEnabled);
+        boolGetters.put(SettingKey.PIECE_SHADOWS_ENABLED, s::arePieceShadowsEnabled);
         boolGetters.put(SettingKey.SHOW_PUZZLE_RATING, s::isShowPuzzleRating);
         boolGetters.put(SettingKey.SHOW_PUZZLE_ID, s::isShowPuzzleId);
         boolGetters.put(SettingKey.SHOW_PUZZLES_COUNT, s::isShowPuzzlesCount);
@@ -46,6 +47,7 @@ public class SettingsPreferenceDataStore extends PreferenceDataStore {
         boolSetters.put(SettingKey.AUTOPLAY, s::setAutoplayEnabled);
         boolSetters.put(SettingKey.SOUND_ENABLED, s::setSoundEnabled);
         boolSetters.put(SettingKey.ANIMATIONS_ENABLED, s::setAnimationsEnabled);
+        boolSetters.put(SettingKey.PIECE_SHADOWS_ENABLED, s::setPieceShadowsEnabled);
         boolSetters.put(SettingKey.SHOW_PUZZLE_RATING, s::setShowPuzzleRating);
         boolSetters.put(SettingKey.SHOW_PUZZLE_ID, s::setShowPuzzleId);
         boolSetters.put(SettingKey.SHOW_PUZZLES_COUNT, s::setShowPuzzlesCount);

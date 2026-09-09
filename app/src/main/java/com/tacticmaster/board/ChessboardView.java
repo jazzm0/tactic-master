@@ -179,14 +179,16 @@ public class ChessboardView extends View implements PuzzleHintView.ViewChangedLi
         if (isNull(bitmap) || bitmap.isRecycled()) {
             return;
         }
-        Bitmap alpha = bitmapManager.getAlphaBitmap(piece);
-        if (!isNull(alpha) && !alpha.isRecycled()) {
-            for (int i = ChessboardPaintFactory.EXTRUSION_LAYERS; i >= 1; i--) {
-                float d = extrusionOffset * i;
-                canvas.drawBitmap(alpha, left + d * 0.5f, top + d, extrusionPaint);
+        if (settingsManager.arePieceShadowsEnabled()) {
+            Bitmap alpha = bitmapManager.getAlphaBitmap(piece);
+            if (!isNull(alpha) && !alpha.isRecycled()) {
+                for (int i = ChessboardPaintFactory.EXTRUSION_LAYERS; i >= 1; i--) {
+                    float d = extrusionOffset * i;
+                    canvas.drawBitmap(alpha, left + d * 0.5f, top + d, extrusionPaint);
+                }
             }
+            canvas.drawBitmap(bitmap, left + shadowOffset, top + shadowOffset, shadowPaint);
         }
-        canvas.drawBitmap(bitmap, left + shadowOffset, top + shadowOffset, shadowPaint);
         canvas.drawBitmap(bitmap, left, top, bitmapPaint);
     }
 

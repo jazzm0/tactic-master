@@ -101,6 +101,14 @@ public class SettingsManager {
         setInt(SettingKey.ANIMATION_SPEED, v);
     }
 
+    public boolean arePieceShadowsEnabled() {
+        return getBool(SettingKey.PIECE_SHADOWS_ENABLED);
+    }
+
+    public void setPieceShadowsEnabled(Boolean v) {
+        setBool(SettingKey.PIECE_SHADOWS_ENABLED, v);
+    }
+
     public boolean isShowPuzzleRating() {
         return getBool(SettingKey.SHOW_PUZZLE_RATING);
     }
