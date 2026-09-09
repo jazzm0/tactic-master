@@ -108,6 +108,21 @@ public class SettingsManagerTest {
     }
 
     @Test
+    public void testPieceShadows_DefaultValue() {
+        when(mockPrefs.getBoolean(eq("piece_shadows_enabled"), eq(true))).thenReturn(true);
+
+        assertTrue(settingsManager.arePieceShadowsEnabled());
+    }
+
+    @Test
+    public void testPieceShadows_SetAndGet() {
+        settingsManager.setPieceShadowsEnabled(false);
+
+        verify(mockEditor).putBoolean("piece_shadows_enabled", false);
+        verify(mockEditor).apply();
+    }
+
+    @Test
     public void testAnimationSpeed_DefaultValue() {
         when(mockPrefs.getInt(eq("animation_speed"), eq(300))).thenReturn(300);
 

@@ -79,6 +79,8 @@
     <string name="piece_set_hint_message">You can now choose between different chess piece designs. Pick your favorite in Settings.</string>
     <string name="piece_set_hint_open_settings">Open Settings</string>
     <string name="piece_set_hint_dismiss">Got it</string>
+    <string name="piece_shadows_enabled_title">Piece Shadows</string>
+    <string name="piece_shadows_enabled_summary">Show shadows beneath the pieces</string>
 
     <!-- Display settings -->
     <string name="display_category_title">Display</string>

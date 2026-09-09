@@ -15,6 +15,7 @@ public enum SettingKey {
     SOUND_ENABLED("sound_enabled", Type.BOOL, true),
     ANIMATIONS_ENABLED("animations_enabled", Type.BOOL, true),
     ANIMATION_SPEED("animation_speed", Type.INT, 300),
+    PIECE_SHADOWS_ENABLED("piece_shadows_enabled", Type.BOOL, true),
     SHOW_PUZZLE_RATING("show_puzzle_rating", Type.BOOL, true),
     SHOW_PUZZLE_ID("show_puzzle_id", Type.BOOL, true),
     SHOW_PUZZLES_COUNT("show_puzzles_count", Type.BOOL, true),

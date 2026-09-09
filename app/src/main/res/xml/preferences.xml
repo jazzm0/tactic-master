@@ -65,6 +65,12 @@
             android:title="@string/piece_set_title"
             tools:ignore="Instantiatable" />
 
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="piece_shadows_enabled"
+            android:summary="@string/piece_shadows_enabled_summary"
+            android:title="@string/piece_shadows_enabled_title" />
+
     </PreferenceCategory>
 
     <!-- Display Section -->
