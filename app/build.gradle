@@ -63,6 +63,13 @@ dependencies {
     implementation libs.material
     implementation libs.preference
     implementation libs.chesslib
+
+    // Force a current androidx.lifecycle: the 2.6.2 bundled lint check is compiled
+    // against an obsolete lint API (14) and fails lintRelease under AGP 9 (lint API 16).
+    constraints {
+        implementation(libs.lifecycle.runtime)
+        implementation(libs.lifecycle.runtime.ktx)
+    }
     implementation libs.androidsvg
     implementation libs.acra.core
     implementation libs.acra.mail
